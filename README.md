@@ -28,7 +28,7 @@ the future.
 
 ItemVersion follows the [CalVer](https://calver.org/) versioning convention.
 
-This is the format: `<year>.<weeknumber>.<patch>`.
+This is the format: `year.weeknumber.patch`.
 
 Every week (on Tuesday at 16:00 UTC), a data refresh occurs and the date parts of the version will
 be bumped and released to CurseForge. Intraweek development releases will bump the patch part of the

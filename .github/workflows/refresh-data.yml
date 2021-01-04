@@ -9,20 +9,20 @@ on:
   workflow_dispatch:
   schedule:
   # run on tuesdays at 16:00 UTC (1 hour after wow weekly reset)
+  # also, by default, this runs on the last commit on the default branch (master)
   - cron:  '0 16 * * 2'
 
 jobs:
-  build:
+  refresh:
+    name: Refresh item data
     runs-on: ubuntu-latest
     steps:
+
     - name: Checkout scrape code
       uses: actions/checkout@v2
       with:
-        repository: git@github.com:t-mart/ItemVersion-Scrape.git
-
-    - name: debug
-      run: |
-        echo pwd
+        repository: t-mart/ItemVersion-Scrape
+        token: ${{ secrets.GH_PAT_FOR_ITEM_VERSION_SCRAPE }}
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -48,7 +48,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ env.ITEM_VERSION_SCRAPE_DATA_CACHE }}
-        key: data-${{ steps.get-date.outputs.date }}
+        key: scrape-data-debug1-${{ steps.get-date.outputs.date }}
 
     - name: Install system dependencies
       run: |
@@ -59,14 +59,60 @@ jobs:
         poetry config cache-dir ${{ env.POETRY_CACHE }}
         poetry install -vvv
 
-    # - name: Run wowitemversion
-    #   run: |
-    #     poetry run wowitemversion
+    - name: Refresh Data.lua
+      run: |
+        poetry run scrape > Data.lua
 
-    # - name: Upload data cache artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: data-cache
-    #     path: ${{ env.ITEM_VERSION_SCRAPE_DATA_CACHE }}
+    - name: Upload generated lua artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Data.lua
+        path: Data.lua
 
-    # TODO make an artifact of the generated lua file?
+  update:
+    name: Update repository
+    runs-on: ubuntu-latest
+    needs: refresh
+    steps:
+
+    - name: Checkout addon code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install bumpver
+      run: |
+        pip install bumpver
+
+    # actions/download-artifact@v2 won't restore an artifact at a path that currently exists
+    - name: Remove current Data.lua
+      run: |
+        rm ItemVersion/Data.lua
+
+    - name: Download generated lua artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: Data.lua
+
+    - name: Commit Data.lua changes
+      run: |
+        mv Data.lua ItemVersion
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add ItemVersion/Data.lua
+        git status
+        git commit -m "Refresh item data"
+
+    - name: Bump version
+      run: |
+        bumpver update --dry && bumpver update || bumpver update --patch
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        tags: true

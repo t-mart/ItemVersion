@@ -26,17 +26,18 @@ the future.
 
 ## Versioning/Updates
 
-ItemVersion follows the [CalVer](https://calver.org/) versioning convention. Every week, a data
-refresh occurs and the date part of the version will be and released to CurseForge. Intraweek
-releases will bump the patch part of the version.
+ItemVersion follows the [CalVer](https://calver.org/) versioning convention.
+
+Every week (on Tuesday at 16:00 UTC), a data refresh occurs and the date part of the version will be
+bumped and released to CurseForge. Intraweek releases will bump the patch part of the version.
 
 ## See a problem? Want a feature?
 
 - Found an item you think is incorrectly versioned? Verify it
-[wowhead.com](https://www.wowhead.com/).
-  - Unfortunately, you will find that ItemVersion is more often than not correct about its claims.
-  One area this is noticeable in is items added towards the end of an expansion that are actually
-  used in the _next_ expansion. Don't blame me -- blame the devs!
+[wowhead.com](https://www.wowhead.com/). Unfortunately, you will find that ItemVersion is more often
+than not correct about its claims. One area this is noticeable in is items added towards the end of
+an expansion that are actually used in the _next_ expansion. Don't blame me -- blame the devs!
+- Is an item missing?
 - Still have an issue or want to request a feature? Create an issue on the
 [GitHub project page](https://github.com/t-mart/ItemVersion/issues)
 - Or fork the project and make a [pull request](https://github.com/t-mart/ItemVersion/pulls)!

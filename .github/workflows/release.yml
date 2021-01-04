@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
     name: Release
     runs-on: ubuntu-latest
     steps:

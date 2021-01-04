@@ -2,3 +2,9 @@ package-as: ItemVersion
 
 move-folders:
   ItemVersion/ItemVersion: ItemVersion
+
+ignore:
+  - README.md
+  - CHANGELOG.md
+  - release.sh
+  - bumpver.toml

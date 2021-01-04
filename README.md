@@ -24,6 +24,12 @@ version and expansion, such as `Version: 9.0.1.36216, Expac: Shadowlands`.
 Just install the addon like normal and mouse over any item! More configuration may be available in
 the future.
 
+## Versioning/Updates
+
+ItemVersion follows the [CalVer](https://calver.org/) versioning convention. Every week, a data
+refresh occurs and the date part of the version will be and released to CurseForge. Intraweek
+releases will bump the patch part of the version.
+
 ## See a problem? Want a feature?
 
 - Found an item you think is incorrectly versioned? Verify it

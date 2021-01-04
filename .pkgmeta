@@ -1,1 +1,4 @@
 package-as: ItemVersion
+
+move-folders:
+  ItemVersion/ItemVersion: ItemVersion

@@ -3,8 +3,7 @@ name: Refresh Data
 env:
   PIP_CACHE: ~/.pip_cache
   POETRY_CACHE: ~/.poetry_cache
-  WOW_ITEM_VERSION_DATA_CACHE: ~/.cache/wowitemversion
-  WOW_ITEM_VERSION_BUILD_DIR: dist/ItemVersion
+  ITEM_VERSION_SCRAPE_DATA_CACHE: ~/.cache/itemversionscrape
 
 on:
   workflow_dispatch:
@@ -16,8 +15,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout scrape code
       uses: actions/checkout@v2
+      with:
+        repository: git@github.com:t-mart/ItemVersion-Scrape.git
+
+    - name: debug
+      run: |
+        echo pwd
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -42,7 +47,7 @@ jobs:
     - name: Retrieve data cache
       uses: actions/cache@v2
       with:
-        path: ${{ env.WOW_ITEM_VERSION_DATA_CACHE }}
+        path: ${{ env.ITEM_VERSION_SCRAPE_DATA_CACHE }}
         key: data-${{ steps.get-date.outputs.date }}
 
     - name: Install system dependencies
@@ -54,18 +59,14 @@ jobs:
         poetry config cache-dir ${{ env.POETRY_CACHE }}
         poetry install -vvv
 
-    - name: Run wowitemversion
-      run: |
-        poetry run wowitemversion
+    # - name: Run wowitemversion
+    #   run: |
+    #     poetry run wowitemversion
 
-    - name: Upload data cache artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: data-cache
-        path: ${{ env.WOW_ITEM_VERSION_DATA_CACHE }}
+    # - name: Upload data cache artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: data-cache
+    #     path: ${{ env.ITEM_VERSION_SCRAPE_DATA_CACHE }}
 
-    - name: Upload addon artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ItemVersion
-        path: ${{ env.WOW_ITEM_VERSION_BUILD_DIR }}
+    # TODO make an artifact of the generated lua file?

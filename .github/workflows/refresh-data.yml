@@ -1,0 +1,71 @@
+name: Refresh Data
+
+env:
+  PIP_CACHE: ~/.pip_cache
+  POETRY_CACHE: ~/.poetry_cache
+  WOW_ITEM_VERSION_DATA_CACHE: ~/.cache/wowitemversion
+  WOW_ITEM_VERSION_BUILD_DIR: dist/ItemVersion
+
+on:
+  workflow_dispatch:
+  schedule:
+  # run on tuesdays at 16:00 UTC (1 hour after wow weekly reset)
+  - cron:  '0 16 * * 2'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Retrieve dependency cache
+      id: dep-cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ env.POETRY_CACHE }}
+          ${{ env.PIP_CACHE }}
+        key: deps-${{ hashFiles('poetry.lock') }}
+
+    - name: Get Date (for data cache hash)
+      id: get-date
+      run: |
+        echo "::set-output name=date::$(/bin/date -u "+%GW%V")"
+      shell: bash
+
+    - name: Retrieve data cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.WOW_ITEM_VERSION_DATA_CACHE }}
+        key: data-${{ steps.get-date.outputs.date }}
+
+    - name: Install system dependencies
+      run: |
+        python -m pip install --cache-dir ${{ env.PIP_CACHE }} --upgrade pip poetry
+
+    - name: Install project dependencies
+      run: |
+        poetry config cache-dir ${{ env.POETRY_CACHE }}
+        poetry install -vvv
+
+    - name: Run wowitemversion
+      run: |
+        poetry run wowitemversion
+
+    - name: Upload data cache artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: data-cache
+        path: ${{ env.WOW_ITEM_VERSION_DATA_CACHE }}
+
+    - name: Upload addon artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ItemVersion
+        path: ${{ env.WOW_ITEM_VERSION_BUILD_DIR }}

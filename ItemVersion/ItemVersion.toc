@@ -1,0 +1,13 @@
+## Interface: 90002
+## Title: ItemVersion
+## Author: Tim Martin
+## Version: 2020.53.0
+## Notes: Shows what version of the game an item is from in the tooltip
+## X-Curse-Project-ID: 433258
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+Init.lua
+Data.lua
+Api.lua
+Tooltip.lua

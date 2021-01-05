@@ -1,7 +1,7 @@
 ## Interface: 90002
 ## Title: ItemVersion
 ## Author: Tim Martin
-## Version: 2021.1.6
+## Version: 2021.1.7
 ## Notes: Shows what version of the game an item is from in the tooltip
 ## X-Curse-Project-ID: 433258
 ## DefaultState: Enabled

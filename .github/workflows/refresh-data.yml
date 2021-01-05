@@ -87,11 +87,6 @@ jobs:
       run: |
         pip install bumpver
 
-    # actions/download-artifact@v2 won't restore an artifact at a path that currently exists
-    - name: Remove current Data.lua
-      run: |
-        rm ItemVersion/Data.lua
-
     - name: Download generated lua artifact
       uses: actions/download-artifact@v2
       with:

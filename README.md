@@ -7,7 +7,7 @@
 ## Useful for
 
 - Clearing your bags and bank of old stuff
-- Identifying gear from your transmog runs
+- Identifying loot from your transmog runs
 - Looking back on WoW history
 
 ## Features
@@ -16,8 +16,8 @@
 version and expansion name, such as `Version: 9.0.1.36216, Expac: Shadowlands`.
 - Where-you-need-it accesiblity in the item tooltip.
 - A queriable library for retrieving this information for other addons. (Docs coming soon.)
-- Weekly updates with the latest items. A version will automatically be released every Tuesday at
-16:00 UTC, just slightly after reset.
+- Weekly updates with the latest items. A refreshed release will automatically occur (at least)
+every Tuesday at 16:00 UTC, just slightly after reset.
 - Open source visibility.
 
 ## Usage
@@ -36,7 +36,8 @@ the future.
 
   If wowhead _does_ in fact disagree with the data in ItemVersion, please create a GitHub issue.
 
-- **An item is missing** or **I found a bug** or **I want to request a feature.**
+- **An item actually is misversioned** or **An item is missing** or **I found a bug** or
+**I want to request a feature.**
 
   Create an issue on the [GitHub project page](https://github.com/t-mart/ItemVersion/issues)
 
@@ -44,7 +45,7 @@ the future.
 
   Fork the project and make a [pull request](https://github.com/t-mart/ItemVersion/pulls)!
 
-## Versioning/Updates
+## Versioning/Updates for the project
 
 ItemVersion, the project, follows the [CalVer](https://calver.org/) versioning convention.
 

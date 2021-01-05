@@ -51,4 +51,4 @@ ItemVersion, the project, follows the [CalVer](https://calver.org/) versioning c
 This is the format: `year.weeknumber.patch`.
 
 Data refresh releases will bump the `year.weeknumber` part. Intraweek development releases will bump
-the patch part.
+the `patch` part.

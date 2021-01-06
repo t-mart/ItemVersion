@@ -11,6 +11,10 @@ jobs:
 
     - name: Checkout addon code
       uses: actions/checkout@v2
+      # need to use the personal access token (PAT) so that this workflow can trigger other
+      # workflows. See https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#triggering-new-workflows-using-a-personal-access-token
+      with:
+        token: ${{ secrets.GH_PAT }}
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v2

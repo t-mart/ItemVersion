@@ -53,3 +53,10 @@ This is the format: `year.weeknumber.patch`.
 
 Data refresh releases will bump the `year.weeknumber` part. Intraweek development releases will bump
 the `patch` part.
+
+## License
+
+Copyright 2020 Tim Martin
+
+Licensed under the GPLv3:
+[https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)

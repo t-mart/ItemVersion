@@ -13,6 +13,13 @@ end
 
 local function OnTooltipSetItem(tooltip)
   local _, link = tooltip:GetItem()
+
+  -- happens when looking at crafting spells at profession trainer, despite this function
+  -- only being called on item tooltips: blizzard strangeness.
+  if not link then
+    return
+  end
+
   local itemId = tonumber(strmatch(link, ':(%w+)'))
   local left, right = tooltipString(itemId)
   tooltip:AddDoubleLine(left, right);

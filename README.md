@@ -1,5 +1,11 @@
 # ItemVersion
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/releases)
+[![CI](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml)
+[![GitHub issues](https://img.shields.io/github/issues/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/issues)
+[![GitHub](https://img.shields.io/github/license/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/blob/master/LICENSE)
+[![CI](https://img.shields.io/badge/packaged%20by-wap-d33682)](https://github.com/t-mart/wap)
+
 ![Montage](https://i.imgur.com/9PVkwkz.png)
 
 **ItemVersion adds information to your tooltip about when an item was added to World of Warcraft.**
@@ -29,17 +35,17 @@ the future.
 
 - **I think an item has the wrong version.**
 
-  Verify it [wowhead.com](https://www.wowhead.com/). Unfortunately, you will find that ItemVersion
-  is more often than not correct about its claims. One area this is noticeable in is items added
-  towards the end of an expansion that are actually used in the _next_ expansion. Don't blame me --
-  ItemVersion just report what it sees.
-
-  If wowhead _does_ in fact disagree with the data in ItemVersion, please create a GitHub issue.
+  First, verify it on [wowhead.com](https://www.wowhead.com/). If wowhead _does_ in fact disagree
+  with the data in ItemVersion, please create a GitHub issue.
+  
+  Often, items are added towards the end of an expansion that actually used in the _next_ expansion,
+  making them appear to have too early of a version. Unfortunately, there's not much we can do in
+  these cases -- the canonical version is better than making something up.
 
 - **An item actually is misversioned** or **An item is missing** or **I found a bug** or
 **I want to request a feature.**
 
-  Create an issue on the [GitHub project page](https://github.com/t-mart/ItemVersion/issues)
+  Create an [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues)
 
 - **I want to submit a change**
 

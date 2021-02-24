@@ -10,6 +10,3 @@ push = false
 "bumpver.toml" = [
     'current_version = "{version}"',
 ]
-"ItemVersion/ItemVersion.toc" = [
-    "## Version: {version}"
-]

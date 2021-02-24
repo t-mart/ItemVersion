@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    # Run only on pushing a tag
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install wap
+      run: |
+        pip install wow-addon-packager
+
+    - name: Upload
+      run: |
+        wap upload --addon-version "$(git describe --always)" --release-type release
+      env:
+        WAP_CURSEFORGE_TOKEN: ${{ secrets.CF_API_KEY }}
+
+    - name: Upload GitHub release assets
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: dist/*.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true

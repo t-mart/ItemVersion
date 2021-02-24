@@ -1,0 +1,21 @@
+name: ItemVersion
+wow-versions:
+  - 9.0.2
+curseforge:
+  project-id: 433258
+  changelog: CHANGELOG.md
+  addon-name: itemversion
+dirs:
+  - path: ItemVersion
+    toc:
+      tags:
+        Title: ItemVersion
+        Author: Tim Martin
+        Notes: Shows what version of the game an item is from in the tooltip
+        DefaultState: Enabled
+        LoadOnDemand: 0
+      files:
+        - Init.lua
+        - Data.lua
+        - Api.lua
+        - Tooltip.lua

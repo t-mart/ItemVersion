@@ -1,4 +1,6 @@
-local AddonName, Private = ...
+local _, Private = ...
+
+local ItemVersion = ItemVersion
 
 function ItemVersion.getItemVersion(itemId)
     return Private.versionIdToVersion[Private.itemIdToVersionId[itemId]]

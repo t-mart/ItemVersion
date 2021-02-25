@@ -45,7 +45,7 @@ jobs:
 
     - name: Upload
       run: |
-        wap upload --addon-version "$(git describe --always)" --release-type release
+        wap upload --addon-version "$(git describe --always --tags --exact-match)" --release-type release
       env:
         WAP_CURSEFORGE_TOKEN: ${{ secrets.CF_API_KEY }}
 

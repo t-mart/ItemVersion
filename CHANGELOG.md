@@ -1,5 +1,11 @@
 # ItemVersion Changelog
 
+## [2021.8.2] - 2021-02-24
+
+### Fixed
+
+- Use tagged version in CI workflow
+
 ## [2021.8.1] - 2021-02-24
 
 ### Fixed

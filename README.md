@@ -3,8 +3,9 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/releases)
 [![CI](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml)
 [![GitHub issues](https://img.shields.io/github/issues/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/issues)
-[![GitHub](https://img.shields.io/github/license/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/blob/master/LICENSE)
-[![CI](https://img.shields.io/badge/packaged%20by-wap-d33682)](https://github.com/t-mart/wap)
+[![License on GitHub](https://img.shields.io/github/license/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/blob/master/LICENSE)
+[![Packaged by wap](https://img.shields.io/badge/packaged%20by-wap-d33682)](https://github.com/t-mart/wap)
+[![Hosted on wap](https://img.shields.io/badge/hosted%20on-CurseForge-F16436)](https://www.curseforge.com/wow/addons/itemversion)
 
 ![Montage](https://i.imgur.com/9PVkwkz.png)
 
@@ -37,7 +38,7 @@ the future.
 
   First, verify it on [wowhead.com](https://www.wowhead.com/). If wowhead _does_ in fact disagree
   with the data in ItemVersion, please create a GitHub issue.
-  
+
   Often, items are added towards the end of an expansion that actually used in the _next_ expansion,
   making them appear to have too early of a version. Unfortunately, there's not much we can do in
   these cases -- the canonical version is better than making something up.

@@ -3,8 +3,8 @@ wow-versions:
   - 9.0.2
 curseforge:
   project-id: 433258
-  changelog: CHANGELOG.md
-  addon-name: itemversion
+  changelog-file: CHANGELOG.md
+  project-slug: itemversion
 dirs:
   - path: ItemVersion
     toc:

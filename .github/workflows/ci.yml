@@ -43,11 +43,24 @@ jobs:
       run: |
         pip install wow-addon-packager
 
+    - name: Get version from tag
+      id: version-tag
+      run: |
+        echo "::set-output name=version::$(git describe --always --tags --exact-match)"
+      shell: bash
+
     - name: Upload
       run: |
-        wap upload --addon-version "$(git describe --always --tags --exact-match)" --release-type release
+        wap build --addon-version "$ITEMVERSION_RELEASE_VERSION"
+      env:
+        ITEMVERSION_RELEASE_VERSION: ${{ steps.version-tag.outputs.version }}
+
+    - name: Upload
+      run: |
+        wap upload --addon-version "$ITEMVERSION_RELEASE_VERSION" --release-type release
       env:
         WAP_CURSEFORGE_TOKEN: ${{ secrets.CF_API_KEY }}
+        ITEMVERSION_RELEASE_VERSION: ${{ steps.version-tag.outputs.version }}
 
     - name: Upload GitHub release assets
       uses: svenstaro/upload-release-action@v2

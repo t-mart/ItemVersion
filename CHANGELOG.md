@@ -1,8 +1,13 @@
 # ItemVersion Changelog
 
+This file keeps track of changes to ItemVersion over time.
+
+Every week, a data refresh release of this project occurs. These releases will not be documented
+here because it is an automated process.
+
 ## Unreleased
 
-### Change
+### Changed
 
 - Upgrade CI workflow for wap 0.6.0
 
@@ -16,11 +21,12 @@
 
 ### Fixed
 
-- Fixed luacheck linting errors
+- Fixed luacheck errors
 
 ### Added
 
 - This changelog!
+- Added luacheck to project
 
 ### Changed
 

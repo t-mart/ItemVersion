@@ -1,9 +1,0 @@
-package-as: ItemVersion
-
-move-folders:
-  ItemVersion/ItemVersion: ItemVersion
-
-ignore:
-  - CHANGELOG.md
-  - release.sh
-  - bumpver.toml

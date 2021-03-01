@@ -2,19 +2,19 @@ local _, Private = ...
 
 local ItemVersion = ItemVersion
 
-function ItemVersion.getItemVersion(itemId)
-    return Private.versionIdToVersion[Private.itemIdToVersionId[itemId]]
+function ItemVersion.getVersion(itemId)
+  -- caller must ensure that itemId is a number
+
+  local versionId = Private.itemIdToVersionId[itemId]
+
+  -- item id not found in database
+  if not versionId then
+    return nil
+  end
+
+  return Private.versionIdToVersion[versionId]
 end
 
-function ItemVersion.getItemExpac(itemId)
-    return
-        Private.majorToExpac[
-          Private.versionIdToVersion[
-            Private.itemIdToVersionId[itemId]
-          ].major
-        ]
-end
-
-function ItemVersion.versionString(version)
-  return format("%d.%d.%d.%d", version.major, version.minor, version.patch, version.build)
+function ItemVersion.getVersionExpac(version)
+  return Private.majorToExpac[version.major]
 end

@@ -42,7 +42,8 @@ $ wap build
 $ wap dev-install -w "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns"
 ```
 
-Then, load up WoW and you'll be using your development addon.
+Then, load up WoW and you'll be using your development addon. Run `/itemversion`
+to ensure that the version is `dev`.
 
 ## Versioning
 

@@ -13,10 +13,15 @@ files["ItemVersion/Data.lua"] = {
 }
 
 globals = {
-	"format",  -- provided by WoW
-	"strmatch",  -- provided by WoW
-	"C_Timer",  -- provided by WoW
-	"GameTooltip",  -- provided by WoW
-	"GetAddOnMetadata",  -- provided by WoW
-	"ItemVersion"  -- provided by us.
+	-- provided by WoW API
+	"format",
+	"strmatch",
+	"C_Timer",
+	"GameTooltip",
+	"GetAddOnMetadata",
+	"SlashCmdList",
+
+	-- provided by ItemVersion
+	"ItemVersion",
+	"SLASH_ITEMVERSION1",
 }

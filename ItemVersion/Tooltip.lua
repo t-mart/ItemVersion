@@ -20,9 +20,16 @@ local function OnTooltipSetItem(tooltip)
     return
   end
 
-  local itemId = tonumber(strmatch(link, ':(%w+)'))
+  local itemId = tonumber(strmatch(link, 'item:(%d*)'))
+
+  -- happens in when looking at crafting reagents.
+  -- blizzard broke tooltips in some cases
+  if not itemId then
+    return
+  end
+
   local left, right = tooltipString(itemId)
-  tooltip:AddDoubleLine(left, right);
+  tooltip:AddDoubleLine(left, right)
   tooltip:Show()
 end
 

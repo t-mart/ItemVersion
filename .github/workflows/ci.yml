@@ -41,7 +41,7 @@ jobs:
 
     - name: Install wap
       run: |
-        pip install wow-addon-packager
+        pip install wow-addon-packager==0.7.1
 
     - name: Get version from tag
       id: version-tag

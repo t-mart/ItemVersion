@@ -17,5 +17,6 @@ globals = {
 	"strmatch",  -- provided by WoW
 	"C_Timer",  -- provided by WoW
 	"GameTooltip",  -- provided by WoW
+	"GetAddOnMetadata",  -- provided by WoW
 	"ItemVersion"  -- provided by us.
 }

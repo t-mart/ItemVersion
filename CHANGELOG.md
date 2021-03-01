@@ -8,6 +8,10 @@ here because it is an automated process.
 
 ## [2021.8.3] - 2021-02-28
 
+### Added
+
+- When an item's version cannot be found, print a helpful error
+
 ### Fixed
 
 - Make item id extraction from tooltip links more robust

@@ -49,7 +49,7 @@ jobs:
         echo "::set-output name=version::$(git describe --always --tags --exact-match)"
       shell: bash
 
-    - name: Upload
+    - name: Build
       run: |
         wap build --addon-version "$ITEMVERSION_RELEASE_VERSION"
       env:

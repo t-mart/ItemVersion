@@ -11,6 +11,7 @@ here because it is an automated process.
 ### Added
 
 - When an item's version cannot be found, print a helpful error
+- A slash command, `/itemversion`, that prints out the version of the addon
 
 ### Fixed
 

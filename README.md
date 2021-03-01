@@ -52,18 +52,9 @@ the future.
 
   Fork the project and make a [pull request](https://github.com/t-mart/ItemVersion/pulls)!
 
-## Versioning/Updates for the project
-
-ItemVersion, the project, follows the [CalVer](https://calver.org/) versioning convention.
-
-This is the format: `year.weeknumber.patch`.
-
-Data refresh releases will bump the `year.weeknumber` part. Intraweek development releases will bump
-the `patch` part.
-
 ## License
 
-Copyright 2020 Tim Martin
+Copyright 2021 Tim Martin
 
 Licensed under the GPLv3:
 [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)

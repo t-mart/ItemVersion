@@ -20,7 +20,14 @@ local function OnTooltipSetItem(tooltip)
     return
   end
 
-  local itemId = tonumber(strmatch(link, ':(%w+)'))
+  local itemIdStr = strmatch(link, 'item:(%d*)')
+
+  if not itemIdStr then
+    return
+  end
+
+  local itemId = tonumber(itemIdStr)
+
   local left, right = tooltipString(itemId)
   tooltip:AddDoubleLine(left, right);
   tooltip:Show()

@@ -6,6 +6,13 @@ three sections: Added, Fixed, and Changed
 Every week, a data refresh release of this project occurs. These releases will not be documented
 here because it is an automated process.
 
+## [2021.11.2] - 2021-03-18
+
+### Changed
+
+- Bump Interface version to 9.0.5
+- Upgrade CI workflow for wap 0.8.1
+
 ## [2021.8.3] - 2021-02-28
 
 ### Added

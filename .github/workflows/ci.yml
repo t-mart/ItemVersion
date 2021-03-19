@@ -41,7 +41,7 @@ jobs:
 
     - name: Install wap
       run: |
-        pip install wow-addon-packager==0.7.1
+        pip install wow-addon-packager==0.8.1
 
     - name: Get version from tag
       id: version-tag
@@ -49,9 +49,9 @@ jobs:
         echo "::set-output name=version::$(git describe --always --tags --exact-match)"
       shell: bash
 
-    - name: Build
+    - name: Package
       run: |
-        wap build --addon-version "$ITEMVERSION_RELEASE_VERSION"
+        wap package --addon-version "$ITEMVERSION_RELEASE_VERSION"
       env:
         ITEMVERSION_RELEASE_VERSION: ${{ steps.version-tag.outputs.version }}
 

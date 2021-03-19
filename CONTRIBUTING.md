@@ -71,7 +71,7 @@ of truth for the current version.**
 2. On the master branch, this new version is incremented to with the `bumpver`.
 
    ``` console
-   $ bumpversion update --patch
+   $ bumpver update --patch
    ```
 
    This command increments the version in `bumpver.toml`, creates a commit with this change

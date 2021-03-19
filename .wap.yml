@@ -1,11 +1,11 @@
 name: ItemVersion
 wow-versions:
-  - 9.0.2
+  - 9.0.5
 curseforge:
   project-id: 433258
   changelog-file: CHANGELOG.md
   project-slug: itemversion
-dirs:
+addons:
   - path: ItemVersion
     toc:
       tags:

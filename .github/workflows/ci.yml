@@ -51,13 +51,13 @@ jobs:
 
     - name: Package
       run: |
-        wap package --addon-version "$ITEMVERSION_RELEASE_VERSION"
+        wap package --version "$ITEMVERSION_RELEASE_VERSION"
       env:
         ITEMVERSION_RELEASE_VERSION: ${{ steps.version-tag.outputs.version }}
 
     - name: Upload
       run: |
-        wap upload --addon-version "$ITEMVERSION_RELEASE_VERSION" --release-type release
+        wap upload --version "$ITEMVERSION_RELEASE_VERSION" --release-type release
       env:
         WAP_CURSEFORGE_TOKEN: ${{ secrets.CF_API_KEY }}
         ITEMVERSION_RELEASE_VERSION: ${{ steps.version-tag.outputs.version }}

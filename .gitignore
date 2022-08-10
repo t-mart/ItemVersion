@@ -1,2 +1,7 @@
 dist
 .venv
+Api.lua
+Data.lua
+ItemVersion.toc
+Init.lua
+Tooltip.lua

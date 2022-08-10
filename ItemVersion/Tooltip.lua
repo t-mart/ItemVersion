@@ -35,9 +35,9 @@ local function OnTooltipSetItem(tooltip)
 
   -- if item is not in DB
   if not version then
-	local left = format('|cFFCA3C3C%s|r %s', 'ItemId', itemId)
-	local right = format('|cFFCA3C3C|r %s',
-                       'Not Found by Addon')
+	local left = format('|c80CA3C3C%s|r %s', 'ItemId', itemId)
+	local right = format('|c80CA3C3C%s',
+                       'Not in ItemVersion')
 	tooltip:AddDoubleLine(left, right)
 	tooltip:Show()
     return

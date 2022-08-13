@@ -1,14 +1,6 @@
 local versionLabelText = "Version"
 local expacLabelText = "Expansion"
 
-local notInDBTextFormat = "|cFFFF0000ERROR|r - ItemVersion v" ..
-                            ItemVersion.version ..
-                            " - Could not find game version for item with id |cFFFFFF00%d|r" ..
-                            ". You may be running an old version of ItemVersion or this " ..
-                            "item may not be in our database. Please upgrade to the " ..
-                            "latest version from CurseForge and/or create an issue on the " ..
-                            "GitHub project page."
-
 local function versionString(version)
   return format("%d.%d.%d.%d", version.major, version.minor, version.patch,
                 version.build)
@@ -43,7 +35,11 @@ local function OnTooltipSetItem(tooltip)
 
   -- if item is not in DB
   if not version then
-    print(format(notInDBTextFormat, itemId))
+	local left = format('|c80CA3C3C%s|r %s', 'ItemId', itemId)
+	local right = format('|c80CA3C3C%s',
+                       'Not in ItemVersion')
+	tooltip:AddDoubleLine(left, right)
+	tooltip:Show()
     return
   end
 

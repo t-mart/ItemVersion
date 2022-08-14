@@ -1,6 +1,6 @@
 name: ItemVersion
 wow-versions:
-  - 9.0.5
+  - 9.2.5
 curseforge:
   project-id: 433258
   changelog-file: CHANGELOG.md
@@ -16,6 +16,7 @@ addons:
         LoadOnDemand: 0
       files:
         - Init.lua
+        - Expac.lua
         - Data.lua
         - Api.lua
         - Tooltip.lua

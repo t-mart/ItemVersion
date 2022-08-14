@@ -3,16 +3,11 @@ local _, AddonTable = ...
 local versionLabelText = "Version"
 local expacLabelText = "Expansion"
 
-local function versionString(version)
-  return format("%d.%d.%d.%d", version.major, version.minor, version.patch,
-                version.build)
-end
-
 local function tooltipString(itemId)
   local version = AddonTable.getItemVersion(itemId)
   local left, right
   if version ~= nil then
-    left = format("|cFF1F77B4%s|r %s", versionLabelText, versionString(version))
+    left = format("|cFF1F77B4%s|r %s", versionLabelText, AddonTable.buildVersionString(version))
     right = format("|cFF1F77B4%s|r %s", expacLabelText,
                    AddonTable.getVersionExpac(version).canonName)
   else

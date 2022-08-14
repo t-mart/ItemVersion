@@ -23,6 +23,15 @@ function AddonTable.getVersionExpac(version)
   return AddonTable.majorToExpac[version.major]
 end
 
+---Return a dot-separated string of the components of version
+---@param version {major: number, minor: number, patch: number, build: number }
+---@return string
+function AddonTable.buildVersionString(version)
+  return format("%d.%d.%d.%d", version.major, version.minor, version.patch,
+                version.build)
+end
+
 -- expose API functions
 ItemVersion.getItemVersion = AddonTable.getItemVersion
 ItemVersion.getVersionExpac = AddonTable.getVersionExpac
+ItemVersion.buildVersionString = AddonTable.buildVersionString

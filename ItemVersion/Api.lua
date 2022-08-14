@@ -1,20 +1,28 @@
-local _, Private = ...
+local _, AddonTable = ...
 
-local ItemVersion = ItemVersion
-
-function ItemVersion.getVersion(itemId)
+---Get the version for a given item, or nil if it does not exist in the database
+---@param itemId number
+---@return {major: number, minor: number, patch: number, build: number } | nil
+function AddonTable.getItemVersion(itemId)
   -- caller must ensure that itemId is a number
-
-  local versionId = Private.itemIdToVersionId[itemId]
+  local versionId = AddonTable.itemIdToVersionId[itemId]
 
   -- item id not found in database
-  if not versionId then
+  if versionId == nil then
     return nil
   end
 
-  return Private.versionIdToVersion[versionId]
+  return AddonTable.versionIdToVersion[versionId]
 end
 
-function ItemVersion.getVersionExpac(version)
-  return Private.majorToExpac[version.major]
+---Get the expansion for a given version (from it's major field), or nil if it does not exist in the
+---database.
+---@param version { major: number }
+---@return {canonName:string,shortName:string}|nil asdf
+function AddonTable.getVersionExpac(version)
+  return AddonTable.majorToExpac[version.major]
 end
+
+-- expose API functions
+ItemVersion.getItemVersion = AddonTable.getItemVersion
+ItemVersion.getVersionExpac = AddonTable.getVersionExpac

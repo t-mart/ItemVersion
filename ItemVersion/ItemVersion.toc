@@ -1,0 +1,13 @@
+## Interface: 90205
+## Version: 2022.17.0
+## Title: ItemVersion
+## Author: Tim Martin
+## Notes: Shows what version of the game an item is from in the tooltip
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+Init.lua
+Expac.lua
+Data.lua
+Api.lua
+Tooltip.lua

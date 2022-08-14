@@ -1,18 +1,15 @@
 # Contributing
 
-First off, thank you for considering contributing to ItemVersion!
-It's people like *you* who make it such a great tool for everyone.
+First off, thank you for considering contributing to ItemVersion! It's people like _you_ who make it
+such a great tool for everyone.
 
-* No contribution is too small!
-  Please submit as many fixes for typos and grammar bloopers as you can!
-* Don't be afraid to open half-finished PRs, and ask questions if something is unclear!
-* Try to limit each pull request to *one* change only.
-* Since we squash on merge, it's up to you how you handle updates to the master branch.
-  Whether you prefer to rebase on master or merge master into your branch, do whatever is more
-  comfortable for you.
-* Please document how you tested your changes in your PR
-* Make sure your changes pass the status checks.
-  You won't get any feedback until it's green unless you ask for it.
+- No contribution is too small! Please submit as many fixes for typos and grammar bloopers as you
+  can!
+- Don't be afraid to open half-finished PRs, and ask questions if something is unclear!
+- PRs should be made on feature branches.
+- Try to limit each pull request to _one_ change only.
+- Please document how you tested your changes in your PR.
+- Make sure your changes pass the status checks.
 
 ## Formatting
 
@@ -30,20 +27,19 @@ faster than waiting for the CI checks to run.
 
 ## Testing Locally
 
-ItemVersion uses [`wap`](https://wow-addon-packager.readthedocs.io/en/stable/) to package itself.
-(Disclaimer: I'm the author of that project.)
+On Windows, you can create a _junction_ (kinda like a symlink) from your development source
+directory to your addons directory.
 
-Once you've installed `wap`, you can build and install the addon into your local WoW installation
-by running:
+A script has been provided that does just that.
 
-``` console
-$ wap build
+To run it, in Powershell, run the following
 
-$ wap dev-install -w "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns"
+```pwsh
+.\dev-install.ps1
 ```
 
-Then, load up WoW and you'll be using your development addon. Run `/itemversion`
-to ensure that the version is `dev`.
+Then, you can just edit the files in this development repository and they will be linked to the
+Addons directory -- no more copy & pasting.
 
 ## Versioning
 
@@ -55,8 +51,8 @@ Data refresh releases will bump the `year.weeknumber` part. Intraweek developmen
 the `patch` part.
 
 To increment versions, we use [BumpVer](https://gitlab.com/mbarkhau/pycalver), which provides the
-`bumpver` command. Its configuration file is located at `bumpver.toml`. **This file is the source
-of truth for the current version.**
+`bumpver` command. Its configuration file is located at `bumpver.toml`. **This file is the source of
+truth for the current version.**
 
 ## Release Process
 
@@ -70,13 +66,12 @@ of truth for the current version.**
 
 2. On the master branch, this new version is incremented to with the `bumpver`.
 
-   ``` console
+   ```console
    $ bumpver update --patch
    ```
 
-   This command increments the version in `bumpver.toml`, creates a commit with this change
-   and indicative message, and finally tags that commit, using the new version as the
-   tag name.
+   This command increments the version in `bumpver.toml`, creates a commit with this change and
+   indicative message, and finally tags that commit, using the new version as the tag name.
 
 3. The new commit and tag are pushed to GitHub.
 

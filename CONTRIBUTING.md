@@ -50,31 +50,9 @@ This is the format: `year.weeknumber.patch`.
 Data refresh releases will bump the `year.weeknumber` part. Intraweek development releases will bump
 the `patch` part.
 
-To increment versions, we use [BumpVer](https://gitlab.com/mbarkhau/pycalver), which provides the
-`bumpver` command. Its configuration file is located at `bumpver.toml`. **This file is the source of
-truth for the current version.**
-
 ## Release Process
 
-1. A stopping point is identified in development to make a release.
+See the GitHub Actions in this project. Essentially, releases happen:
 
-   (Weekly releases occur on Tuesday and refresh `ItemVersion/Data.lua`. Because these release are
-   cut from the master branch, any unreleased code in master will also be included. This may or may
-   not be intended. On one hand, it lowers the amount of updates users need to download. But on the
-   other hand, the weekly releases are supposed to only be for the data updates. I'm not sure which
-   one is best. Maybe we'll make a `dev` branch that merges into master for development sometime.)
-
-2. On the master branch, this new version is incremented to with the `bumpver`.
-
-   ```console
-   $ bumpver update --patch
-   ```
-
-   This command increments the version in `bumpver.toml`, creates a commit with this change and
-   indicative message, and finally tags that commit, using the new version as the tag name.
-
-3. The new commit and tag are pushed to GitHub.
-
-4. The [CI workflow](https://github.com/t-mart/wap/actions/workflows/ci.yml) is triggered, and
-   because the git ref is a tag, additional deploy steps will be taken, such as publishing to
-   CurseForge and creating a GitHub release asset.
+- Automatically every week on Tuesday, in which the item database will be refreshed.
+- Manually, whenever needed.

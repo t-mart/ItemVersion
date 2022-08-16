@@ -1,0 +1,94 @@
+name: 'release'
+
+description: 'bump version, wap package, wap upload, and github release'
+
+inputs:
+  wap-upload-type:
+    description: "wap upload release type. Can be none|alpha|beta|release. False means don't upload."
+    default: "none"
+    required: true
+  github-token:
+    description: "Github token to automate release (such as secrets.GITHUB_TOKEN)"
+    required: true
+  curseforge-token:
+    description: "Curseforge token to automate upload to Curseforge"
+    required: false
+    default: "invalid"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Git Config
+      shell: bash
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install wap
+      shell: bash
+      run: |
+        pip install wow-addon-packager==0.9.0
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2.2.2
+      with:
+        version: 7
+
+    - name: Setup Node 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install calver-cli
+      shell: bash
+      run: |
+        pnpm install --global calver-cli
+
+    - name: Get next version
+      id: next-version
+      shell: bash
+      run: |
+        LAST_VERSION=$(git describe --tags --abbrev=0)
+        echo "Last version was $LAST_VERSION"
+        NEXT_VERSION=$(calver inc --format yyyy.0w.patch --levels calendar.patch $LAST_VERSION)
+        echo "Next version is $NEXT_VERSION"
+        echo "::set-output name=version::$NEXT_VERSION"
+
+    - name: wap package
+      shell: bash
+      run: |
+        wap package --version ${{ steps.next-version.outputs.version }}
+
+    - name: wap upload
+      if: ${{ inputs.wap-upload-type != 'none' }}
+      shell: bash
+      run: |
+        wap upload --version ${{ steps.next-version.outputs.version }} --release-type ${{ inputs.wap-upload-type }}
+      env:
+        WAP_CURSEFORGE_TOKEN:  ${{ inputs.curseforge-token }}
+
+    - name: Tag
+      shell: bash
+      run: |
+        git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
+      env:
+        WAP_CURSEFORGE_TOKEN:  ${{ inputs.curseforge-token }}
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ inputs.github-token }}
+
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.next-version.outputs.version }}
+        token: ${{ inputs.github-token  }}
+        files: dist/*.zip
+

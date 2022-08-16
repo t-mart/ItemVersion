@@ -1,0 +1,24 @@
+name: Issue
+description: Create a report about a bug, feature request, or anything else.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: What version of ItemVersion are you running? (Type `/itemversion` in the chat window in game)
+      description: Type `/itemversion` in the chat window in game. Use the latest release you can.
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What is your issue?
+      description: If you are a reporting a bug, please provide steps to reproduce it. If you are reporting a missing item, please provide the Wowhead link for it.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Can you provide any screenshots of what you describe?
+      description: Please add any relevant screenshots here, if any
+    validations:
+      required: false

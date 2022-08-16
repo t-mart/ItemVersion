@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      wapUploadType:
+        description: "Curseforge release type"
+        required: true
+        default: release
+        type: choice
+        options:
+          - none
+          - alpha
+          - beta
+          - release
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # needed to get last tag, used for version bumping during release
+
+      - name: Release
+        uses: ./.github/actions/release
+        with:
+          wap-upload-type: ${{ inputs.wapUploadType }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          curseforge-token: ${{ secrets.CF_API_KEY }}

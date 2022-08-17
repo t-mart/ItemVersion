@@ -10,6 +10,7 @@ here because it is an automated process.
 
 ### Changed
 
+- Update for Interface 9.2.7
 - We're back. Too many things to list.
 
 ## [2021.11.3] - 2021-03-18

@@ -6,7 +6,13 @@ three sections: Added, Fixed, and Changed
 Every week, a data refresh release of this project occurs. These releases will not be documented
 here because it is an automated process.
 
-## [2022.33.0] - 2022-08-16
+## [2022.33.1] - 2022-08-16
+
+### Changed
+
+- Last release pulled because of some errors encountered with new build process. Should be good now.
+
+## [2022.33.0] - 2022-08-16 [YANKED]
 
 ### Changed
 

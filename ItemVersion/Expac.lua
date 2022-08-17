@@ -1,14 +1,16 @@
 local _, AddonTable = ...
 
+local L = AddonTable.L
+
 AddonTable.majorToExpac = {
-  [1] = { canonName = "World of Warcraft", shortName = "WoW", },
-  [2] = { canonName = "The Burning Crusade", shortName = "TBC", },
-  [3] = { canonName = "Wrath of the Lich King", shortName = "WotLK", },
-  [4] = { canonName = "Cataclysm", shortName = "Cata", },
-  [5] = { canonName = "Mists of Pandaria", shortName = "MoP", },
-  [6] = { canonName = "Warlords of Draenor", shortName = "WoD", },
-  [7] = { canonName = "Legion", shortName = "Legion", },
-  [8] = { canonName = "Battle for Azeroth", shortName = "BfA", },
-  [9] = { canonName = "Shadowlands", shortName = "SL", },
-  [10] = { canonName = "Dragonflight ", shortName = "DF", },
+  [1] = { canonName = L["Classic"], shortName = L["WoW"], },
+  [2] = { canonName = L["The Burning Crusade"], shortName = L["TBC"], },
+  [3] = { canonName = L["Wrath of the Lich King"], shortName = L["WotLK"], },
+  [4] = { canonName = L["Cataclysm"], shortName = L["Cata"], },
+  [5] = { canonName = L["Mists of Pandaria"], shortName = L["MoP"], },
+  [6] = { canonName = L["Warlords of Draenor"], shortName = L["WoD"], },
+  [7] = { canonName = L["Legion"], shortName = L["Legion"], },
+  [8] = { canonName = L["Battle for Azeroth"], shortName = L["BfA"], },
+  [9] = { canonName = L["Shadowlands"], shortName = L["SL"], },
+  [10] = { canonName = L["Dragonflight"], shortName = L["DF"], }, -- will probably be updated at release
 }

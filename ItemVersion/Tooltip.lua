@@ -1,7 +1,9 @@
 local _, AddonTable = ...
 
-local versionLabelText = "Version"
-local expacLabelText = "Expansion"
+local L = AddonTable.L
+
+local versionLabelText = L["Version"]
+local expacLabelText = L["Expansion"]
 
 local function tooltipString(itemId)
   local version = AddonTable.getItemVersion(itemId)
@@ -11,9 +13,8 @@ local function tooltipString(itemId)
     right = format("|cFF1F77B4%s|r %s", expacLabelText,
                    AddonTable.getVersionExpac(version).canonName)
   else
-    left = format("|cFF989898%s %s|r ", "ItemId", itemId)
-    right = format("|cFF989898%s",
-                   "Not in ItemVersion")
+    left = format("|cFF989898%s %s|r ", L["Item"], itemId)
+    right = format("|cFF989898%s", L["Unknown"] .. " (ItemVersion)")
   end
   return left, right
 end

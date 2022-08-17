@@ -33,7 +33,7 @@ globals = {
 	"EXPANSION_FILTER_TEXT",
 	"UNKNOWN",
 	"HELPFRAME_ITEM_TITLE",
-	"EXPANSION_FILTER_TEXT"
+	"EXPANSION_FILTER_TEXT",
 
 	-- provided by ItemVersion
 	"ItemVersion",

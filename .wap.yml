@@ -1,6 +1,6 @@
 name: ItemVersion
 wow-versions:
-  - 9.2.5
+  - 9.2.7
 curseforge:
   project-id: 433258
   changelog-file: CHANGELOG.md

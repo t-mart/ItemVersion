@@ -33,7 +33,7 @@ Just install the addon like normal and mouse over any item!
 
 ## API
 
-See the [API page](https://github.com/t-mart/ItemVersion/docs/API.md)
+See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md)
 
 ## Support
 

@@ -34,6 +34,7 @@ globals = {
 	"UNKNOWN",
 	"HELPFRAME_ITEM_TITLE",
 	"EXPANSION_FILTER_TEXT",
+	"GetLocale",
 
 	-- provided by ItemVersion
 	"ItemVersion",

@@ -26,15 +26,25 @@ L["Expansion"] = EXPANSION_FILTER_TEXT
 
 if locale== "deDE" then
   -- L["Something in english"] = "Something in german"
+  L[""] = L[""]
 elseif locale == "esES" then
+  L[""] = L[""]
 elseif locale == "esMX" then
+  L[""] = L[""]
 elseif locale == "frFR" then
+  L[""] = L[""]
 elseif locale == "itIT" then
+  L[""] = L[""]
 elseif locale == "koKR" then
+  L[""] = L[""]
 elseif locale == "ptBR" then
+  L[""] = L[""]
 elseif locale == "ruRU" then
+  L[""] = L[""]
 elseif locale == "zhCN" then
+  L[""] = L[""]
 elseif locale == "zhTW" then
+  L[""] = L[""]
 end
 
 AddonTable.L = L;

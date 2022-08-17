@@ -1,11 +1,11 @@
 # ItemVersion
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/releases)
-[![CI](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/t-mart/ItemVersion/actions/workflows/ci.yml)
+[![Release](https://github.com/t-mart/ItemVersion/actions/workflows/release.yml/badge.svg)](https://github.com/t-mart/ItemVersion/actions/workflows/release.yml)
 [![GitHub issues](https://img.shields.io/github/issues/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/issues)
 [![License on GitHub](https://img.shields.io/github/license/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/blob/master/LICENSE)
 [![Packaged by wap](https://img.shields.io/badge/packaged%20by-wap-d33682)](https://github.com/t-mart/wap)
-[![Hosted on wap](https://img.shields.io/badge/hosted%20on-CurseForge-F16436)](https://www.curseforge.com/wow/addons/itemversion)
+[![Hosted on Curseforge](https://img.shields.io/badge/hosted%20on-CurseForge-F16436)](https://www.curseforge.com/wow/addons/itemversion)
 
 ![Montage](https://i.imgur.com/9PVkwkz.png)
 
@@ -21,8 +21,8 @@
 
 - A complete database of when every item was added to the game, in `<major>.<minor>.<patch>.<build>`
   format and with expansion name, such as `Version: 9.0.1.36216, Expac: Shadowlands`.
-- Where-you-need-it accesiblity in the item tooltip.
-- A queriable library for retrieving this information for other addons.
+- Where-you-need-it accessibility in the item tooltip.
+- Lua API exposed for use by other addons.
 - Weekly updates with the latest items. A refreshed release will automatically occur (at least)
   every Tuesday at 16:00 UTC, just slightly after reset.
 - Open source visibility.
@@ -57,7 +57,7 @@ Examples:
 
 ### `ItemVersion.getVersionExpac`
 
-Type: `function({major: number}) -> { canonName: string, shortName: string }`
+Type: `function({major: number}) -> { canonName: string, shortName: string } | nil`
 
 Given a table with field `major` (such as the table given by `ItemVersion.getItemVersion`), return
 the expansion of the version. Has fields for `canonName` and `shortName`.
@@ -111,7 +111,7 @@ Examples:
 
 - **I think an item has the wrong version.**
 
-  First, verify it on [wowhead.com](https://www.wowhead.com/). If wowhead _does_ in fact disagree
+  First, verify it on [wowhead.com](https://www.wowhead.com/). If Wowhead _does_ in fact disagree
   with the data in ItemVersion, please create a GitHub issue.
 
   Often, items are added towards the end of an expansion that actually used in the _next_ expansion,

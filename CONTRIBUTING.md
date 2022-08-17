@@ -11,20 +11,6 @@ such a great tool for everyone.
 - Please document how you tested your changes in your PR.
 - Make sure your changes pass the status checks.
 
-## Formatting
-
-Formatting should be done with the [LuaFormatter](https://github.com/Koihik/LuaFormatter) tool. The
-configuration file for it is located at `.lua-format`. Unfortunately, there's no easy way to check
-if PRs are well formatted. Perhaps I will run them routinely.
-
-## Passing Checks
-
-New commits are run through [luacheck](https://github.com/mpeterv/luacheck) in PR status checks.
-This program catches a lot of common lua errors.
-
-While you don't need to, you could run luacheck locally before you make your PR. That would be
-faster than waiting for the CI checks to run.
-
 ## Testing Locally
 
 On Windows, you can create a _junction_ (kinda like a symlink) from your development source

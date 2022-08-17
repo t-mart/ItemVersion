@@ -16,6 +16,7 @@ addons:
         LoadOnDemand: 0
       files:
         - Init.lua
+        - Strings.lua
         - Expac.lua
         - Data.lua
         - Api.lua

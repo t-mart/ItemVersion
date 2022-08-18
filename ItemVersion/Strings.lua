@@ -4,9 +4,8 @@ local function notFound(_, key)
   return key;
  end
 
+-- If field F has no value in table, return F
 local L = setmetatable({}, {__index=notFound});
-
-local locale = GetLocale();
 
 -- WoW localizes these for everyone
 L["Version"] = GAME_VERSION_LABEL
@@ -24,27 +23,39 @@ L["Unknown"] = UNKNOWN
 L["Item"] = HELPFRAME_ITEM_TITLE
 L["Expansion"] = EXPANSION_FILTER_TEXT
 
-if locale== "deDE" then
-  -- L["Something in english"] = "Something in german"
-  L[""] = L[""]
+-- Translations
+-- Keep locale branch stubs for later use
+local locale = GetLocale();
+if locale == "deDE" then
+  L[""] = ""
+elseif locale == "enGB" then
+  L[""] = ""
+elseif locale == "enUS" then
+  L[""] = ""
 elseif locale == "esES" then
-  L[""] = L[""]
-elseif locale == "esMX" then
-  L[""] = L[""]
+  L[""] = ""
 elseif locale == "frFR" then
-  L[""] = L[""]
-elseif locale == "itIT" then
-  L[""] = L[""]
+  L[""] = ""
 elseif locale == "koKR" then
-  L[""] = L[""]
-elseif locale == "ptBR" then
-  L[""] = L[""]
-elseif locale == "ruRU" then
-  L[""] = L[""]
+  L[""] = ""
 elseif locale == "zhCN" then
-  L[""] = L[""]
+  L[""] = ""
 elseif locale == "zhTW" then
-  L[""] = L[""]
+  L[""] = ""
+elseif locale == "enCN" then
+  L[""] = ""
+elseif locale == "enTW" then
+  L[""] = ""
+elseif locale == "esMX" then
+  L[""] = ""
+elseif locale == "ruRU" then
+  L[""] = ""
+elseif locale == "ptBR" then
+  L[""] = ""
+elseif locale == "ptPT" then
+  L[""] = ""
+elseif locale == "itIT" then
+  L[""] = ""
 end
 
 AddonTable.L = L;

@@ -6,6 +6,13 @@ three sections: Added, Fixed, and Changed
 Every week, a data refresh release of this project occurs. These releases will not be documented
 here because it is an automated process.
 
+## [2022.34.0] - 2022-08-23
+
+### Added
+
+- Added basic localization by minorly rewording tooltips to leverage translations that Blizzard
+  provides. This enables non-English-locale players see the text in their own language.
+
 ## [2022.33.1] - 2022-08-16
 
 ### Changed

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/t-mart/wap-json-schema/master/wap.schema.json",
+  "name": "ItemVersion",
+  "version": "2022.33.1",
+  "wowVersions": {
+    "mainline": "9.2.7",
+    "wrath": "1.2.3",
+    "tbc": "2.5.4",
+    "vanilla": "1.14.3"
+  },
+  "publish": {
+    "curseforge": {
+      "projectId": 433258,
+      "changelogFile": "./CHANGELOG.md",
+      "slug": "itemversion",
+      "releaseType": "alpha"
+    }
+  },
+  "package": [
+    {
+      "path": "./ItemVersion",
+      "toc": {
+        "tags": {
+          "Title": "ItemVersion",
+          "Author": "Tim Martin",
+          "Notes": "Shows what version of the game an item is from in the tooltip"
+        },
+        "files": ["Init.lua", "Strings.lua", "Expac.lua", "Data.lua", "Api.lua", "Tooltip.lua"]
+      },
+      "include": ["./LICENSE"]
+    }
+  ]
+}

@@ -83,6 +83,7 @@ runs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ inputs.github-token }}
+        tags: true
 
     - name: Release
       uses: softprops/action-gh-release@v1

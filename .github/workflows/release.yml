@@ -61,8 +61,10 @@ jobs:
     - name: Update wap.json version
       shell: bash
       run: |
-        jq  '.version = "${{ steps.next-version.outputs.version }}"' <wap.json >wap-next.json
+        jq  '.version = "$NEXT_VERSION"' <wap.json >wap-next.json
         mv wap-next.json wap.json
+      env:
+        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 
     - name: Commit, tag, and push
       shell: bash
@@ -70,9 +72,11 @@ jobs:
         git config user.name "${GITHUB_ACTOR}"
         git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git add wap.json
-        git commit -m "Release ${{ steps.next-version.outputs.version }}"
-        git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
-        git push --atomic origin  "${{ github.ref_name }}" "${{ steps.next-version.outputs.version }}"
+        git commit -m "Release $NEXT_VERSION"
+        git tag -a "$NEXT_VERSION" -m "Release $NEXT_VERSION"
+        git push --atomic origin  "${{ github.ref_name }}" "$NEXT_VERSION"
+      env:
+        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 
     - name: wap
       uses: t-mart/wap-action@master
@@ -81,7 +85,8 @@ jobs:
         curseforge-token: ${{ secrets.CF_API_KEY }}
 
     - name: GH Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ steps.next-version.outputs.version }}
-        files: dist/*.zip
+      run: |
+        gh release create "$NEXT_VERSION" dist/*.zip
+      env:
+        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

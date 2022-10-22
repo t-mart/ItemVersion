@@ -64,7 +64,7 @@ jobs:
         jq  '.version = "${{steps.next-version.outputs.version}}"' <wap.json >wap-next.json
         mv wap-next.json wap.json
 
-    - name: Commit and tag
+    - name: Commit, tag, and push
       shell: bash
       run: |
         git config user.name "${GITHUB_ACTOR}"
@@ -72,10 +72,6 @@ jobs:
         git add wap.json
         git commit -m "Release ${{ steps.next-version.outputs.version }}"
         git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
-
-    - name: Push
-      shell: bash
-      run: |
         git push --tags
 
     - name: wap

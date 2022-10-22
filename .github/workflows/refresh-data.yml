@@ -61,7 +61,7 @@ jobs:
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add ItemVersion/Data.lua
           git commit -m "Refresh item data"
-          git push
+          git push origin "${{ github.ref_name }}"
 
       - name: Output updated git ref
         id: get-refreshed-data-git-ref

@@ -72,7 +72,7 @@ jobs:
         git add wap.json
         git commit -m "Release ${{ steps.next-version.outputs.version }}"
         git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
-        git push --atomic origin master "${{ steps.next-version.outputs.version }}"
+        git push --atomic origin  "${{ github.ref_name }}" "${{ steps.next-version.outputs.version }}"
 
     - name: wap
       uses: t-mart/wap-action@master

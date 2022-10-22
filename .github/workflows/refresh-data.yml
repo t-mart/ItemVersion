@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 19
-          cache: "yarn" # this is why pnpm setup goes first. will fail otherwise
+          cache: "yarn"
 
       - name: Refresh Data.lua
         run: yarn main

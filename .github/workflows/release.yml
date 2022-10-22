@@ -3,31 +3,86 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      wapUploadType:
-        description: "Curseforge release type"
-        required: true
-        default: release
+      release-type:
+        description: "The type of wap release to perform (or none at all)"
         type: choice
         options:
-          - none
-          - alpha
-          - beta
-          - release
+          - "none"
+          - "alpha"
+          - "beta"
+          - "release"
+        required: false
+        default: "beta"
+  workflow_call:
+    inputs:
+      git-ref:
+        type: string
+        required: false
+        default: ''
+      release-type:
+        type: string
+        required: false
+        default: "beta"
+    secrets:
+      CF_API_KEY:
+        required: false
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # needed to get last tag, used for version bumping during release
-          persist-credentials: false # ensure that later push uses PAT https://github.com/orgs/community/discussions/26460#discussioncomment-3251996
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.git-ref }}
 
-      - name: Release
-        uses: ./.github/actions/release
-        with:
-          wap-upload-type: ${{ inputs.wapUploadType }}
-          github-token: ${{ secrets.GH_PAT }}
-          curseforge-token: ${{ secrets.CF_API_KEY }}
+    - name: Setup Node 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install calver-cli
+      shell: bash
+      run: |
+        npm install --global calver-cli
+
+    - name: Determine next version
+      id: next-version
+      shell: bash
+      run: |
+        LAST_VERSION=$(jq <"wap.json" ".version" --raw-output)
+        echo "Last version was $LAST_VERSION"
+        NEXT_VERSION=$(calver inc --format yyyy.0w.patch --levels calendar.patch $LAST_VERSION)
+        echo "Next version is $NEXT_VERSION"
+        echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Update wap.json version
+      shell: bash
+      run: |
+        jq  '.version = "${{steps.next-version.outputs.version}}"' <wap.json >wap-next.json
+        mv wap-next.json wap.json
+
+    - name: Commit and tag
+      shell: bash
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        git add wap.json
+        git commit -m "Release ${{ steps.next-version.outputs.version }}"
+        git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+
+    - name: wap
+      uses: t-mart/wap-action@master
+      with:
+        release-type: ${{ inputs.release-type }}
+        curseforge-token: ${{ secrets.CF_API_KEY }}
+
+    - name: GH Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.next-version.outputs.version }}
+        files: dist/*.zip

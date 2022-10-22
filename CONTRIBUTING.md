@@ -1,7 +1,6 @@
 # Contributing
 
-First off, thank you for considering contributing to ItemVersion! It's people like _you_ who make it
-such a great tool for everyone.
+## Pull Requests
 
 - No contribution is too small! Please submit as many fixes for typos and grammar bloopers as you
   can!
@@ -11,21 +10,9 @@ such a great tool for everyone.
 - Please document how you tested your changes in your PR.
 - Make sure your changes pass the status checks.
 
-## Testing Locally
+## Developer Environment
 
-On Windows, you can create a _junction_ (kinda like a symlink) from your development source
-directory to your addons directory.
-
-A script has been provided that does just that.
-
-To run it, in Powershell, run the following
-
-```pwsh
-.\dev-install.ps1
-```
-
-Then, you can just edit the files in this development repository and they will be linked to the
-Addons directory -- no more copy & pasting.
+ItemVersion uses [wap](https://t-mart.github.io/wap/) for most development tasks.
 
 ## Versioning
 

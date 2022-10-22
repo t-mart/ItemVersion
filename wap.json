@@ -1,19 +1,18 @@
 {
-  "$schema": "https://raw.githubusercontent.com/t-mart/wap-json-schema/master/wap.schema.json",
+  "$schema": "https://raw.githubusercontent.com/t-mart/wap/master/src/wap/schema/wap.schema.json",
   "name": "ItemVersion",
   "version": "2022.33.1",
   "wowVersions": {
     "mainline": "9.2.7",
-    "wrath": "1.2.3",
-    "tbc": "2.5.4",
+    "wrath": "3.4.0",
     "vanilla": "1.14.3"
   },
   "publish": {
     "curseforge": {
-      "projectId": 433258,
-      "changelogFile": "./CHANGELOG.md",
+      "projectId": "433258",
       "slug": "itemversion",
-      "releaseType": "alpha"
+      "releaseType": "alpha",
+      "changelogFile": "./CHANGELOG.md"
     }
   },
   "package": [

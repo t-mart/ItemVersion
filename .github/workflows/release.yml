@@ -61,7 +61,7 @@ jobs:
     - name: Update wap.json version
       shell: bash
       run: |
-        jq  '.version = "${{steps.next-version.outputs.version}}"' <wap.json >wap-next.json
+        jq  '.version = "${{ steps.next-version.outputs.version }}"' <wap.json >wap-next.json
         mv wap-next.json wap.json
 
     - name: Commit, tag, and push
@@ -72,7 +72,7 @@ jobs:
         git add wap.json
         git commit -m "Release ${{ steps.next-version.outputs.version }}"
         git tag -a "${{ steps.next-version.outputs.version }}" -m "Release ${{ steps.next-version.outputs.version }}"
-        git push --tags
+        git push --atomic origin master "${{ steps.next-version.outputs.version }}"
 
     - name: wap
       uses: t-mart/wap-action@master

@@ -62,6 +62,10 @@ jobs:
 
       - name: Push changes
         uses: ad-m/github-push-action@master
+        with:
+          # necessary to push to protected branch without checks
+          github_token: ${{ secrets.GH_PAT }}
+
 
       - name: Push changes
         id: get-refreshed-data-git-ref

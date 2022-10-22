@@ -76,6 +76,8 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         tags: true
+        # necessary to push to protected branch without checks
+        github_token: ${{ secrets.GH_PAT }}
 
     - name: wap
       uses: t-mart/wap-action@master

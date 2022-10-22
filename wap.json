@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/t-mart/wap/master/src/wap/schema/wap.schema.json",
   "name": "ItemVersion",
-  "version": "2022.42.0",
+  "version": "2022.42.1",
   "wowVersions": {
     "mainline": "9.2.7",
     "wrath": "3.4.0",
@@ -24,9 +24,18 @@
           "Author": "Tim Martin",
           "Notes": "Shows what version of the game an item is from in the tooltip"
         },
-        "files": ["Init.lua", "Strings.lua", "Expac.lua", "Data.lua", "Api.lua", "Tooltip.lua"]
+        "files": [
+          "Init.lua",
+          "Strings.lua",
+          "Expac.lua",
+          "Data.lua",
+          "Api.lua",
+          "Tooltip.lua"
+        ]
       },
-      "include": ["./LICENSE"]
+      "include": [
+        "./LICENSE"
+      ]
     }
   ]
 }

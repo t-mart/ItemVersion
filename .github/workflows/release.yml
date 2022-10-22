@@ -61,7 +61,7 @@ jobs:
     - name: Update wap.json version
       shell: bash
       run: |
-        jq  '.version = "$NEXT_VERSION"' <wap.json >wap-next.json
+        jq  ".version = \"$NEXT_VERSION\"" <wap.json >wap-next.json
         mv wap-next.json wap.json
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"

@@ -57,7 +57,7 @@ jobs:
           echo "CACHE_UPDATED=$?" >> $GITHUB_OUTPUT
 
       - name: Commit
-        if: ${{ steps.cache-updated.outputs.CACHE_UPDATED == "1" }}
+        if: steps.cache-updated.outputs.CACHE_UPDATED == '1'
         run: |
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"

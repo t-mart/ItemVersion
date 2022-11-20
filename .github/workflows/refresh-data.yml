@@ -55,8 +55,8 @@ jobs:
       - name: Check if cache updated
         id: cache-updated
         run: |
-          git diff --exit-code ./cache
-          echo "CACHE_UPDATED=$?" >> $GITHUB_OUTPUT
+          RESULT=$(git diff --exit-code ./cache && echo "0" || echo "1")
+          echo "CACHE_UPDATED=$RESULT" >> $GITHUB_OUTPUT
 
       - name: Commit
         if: steps.cache-updated.outputs.CACHE_UPDATED == '1'

@@ -99,5 +99,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       git-ref: master
-      release-type: "beta"  #TODO change me to release when bugs worked out
+      release-type: release
     secrets: inherit

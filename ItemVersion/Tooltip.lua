@@ -20,6 +20,10 @@ local function tooltipString(itemId)
 end
 
 local function OnTooltipSetItem(tooltip)
+  if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
+      return
+  end
+
   -- blizzard broke tooltips in some cases. we return out of this function in
   -- those cases. These are known issues
   local _, link = tooltip:GetItem()
@@ -29,7 +33,7 @@ local function OnTooltipSetItem(tooltip)
     return
   end
 
-  local itemId = tonumber(strmatch(link, "item:(%d*)"))
+  local itemId = tonumber(string.match(link, "item:(%d*)"))
 
   -- will be nil for crafting reagents in profession window and legion artifacts
   if not itemId then
@@ -46,5 +50,5 @@ end
 -- those addons calling HookScript. So, delaying our call puts our stuff very
 -- likely at the end of the tooltip.
 C_Timer.After(3, function()
-  GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
+  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 end)

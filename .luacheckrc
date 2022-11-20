@@ -35,6 +35,9 @@ globals = {
 	"HELPFRAME_ITEM_TITLE",
 	"EXPANSION_FILTER_TEXT",
 	"GetLocale",
+	"ItemRefTooltip",
+	"TooltipDataProcessor",
+	"Enum",
 
 	-- provided by ItemVersion
 	"ItemVersion",

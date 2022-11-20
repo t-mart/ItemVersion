@@ -19,7 +19,7 @@ local function tooltipString(itemId)
   return left, right
 end
 
-local function OnTooltipSetItem(tooltip, data)
+local function OnTooltipSetItem(tooltip)
   if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
       return
   end

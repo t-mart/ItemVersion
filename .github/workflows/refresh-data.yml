@@ -1,5 +1,14 @@
 name: Refresh Data
 
+# jobs
+# 1. run scrape from item-version-scrape
+#   - output to dist/Data.lua and upload artifact
+#   - if cache has been updated, make a commit and push to that repo
+# 2. incorporate new Data.lua
+#   - download artifact
+#   - make commit and push
+# 3. run release workflow
+
 on:
   workflow_dispatch:
   schedule:
@@ -8,35 +17,58 @@ on:
     - cron: "0 16 * * 2"
 
 jobs:
-  refresh:
-    name: Refresh item data
+  scrape:
+    name: Scrape
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout scrape code
+      - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: t-mart/item-version-scrape
+          repository: "t-mart/item-version-scrape"
           token: ${{ secrets.GH_PAT }}
 
-      - name: Setup Node 19
-        uses: actions/setup-node@v3
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          node-version: 19
-          cache: "yarn"
+          python-version: "3.10"
+          cache: "poetry"
 
-      - name: Refresh Data.lua
-        run: yarn main
+      - name: Install dependencies
+        run: |
+          poetry install
 
-      - name: Upload generated lua artifact
-        uses: actions/upload-artifact@v3
+      - name: Scrape
+        run: |
+          poetry run ivs scrape
+
+      - uses: actions/upload-artifact@v3
         with:
           name: Data.lua
           path: dist/Data.lua
 
+      - name: Check if cache updated
+        id: cache-updated
+        run: |
+          git diff --exit-code ./cache
+          echo "CACHE_UPDATED=$?" >> $GITHUB_OUTPUT
+
+      - name: Commit
+        if: ${{ steps.cache-updated.outputs.CACHE_UPDATED == "1" }}
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add ./cache
+          git commit -m "Update cache"
+          git push origin "${{ github.ref_name }}"
+
   commit:
     name: Commit new item data
     runs-on: ubuntu-latest
-    needs: refresh
+    needs: scrape
     outputs:
       refreshed-data-git-ref: ${{ steps.get-refreshed-data-git-ref.outputs.git-ref }}
     steps:
@@ -73,5 +105,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       git-ref: ${{ needs.commit.outputs.refreshed-data-git-ref }}
-      release-type: "release"
+      release-type: "beta"  #TODO change me to release when bugs worked out
     secrets: inherit

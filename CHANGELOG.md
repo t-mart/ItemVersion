@@ -1,10 +1,8 @@
 # ItemVersion Changelog
 
-This file keeps track of changes to ItemVersion over time. For each release, there will be at most
-three sections: Added, Fixed, and Changed
+## [2022.46.2] - 2022-11-20
 
-Every week, a data refresh release of this project occurs. These releases will not be documented
-here because it is an automated process.
+- Use new Tooltip API for Dragonflight
 
 ## [2022.34.0] - 2022-08-23
 

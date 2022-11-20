@@ -44,7 +44,6 @@ jobs:
 
       - name: Scrape
         run: |
-          poetry run python -c "import sqlite3; print(sqlite3.sqlite_version_info);"
           poetry run ivs scrape
 
       - uses: actions/upload-artifact@v3

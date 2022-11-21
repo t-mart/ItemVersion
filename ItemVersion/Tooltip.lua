@@ -19,23 +19,13 @@ local function tooltipString(itemId)
   return left, right
 end
 
-local function OnTooltipSetItem(tooltip)
+local function OnTooltipSetItem(tooltip, data)
   if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
       return
   end
 
-  -- blizzard broke tooltips in some cases. we return out of this function in
-  -- those cases. These are known issues
-  local _, link = tooltip:GetItem()
+  local itemId = data.id
 
-  -- will be nil for crafting spells at profession trainer vendor window
-  if not link then
-    return
-  end
-
-  local itemId = tonumber(string.match(link, "item:(%d*)"))
-
-  -- will be nil for crafting reagents in profession window and legion artifacts
   if not itemId then
     return
   end

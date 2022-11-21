@@ -86,7 +86,7 @@ jobs:
 
     - name: GH Release
       run: |
-        gh release create "$NEXT_VERSION" dist/*.zip
+        gh release create --generate-notes "$NEXT_VERSION" dist/*.zip
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

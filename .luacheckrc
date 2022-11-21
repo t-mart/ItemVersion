@@ -38,6 +38,7 @@ globals = {
 	"ItemRefTooltip",
 	"TooltipDataProcessor",
 	"Enum",
+	"RegisterNewSlashCommand",
 
 	-- provided by ItemVersion
 	"ItemVersion",

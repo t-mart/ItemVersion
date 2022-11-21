@@ -2,12 +2,11 @@ local AddonName = ...
 
 local version = GetAddOnMetadata(AddonName, "Version")
 
--- slash command to get version of ItemVersion
-SLASH_ITEMVERSION1 = "/itemversion"
-
-function SlashCmdList.ITEMVERSION()
+local slash_command = function(msg)
   print(AddonName .. " v" .. version)
 end
+
+RegisterNewSlashCommand(slash_command, "itemversion", "")
 
 -- create global table and expose version
 ItemVersion = {

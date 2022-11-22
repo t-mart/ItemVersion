@@ -1,0 +1,40 @@
+local addonName = ...
+
+local L = LibStub("AceLocale-3.0"):NewLocale(addonName, "enUS", true)
+if not L then return end
+
+L["Tooltip"] = true
+L["Added in"] = true
+L["Show prefix"] = true
+L["Prefix the tooltip line with a label"] = true
+L["Prefix color"] = true
+L["The color of the prefix"] = true
+L["Use short expansion names"] = true
+L["Abbreviate the item's expansion"] = true
+L["Expansion color"] = true
+L["The color of the expansion"] = true
+L["Show version"] = true
+L["Show the version in which the item was added"] = true
+L["Version color"] = true
+L["The color of the version"] = true
+L["Classic"] = true
+L["The Burning Crusade"] = true
+L["TBC"] = true
+L["Wrath of the Lich King"] = true
+L["WotLK"] = true
+L["Cataclysm"] = true
+L["Cata"] = true
+L["Mists of Pandaria"] = true
+L["MoP"] = true
+L["Warlords of Draenor"] = true
+L["WoD"] = true
+L["Legion"] = true
+L["Battle for Azeroth"] = true
+L["BfA"] = true
+L["Shadowlands"] = true
+L["SL"] = true
+L["Dragonflight"] = true
+L["DF"] = true
+L["Show when item missing"] = true
+L["Show the tooltip line even when the item is missing from the database"] = true
+L["unknown"] = true

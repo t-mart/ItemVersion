@@ -1,25 +1,58 @@
-local _, AddonTable = ...
+local addonName, AddonTable = ...
 
-local L = AddonTable.L
+ItemVersion = LibStub("AceAddon-3.0"):GetAddon(addonName)
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local versionLabelText = L["Version"]
-local expacLabelText = L["Expansion"]
-
-local function tooltipString(itemId)
-  local version = AddonTable.getItemVersion(itemId)
-  local left, right
-  if version ~= nil then
-    left = format("|cFF1F77B4%s|r %s", versionLabelText, AddonTable.buildVersionString(version))
-    right = format("|cFF1F77B4%s|r %s", expacLabelText,
-                   AddonTable.getVersionExpac(version).canonName)
-  else
-    left = format("|cFF989898%s %s|r ", L["Item"], itemId)
-    right = format("|cFF989898%s", L["Unknown"] .. " (ItemVersion)")
-  end
-  return left, right
+local function CreateColorNoAlpha(c)
+  return CreateColor(c.r, c.g, c.b, 1.0)
 end
 
-local function OnTooltipSetItem(tooltip, data)
+function ItemVersion:tooltipLine(itemId)
+  local version = self:getItemVersion(itemId)
+
+  if not version and not self.db.profile.showWhenMissing then
+    return
+  end
+
+  local line = ""
+
+  -- prefix
+  if self.db.profile.showPrefix then
+    local prefixColor = CreateColorNoAlpha(self.db.profile.prefixColor)
+    line = line .. WrapTextInColor(L["Added in"], prefixColor) .. " "
+  end
+
+  -- expac
+  local expacName
+  if version then
+    local expac = self:getVersionExpac(version)
+    if self.db.profile.shortExpacNames then
+      expacName = expac.shortName
+    else
+      expacName = expac.canonName
+    end
+  else
+    expacName = "unknown"
+  end
+  local expacColor = CreateColorNoAlpha(self.db.profile.expacColor)
+  line = line .. WrapTextInColor(L[expacName], expacColor)
+
+  -- version
+  if self.db.profile.showVersion then
+    local versionString
+    if version then
+      versionString = self:buildVersionString(version)
+    else
+      versionString = L["unknown"]
+    end
+    local versionColor = CreateColorNoAlpha(self.db.profile.versionColor)
+    line = line ..  WrapTextInColor(" (" .. versionString .. ")", versionColor)
+  end
+
+  return line
+end
+
+function ItemVersion:OnTooltipSetItem(tooltip, data)
   if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
       return
   end
@@ -30,15 +63,6 @@ local function OnTooltipSetItem(tooltip, data)
     return
   end
 
-  local left, right = tooltipString(itemId)
-  tooltip:AddDoubleLine(left, right)
+  tooltip:AddLine(self:tooltipLine(itemId))
   tooltip:Show()
 end
-
--- Not reliable, but I want this info at the bottom of the tooltip, and the
--- order of addons' stuff appearing in the tooltip is the same as the order of
--- those addons calling HookScript. So, delaying our call puts our stuff very
--- likely at the end of the tooltip.
-C_Timer.After(3, function()
-  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
-end)

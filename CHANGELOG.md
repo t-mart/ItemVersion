@@ -1,5 +1,21 @@
 # ItemVersion Changelog
 
+## [2022.47.1] - 2022-11-20
+
+- Change tooltip format to `Added in <expac> (<version>)`. Before, was
+  `Version: <version> Expansion: <expansion>`. This change emphasizes the expansion more, which is
+  arguably more useful for most players.
+- Add options menu with many things to configure. Access it with `/itemversion config` or through
+  the Blizzard Addon Options menu.
+- Add profile management, so you can have different settings in different scenarios.
+- In several places, custom text has been added, such as in the tooltip and in the options menu.
+  Non-`enUS`-locale players will unfortunately see English text in these cases until translations
+  have been completed. If you can help with this, please see the instructions at
+  `ItemVersion/Locales/README.md`.
+- Remove 3 second timer that attempted to place this addon's tooltip line last. This was a hack,
+  and I don't feel like this addon deserves that last line any more than any other addon.
+- Rewrite a lot of stuff using Ace libraries and some official WoW API.
+
 ## [2022.46.2] - 2022-11-20
 
 - Use new Tooltip API for Dragonflight

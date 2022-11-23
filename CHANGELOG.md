@@ -5,7 +5,11 @@
 - Change tooltip format to `Added in <expac> (<version>)`. Before, was
   `Version: <version> Expansion: <expansion>`. This change emphasizes the expansion more, which is
   arguably more useful for most players.
-- Add options menu with many things to configure. Access it with `/itemversion config` or through
+- Add community updates mode, where some item's version is corrected to the one players probably
+  expect. For example, Marrowroot was actually added in BfA, but only usable in SL. This option
+  changes which version would be displayed in these cases.
+- Add requirement to press some key modifiers (Shift, Ctrl, Alt) to display tooltip line.
+- Add options menu with many things to configure. Access it with `/itemversion` or through
   the Blizzard Addon Options menu.
 - Add profile management, so you can have different settings in different scenarios.
 - In several places, custom text has been added, such as in the tooltip and in the options menu.

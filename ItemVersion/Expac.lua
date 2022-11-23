@@ -1,6 +1,5 @@
-local addonName = ...
+local addonName, ItemVersion = ...
 
-ItemVersion = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local majorToExpac = {
@@ -18,4 +17,13 @@ local majorToExpac = {
 
 function ItemVersion:getExpacFromMajor(major)
   return majorToExpac[major]
+end
+
+function ItemVersion:getExpacIdFromCanonName(canonName)
+  for expacId, expac in pairs(majorToExpac) do
+    if expac.canonName == canonName then
+      return expacId
+    end
+  end
+  return nil
 end

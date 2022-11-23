@@ -19,17 +19,18 @@
 
 ## Features
 
-- A complete database of when every item was added to the game, in `<major>.<minor>.<patch>.<build>`
-  format and with expansion name, such as `Version: 9.0.1.36216, Expac: Shadowlands`.
+- A complete database of the version/expansion in which every item was added.
 - Where-you-need-it accessibility in the item tooltip.
-- Lua API exposed for use by other addons.
 - Weekly updates with the latest items. A refreshed release will automatically occur (at least)
   every Tuesday at 16:00 UTC, just slightly after reset.
+- API exposed for use by other addons.
 - Open source visibility.
 
 ## Usage
 
 Just install the addon like normal and mouse over any item!
+
+Access the configuration screen with `/itemversion`.
 
 ## API
 
@@ -42,9 +43,19 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
   First, verify it on [wowhead.com](https://www.wowhead.com/). If Wowhead _does_ in fact disagree
   with the data in ItemVersion, please create a GitHub issue.
 
-  Often, items are added towards the end of an expansion that actually used in the _next_ expansion,
-  making them appear to have too early of a version. Unfortunately, there's not much we can do in
-  these cases -- the canonical version is better than making something up.
+  In some cases, items are added towards the end of an expansion that actually used in the _next_
+  expansion, making them appear to have too early of a version. For example, Marrowroot, a herb used
+  in Shadowlands was actually added to the game during the previous expansion, Battle for Azeroth.
+  And, ItemVersion will display BfA because it is canonically correct (and [Wowhead
+  agrees](https://www.wowhead.com/item=168589/marrowroot)).
+
+  However, to instead display the expansion that players probably expect in these cases, turn on the
+  "Include community updates" option on the options screen. Then, the Marrowroot example would
+  display Shadowlands.
+
+  (These community updates are an ongoing effort. If you have discovered an item that's usage is in
+  a different expansion than ItemVersion reports, please lend a hand and create an
+  [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
 
 - **An item actually is misversioned** or **An item is missing** or **I found a bug** or **I want to
   request a feature.**

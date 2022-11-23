@@ -1,52 +1,24 @@
-local addonName = ...
+local addonName, addon = ...
 
-ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0")
+-- pass in the `addon` table: AceAddon will use it instead of creating a new table
+-- this is important because our Data.lua file inserts into that addon table too
+ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceConsole-3.0")
 
 function ItemVersion:OnInitialize()
   self.version = GetAddOnMetadata(self.name, "Version")
 
-  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", ItemVersion:GetDefaultDB())
+  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", self:GetDefaultDB())
 
   LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
 
-  self:RegisterChatCommand("itemversion", "HandleCommand")
+  self:RegisterChatCommand("itemversion", function(...) self:HandleCommand(...) end)
 
-  local _, categoryId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name)
+  local _, categoryId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name, nil, "tooltip")
   self.settingsCategoryId = categoryId
+
+  LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, "Profiles", categoryId, "profile")
+
 
   TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
                                           function(...) self:OnTooltipSetItem(...) end)
-end
-
-local usage = (
-    "\n" ..
-        "usage: /itemversion <command>\n" ..
-        "\n" ..
-        "Available Commands:\n" ..
-        "    version Displays the version of ItemVersion\n" ..
-        "    config  Opens the configuration window"
-    )
-local subcommand_handlers = {
-  version = "HandleVersionSubcommand",
-  config = "HandleConfigSubcommand",
-}
-
-function ItemVersion:HandleVersionSubcommand()
-  self:Print(string.format("%s v%s", self.name, self.version))
-end
-
-function ItemVersion:HandleConfigSubcommand()
-  Settings.OpenToCategory(self.settingsCategoryId)
-end
-
-function ItemVersion:HandleCommand(input)
-  local subcommand, nextpos = self:GetArgs(input)
-
-  if not subcommand or not subcommand_handlers[subcommand] then
-    self:Print(usage)
-    return
-  end
-
-  local left = string.sub(input, nextpos)
-  self[subcommand_handlers[subcommand]](self, left)
 end

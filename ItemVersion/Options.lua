@@ -1,29 +1,21 @@
-local addonName = ...
+local addonName, ItemVersion = ...
 
-ItemVersion = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 function ItemVersion:GetDefaultDB()
   return {
     profile = {
       showPrefix = true,
-      prefixColor = { r = 1.0, g = 1.0, b = 1.0},
+      prefixColor = { r = 1.0, g = 1.0, b = 1.0 },
       shortExpacNames = false,
-      expacColor = { r = 1.0, g = 1.0, b = 1.0},
+      expacColor = { r = 1.0, g = 1.0, b = 1.0 },
       showVersion = true,
-      versionColor = { r = 1.0, g = 1.0, b = 1.0},
+      versionColor = { r = 1.0, g = 1.0, b = 1.0 },
       showWhenMissing = false,
+      keyModifiers = { shift = false, control = false, alt = false },
+      includeCommunityUpdates = true,
     }
   }
-end
-
-local function packRGBTable(...)
-  local r, g, b, a = ...
-  return { r = r, g = g, b = b}
-end
-
-local function unpackRGBTable(tbl)
-  return tbl.r, tbl.g, tbl.b, tbl.a
 end
 
 local function CombineTables(...)
@@ -36,6 +28,58 @@ local function CombineTables(...)
   return combined
 end
 
+function ItemVersion:_UpdatePreviews()
+  local optionsTable = LibStub("AceConfigRegistry-3.0"):GetOptionsTable(self.name, "dialog",
+                                                                        self.name .. "-1.0")
+  optionsTable.args.tooltip.args.preview.name = self:PreviewTooltipText()
+end
+
+function ItemVersion:_SetScalarOptFn(varname)
+  return function(_, value)
+    self.db.profile[varname] = value
+    self:_UpdatePreviews()
+  end
+end
+
+function ItemVersion:_GetScalarOptFn(varname)
+  return function()
+    return self.db.profile[varname]
+  end
+end
+
+function ItemVersion:_SetOptColorFn(varname)
+  return function(_, r, g, b)
+    self.db.profile[varname] = { r = r, g = g, b = b }
+    self:_UpdatePreviews()
+  end
+end
+
+function ItemVersion:_GetOptColorFn(varname)
+  return function()
+    local c = self.db.profile[varname]
+    return c.r, c.g, c.b
+  end
+end
+
+function ItemVersion:PreviewTooltipText()
+  local exampleItems = {
+    2447, -- Peacebloom, classic
+    22786, -- Dreaming Glory, tbc
+    36905, -- Lichbloom, wotlk
+    52985, -- Azshara's Veil, cata
+    72238, -- Golden Lotus, mop
+    120945, -- Primal Spirit, wod
+    124124, -- Blood of Sargeras, legion
+    169701, -- Death Blossom, bfa
+    192466, -- Puzzling Cartel Dinar, sl
+    191470, -- Writhebark, df
+    0, -- unknown item
+  }
+  return table.concat(TableUtil.Map(exampleItems,
+                                    function(id) return self:TooltipLineForItemId(id) end),
+                      "\n\n")
+end
+
 function ItemVersion:GetOptions()
   local options = {
     name = self.name,
@@ -43,75 +87,143 @@ function ItemVersion:GetOptions()
     type = "group",
     inline = true,
     args = {
-      tooltipGroup = {
+      tooltip = {
         type = "group",
         name = L["Tooltip"],
         order = 10,
         args = {
-          showPrefix = {
+          includeCommunityUpdates = {
             type = "toggle",
-            order = 10,
-            name = L["Show prefix"],
-            desc = L["Prefix the tooltip line with a label"],
-            set = function(_, value) self.db.profile.showPrefix = value end,
-            get = function() return self.db.profile.showPrefix end,
-            width = "normal",
-          },
-          prefixColor = {
-            type = "color",
-            order = 11,
-            name = L["Prefix color"],
-            desc = L["The color of the prefix"],
-            set = function(_, ...) self.db.profile.prefixColor = packRGBTable(...) end,
-            get = function() return unpackRGBTable(self.db.profile.prefixColor) end,
-            disabled = function() return self.db.profile.showPrefix == false end,
-            width = "normal",
-          },
-          shortExpacNames = {
-            type = "toggle",
-            order = 20,
-            name = L["Use short expansion names"],
-            desc = L["Abbreviate the item's expansion"],
-            set = function(_, value) self.db.profile.shortExpacNames = value end,
-            get = function() return self.db.profile.shortExpacNames end,
+            order = 5,
+            name = L["Include community updates"],
+            desc = "Some items were added to the game in a version/expansion earlier than the " ..
+            "one in which they were usable by players. For example, the herb Marrowroot was added during the end of BfA, but only usable in SL. " ..
+            "In this case, BfA would be \"canonical\" version/expansion.\n" ..
+            "\n" ..
+            "However, in a community effort, these items have had their expansions " ..
+            "updated to the one in which they were usable. This is probably what most players expect to see. " ..
+            "Because there is no true " ..
+            "version in these cases, a placeholder one will be displayed. (If you " ..
+            "would like to contribute to this effort with an item correction, please " ..
+            "make a GitHub issue.)\n" ..
+            "\n" ..
+            "You may choose to incorporate those community updates with this option.",
+            set = self:_SetScalarOptFn("includeCommunityUpdates"),
+            get = self:_GetScalarOptFn("includeCommunityUpdates"),
             width = "full",
-          },
-          expacColor = {
-            type = "color",
-            order = 30,
-            name = L["Expansion color"],
-            desc = L["The color of the expansion"],
-            set = function(_, ...) self.db.profile.expacColor = packRGBTable(...) end,
-            get = function() return unpackRGBTable(self.db.profile.expacColor) end,
-            width = "full",
-          },
-          showVersion = {
-            type = "toggle",
-            order = 40,
-            name = L["Show version"],
-            desc = L["Show the version in which the item was added"],
-            set = function(_, value) self.db.profile.showVersion = value end,
-            get = function() return self.db.profile.showVersion end,
-            width = "normal",
-          },
-          versionColor = {
-            type = "color",
-            order = 41,
-            name = L["Version color"],
-            desc = L["The color of the version"],
-            set = function(_, ...) self.db.profile.versionColor = packRGBTable(...) end,
-            get = function() return unpackRGBTable(self.db.profile.versionColor) end,
-            disabled = function() return self.db.profile.showVersion == false end,
-            width = "normal",
           },
           showWhenMissing = {
             type = "toggle",
-            order = 50,
-            name = L["Show when item missing"],
-            desc = L["Show the tooltip line even when the item is missing from the database"],
-            set = function(_, value) self.db.profile.showWhenMissing = value end,
-            get = function() return self.db.profile.showWhenMissing end,
+            order = 7,
+            name = L["Show for unknown items"],
+            desc = L["Show the tooltip line even when the item is not in the database"],
+            set = self:_SetScalarOptFn("showWhenMissing"),
+            get = self:_GetScalarOptFn("showWhenMissing"),
             width = "full",
+          },
+          prefix = {
+            order = 10,
+            type = "group",
+            guiInline = true,
+            name = L["Prefix"],
+            args = {
+              showPrefix = {
+                type = "toggle",
+                order = 10,
+                name = L["Show prefix"],
+                desc = L["Prefix the tooltip line with a label"],
+                set = self:_SetScalarOptFn("showPrefix"),
+                get = self:_GetScalarOptFn("showPrefix"),
+              },
+              prefixColor = {
+                type = "color",
+                order = 20,
+                name = L["Prefix color"],
+                desc = L["The color of the prefix"],
+                set = self:_SetOptColorFn("prefixColor"),
+                get = self:_GetOptColorFn("prefixColor"),
+                disabled = function() return self.db.profile.showPrefix == false end,
+              },
+            }
+          },
+          expac = {
+            order = 11,
+            type = "group",
+            guiInline = true,
+            name = L["Expansion"],
+            args = {
+              shortExpacNames = {
+                type = "toggle",
+                order = 20,
+                name = L["Use short expansion names"],
+                desc = L["Abbreviate the item's expansion"],
+                set = self:_SetScalarOptFn("shortExpacNames"),
+                get = self:_GetScalarOptFn("shortExpacNames"),
+                width = "double"
+              },
+              expac_newline = {
+                order = 21,
+                type = "description",
+                name = "",
+              },
+              expacColor = {
+                type = "color",
+                order = 30,
+                name = " " .. L["Expansion color"], -- strange alignment issue
+                desc = L["The color of the expansion"],
+                set = self:_SetOptColorFn("expacColor"),
+                get = self:_GetOptColorFn("expacColor"),
+              },
+            }
+          },
+          version = {
+            order = 20,
+            type = "group",
+            guiInline = true,
+            name = L["Version"],
+            args = {
+              showVersion = {
+                type = "toggle",
+                order = 40,
+                name = L["Show version"],
+                desc = L["Show the version in which the item was added"],
+                set = self:_SetScalarOptFn("showVersion"),
+                get = self:_GetScalarOptFn("showVersion"),
+              },
+              versionColor = {
+                type = "color",
+                order = 41,
+                name = L["Version color"],
+                desc = L["The color of the version"],
+                set = self:_SetOptColorFn("versionColor"),
+                get = self:_GetOptColorFn("versionColor"),
+                disabled = function() return self.db.profile.showVersion == false end,
+              },
+            }
+          },
+          keyModifiers = {
+            type = "multiselect",
+            order = 30,
+            name = L["Modifier keys"],
+            desc = L[
+                "Display the tooltip only when the selected modifier keys being are pressed. (No selections means always show.)"
+                ],
+            values = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] },
+            set = function(_, key, value) self.db.profile.keyModifiers[key] = value end,
+            get = function(...) return self.db.profile.keyModifiers[select(-1, ...)] end,
+            width = "full",
+          },
+          previewHeader = {
+            type = "header",
+            order = 60,
+            name = L["Preview"],
+            width = "full",
+          },
+          preview = {
+            order = 61,
+            type = "description",
+            fontSize = "medium",
+            name = self:PreviewTooltipText(),
           },
         }
       },

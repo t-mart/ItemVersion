@@ -1,6 +1,4 @@
-local addonName, ItemVersion = ...
-
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local _, ItemVersion = ...
 
 local subcommand_handlers = {
   version = "HandleVersionSubcommand",

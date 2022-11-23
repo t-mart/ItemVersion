@@ -20,7 +20,7 @@ end
 
 local function CombineTables(...)
   local combined = {}
-  for i, tbl in ipairs(SafePack(...)) do
+  for _, tbl in ipairs(SafePack(...)) do
     for k, v in pairs(tbl) do
       combined[k] = v;
     end
@@ -97,7 +97,8 @@ function ItemVersion:GetOptions()
             order = 5,
             name = L["Include community updates"],
             desc = "Some items were added to the game in a version/expansion earlier than the " ..
-            "one in which they were usable by players. For example, the herb Marrowroot was added during the end of BfA, but only usable in SL. " ..
+            "one in which they were usable by players. For example, the herb Marrowroot was added during " ..
+            "the end of BfA, but only usable in SL. " ..
             "In this case, BfA would be \"canonical\" version/expansion.\n" ..
             "\n" ..
             "However, in a community effort, these items have had their expansions " ..
@@ -206,7 +207,8 @@ function ItemVersion:GetOptions()
             order = 30,
             name = L["Modifier keys"],
             desc = L[
-                "Display the tooltip only when the selected modifier keys being are pressed. (No selections means always show.)"
+                "Display the tooltip only when the selected modifier keys being are " ..
+                "pressed. (No selections means always show.)"
                 ],
             values = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] },
             set = function(_, key, value) self.db.profile.keyModifiers[key] = value end,

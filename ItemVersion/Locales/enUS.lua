@@ -29,7 +29,8 @@ L["DF"] = true
 L["Show for unknown items"] = true
 L["Show the tooltip line even when the item is not in the database"] = true
 L["Modifier keys"] = true
-L["Display the tooltip only when the selected modifier keys being are pressed. (No selections means always show.)"] = true
+L["Display the tooltip only when the selected modifier keys being are pressed. " ..
+    "(No selections means always show.)"] = true
 L["Include community updates"] = true
 L["Override canonical version/expansion with a community update."] = true
 

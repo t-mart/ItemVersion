@@ -5,19 +5,37 @@
 - Change tooltip format to `Added in <expac> (<version>)`. Before, was
   `Version: <version> Expansion: <expansion>`. This change emphasizes the expansion more, which is
   arguably more useful for most players.
-- Add community updates mode, where some item's version is corrected to the one players probably
+
+- Add community updates mode, where some item's version is corrected to the one players
   expect. For example, Marrowroot was actually added in BfA, but only usable in SL. This option
   changes which version would be displayed in these cases.
-- Add requirement to press some key modifiers (Shift, Ctrl, Alt) to display tooltip line.
-- Add options menu with many things to configure. Access it with `/itemversion` or through
-  the Blizzard Addon Options menu.
+
+- Add option for inclusion of community updates, which changes some items' version/expansion to the
+  one that players expect. For example, the herb Marrowroot was actually added towards the end of
+  BfA in pre-release development, but was only obtainable in SL.'
+
+  With this option turned on, ItemVersion would report SL in this case, instead of BfA. Because the
+  updates are non-canonical, the version number will be a placeholder one: the major part will be
+  that of the new expansion, but the lesser parts will be zeroed.
+
+  If you encounter an item that is not fixed by these updates, please consider "reporting it to the
+  project page.
+
+- Add requirement to press some key modifiers (Shift, Ctrl, Alt) to display ItemVersion in tooltip.
+
+- Add options window with many things to configure. Access it with `/itemversion` or through the
+  Blizzard Addon Options menu.
+
 - Add profile management, so you can have different settings in different scenarios.
+
 - In several places, custom text has been added, such as in the tooltip and in the options menu.
   Non-`enUS`-locale players will unfortunately see English text in these cases until translations
   have been completed. If you can help with this, please see the instructions at
   `ItemVersion/Locales/README.md`.
+
 - Remove 3 second timer that attempted to place this addon's tooltip line last. This was a hack,
   and I don't feel like this addon deserves that last line any more than any other addon.
+
 - Rewrite a lot of stuff using Ace libraries and some official WoW API.
 
 ## [2022.46.2] - 2022-11-20

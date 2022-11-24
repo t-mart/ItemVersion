@@ -63,15 +63,15 @@ end
 
 function ItemVersion:PreviewTooltipText()
   local exampleItems = {
-    2447, -- Peacebloom, classic
+    159, -- Refreshing Spring Water, classic
     22786, -- Dreaming Glory, tbc
     36905, -- Lichbloom, wotlk
     52985, -- Azshara's Veil, cata
     72238, -- Golden Lotus, mop
     120945, -- Primal Spirit, wod
     124124, -- Blood of Sargeras, legion
-    169701, -- Death Blossom, bfa
-    192466, -- Puzzling Cartel Dinar, sl
+    163036, -- Polished Pet Charm, bfa
+    182614, -- Blanchy's Reins, sl
     191470, -- Writhebark, df
     0, -- unknown item
   }
@@ -96,19 +96,14 @@ function ItemVersion:GetOptions()
             type = "toggle",
             order = 5,
             name = L["Include community updates"],
-            desc = "Some items were added to the game in a version/expansion earlier than the " ..
-            "one in which they were usable by players. For example, the herb Marrowroot was added during " ..
-            "the end of BfA, but only usable in SL. " ..
-            "In this case, BfA would be \"canonical\" version/expansion.\n" ..
-            "\n" ..
-            "However, in a community effort, these items have had their expansions " ..
-            "updated to the one in which they were usable. This is probably what most players expect to see. " ..
-            "Because there is no true " ..
-            "version in these cases, a placeholder one will be displayed. (If you " ..
-            "would like to contribute to this effort with an item correction, please " ..
-            "make a GitHub issue.)\n" ..
-            "\n" ..
-            "You may choose to incorporate those community updates with this option.",
+            desc = "Including community updates changes some items' version/expansion to the one " ..
+            "that players expect. For example, the herb [Marrowroot] was actually added towards " ..
+            "the end of BfA in pre-release development, but was only obtainable in SL. With this " ..
+            "option turned on, ItemVersion would report SL in this case, instead of BfA.\n\n" ..
+            "Because the updates are non-canonical, the version number will be a placeholder one: " ..
+            "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
+            "If you encounter an item that is not fixed by these updates, please consider " ..
+            "reporting it to the project page.",
             set = self:_SetScalarOptFn("includeCommunityUpdates"),
             get = self:_GetScalarOptFn("includeCommunityUpdates"),
             width = "full",
@@ -208,7 +203,7 @@ function ItemVersion:GetOptions()
             name = L["Modifier keys"],
             desc = L[
                 "Display the tooltip only when the selected modifier keys being are " ..
-                "pressed. (No selections means always show.)"
+                    "pressed. (No selections means always show.)"
                 ],
             values = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] },
             set = function(_, key, value) self.db.profile.keyModifiers[key] = value end,

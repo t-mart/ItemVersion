@@ -7,7 +7,7 @@
 [![Packaged by wap](https://img.shields.io/badge/packaged%20by-wap-d33682)](https://github.com/t-mart/wap)
 [![Hosted on Curseforge](https://img.shields.io/badge/hosted%20on-CurseForge-F16436)](https://www.curseforge.com/wow/addons/itemversion)
 
-![Montage](https://i.imgur.com/9PVkwkz.png)
+![Hero](https://raw.githubusercontent.com/t-mart/ItemVersion/master/docs/images/hero.png)
 
 **ItemVersion adds information to your tooltip about when an item was added to World of Warcraft.**
 
@@ -30,7 +30,9 @@
 
 Just install the addon like normal and mouse over any item!
 
-Access the configuration screen with `/itemversion`.
+Access the options screen with `/itemversion`.
+
+![Options screen](https://raw.githubusercontent.com/t-mart/ItemVersion/master/docs/images/options.png)
 
 ## API
 
@@ -38,16 +40,16 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
 
 ## Support
 
-- **I think an item has the wrong version.**
+- **An item has the wrong version.**
 
   First, verify it on [wowhead.com](https://www.wowhead.com/). If Wowhead _does_ in fact disagree
   with the data in ItemVersion, please create a GitHub issue.
 
   In some cases, items are added towards the end of an expansion that actually used in the _next_
-  expansion, making them appear to have too early of a version. For example, Marrowroot, a herb used
-  in Shadowlands was actually added to the game during the previous expansion, Battle for Azeroth.
-  And, ItemVersion will display BfA because it is canonically correct (and [Wowhead
-  agrees](https://www.wowhead.com/item=168589/marrowroot)).
+  expansion, making them appear to have too early of a version. For example,
+  [Marrowroot](https://www.wowhead.com/item=168589/marrowroot), a herb used in Shadowlands, was
+  actually added to the game during the previous expansion, Battle for Azeroth. And, ItemVersion
+  will display Battle for Azeroth because it is canonically correct.
 
   However, to instead display the expansion that players probably expect in these cases, turn on the
   "Include community updates" option on the options screen. Then, the Marrowroot example would
@@ -57,14 +59,12 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
   a different expansion than ItemVersion reports, please lend a hand and create an
   [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
 
-- **An item actually is misversioned** or **An item is missing** or **I found a bug** or **I want to
-  request a feature.**
+- **An item still has the wrong versioned** or **An item is missing** or **I found a bug** or
+  **I want to request a feature**.
 
-  Create an [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues)
+  Create an [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
 
-- **I want to submit a change**
-
-  Fork the project and make a [pull request](https://github.com/t-mart/ItemVersion/pulls)!
+  Pull requests are also warmly welcome!
 
 ## License
 

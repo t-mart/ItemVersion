@@ -33,6 +33,10 @@ L["Display the tooltip only when the selected modifier keys being are pressed. "
     "(No selections means always show.)"] = true
 L["Include community updates"] = true
 L["Override canonical version/expansion with a community update."] = true
+-- these expac strings aren't known in non-mainline, unfortunately
+L["Battle for Azeroth"] = "Battle for Azeroth"
+L["Shadowlands"] = "Shadowlands"
+L["Dragonflight"] = "Dragonflight"
 
 -- the following do NOT need translation because Blizzard already has in GlobalsStrings,
 -- but we keep them in this file for consistency with other strings.
@@ -46,9 +50,6 @@ L["Cataclysm"] = EXPANSION_NAME3
 L["Mists of Pandaria"] = EXPANSION_NAME4
 L["Warlords of Draenor"] = EXPANSION_NAME5
 L["Legion"] = EXPANSION_NAME6
-L["Battle for Azeroth"] = EXPANSION_NAME7
-L["Shadowlands"] = EXPANSION_NAME8
-L["Dragonflight"] = EXPANSION_NAME9
 L["Preview"] = PREVIEW
 L["Unknown"] = UNKNOWN
 L["Version"] = GAME_VERSION_LABEL

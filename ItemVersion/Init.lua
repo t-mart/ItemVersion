@@ -18,7 +18,7 @@ function ItemVersion:OnInitialize()
 
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, "Profiles", categoryId, "profile")
 
-
-  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
-                                          function(...) self:OnTooltipSetItem(...) end)
+  self:HookTooltipCall()
+  -- TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
+  --                                         function(...) self:OnTooltipSetItem(...) end)
 end

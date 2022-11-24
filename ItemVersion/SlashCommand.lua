@@ -1,4 +1,4 @@
-local _, ItemVersion = ...
+local addonName, ItemVersion = ...
 
 local subcommand_handlers = {
   version = "HandleVersionSubcommand",
@@ -24,7 +24,15 @@ function ItemVersion:HandleHelpSubcommand()
 end
 
 function ItemVersion:HandleConfigSubcommand()
-  Settings.OpenToCategory(self.settingsCategoryId)
+  if Settings then
+    -- mainline way
+    Settings.OpenToCategory(self.settingsCategoryId)
+  else
+    -- classic way
+    -- lol, this isn't a bug: gotta do it twice.
+    InterfaceOptionsFrame_OpenToCategory(addonName)
+		InterfaceOptionsFrame_OpenToCategory(addonName)
+  end
 end
 
 function ItemVersion:HandleCommand(input)

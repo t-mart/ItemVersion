@@ -37,8 +37,7 @@ function ItemVersion:TooltipLine(version)
 
   -- prefix
   if self.db.profile.showPrefix then
-    local prefixColor = CreateColorNoAlpha(self.db.profile.prefixColor)
-    line = line .. WrapTextInColor(L["Added in"], prefixColor) .. " "
+    line = line .. self.Util.WrapTextInColor(L["Added in"], self.db.profile.prefixColor) .. " "
   end
 
   -- expac
@@ -53,8 +52,7 @@ function ItemVersion:TooltipLine(version)
   else
     expacName = L["Unknown"]
   end
-  local expacColor = CreateColorNoAlpha(self.db.profile.expacColor)
-  line = line .. WrapTextInColor(expacName, expacColor)
+  line = line .. self.Util.WrapTextInColor(expacName, self.db.profile.expacColor)
 
   -- version
   if self.db.profile.showVersion then
@@ -64,8 +62,8 @@ function ItemVersion:TooltipLine(version)
     else
       versionString = L["Unknown"]
     end
-    local versionColor = CreateColorNoAlpha(self.db.profile.versionColor)
-    line = line .. WrapTextInColor(" (" .. versionString .. ")", versionColor)
+    line = line ..
+        self.Util.WrapTextInColor(" (" .. versionString .. ")", self.db.profile.versionColor)
   end
 
   return line
@@ -85,7 +83,17 @@ function ItemVersion:OnTooltipSetItem(tooltip, data)
     return
   end
 
-  local itemId = data.id
+  local itemId
+  if data then
+    -- mainline way
+    itemId = data.id
+  else
+    -- classic way
+    local name, link = GameTooltip:GetItem() -- will this break if its ItemRefTooltip?
+    if (link) and (name) then
+      itemId = tonumber(string.match(link, "item:(%d*)"))
+    end
+  end
 
   if not itemId then
     return
@@ -101,4 +109,13 @@ function ItemVersion:OnTooltipSetItem(tooltip, data)
 
   tooltip:AddLine(tooltipLine)
   tooltip:Show()
+end
+
+function ItemVersion:HookTooltipCall()
+  if TooltipDataProcessor then
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
+                                            function(...) self:OnTooltipSetItem(...) end)
+  else
+    GameTooltip:HookScript("OnTooltipSetItem", function(...) self:OnTooltipSetItem(...) end)
+  end
 end

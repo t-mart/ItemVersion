@@ -37,7 +37,8 @@
           "Data.lua",
           "Community.lua",
           "Api.lua",
-          "Tooltip.lua"
+          "Tooltip.lua",
+          "Util.lua"
         ]
       },
       "include": [

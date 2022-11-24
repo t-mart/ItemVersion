@@ -75,9 +75,11 @@ function ItemVersion:PreviewTooltipText()
     191470, -- Writhebark, df
     0, -- unknown item
   }
-  return table.concat(TableUtil.Map(exampleItems,
-                                    function(id) return self:TooltipLineForItemId(id) end),
-                      "\n\n")
+  local mapped = {}
+  for _, id in pairs(exampleItems) do
+    table.insert(mapped, self:TooltipLineForItemId(id))
+  end
+  return table.concat(mapped, "\n\n")
 end
 
 function ItemVersion:GetOptions()

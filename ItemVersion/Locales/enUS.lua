@@ -40,28 +40,7 @@ L["Including community updates changes some items' version/expansion to the one 
             "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
             "If you encounter an item that is not fixed by these updates, please consider " ..
             "reporting it to the project page."] = true
-L["Override canonical version/expansion with a community update."] = true
 -- these expac strings aren't known in non-mainline, unfortunately
 L["Battle for Azeroth"] = "Battle for Azeroth"
 L["Shadowlands"] = "Shadowlands"
 L["Dragonflight"] = "Dragonflight"
-
--- the following do NOT need translation because Blizzard already has in GlobalsStrings,
--- but we keep them in this file for consistency with other strings.
--- The client will define these according the the current locale. And, AceLocale will default to
--- these assignments if they are not overriden in any other locale file.
-L["Expansion"] = EXPANSION_FILTER_TEXT
-L["Classic"] = EXPANSION_NAME0
-L["The Burning Crusade"] = EXPANSION_NAME1
-L["Wrath of the Lich King"] = EXPANSION_NAME2
-L["Cataclysm"] = EXPANSION_NAME3
-L["Mists of Pandaria"] = EXPANSION_NAME4
-L["Warlords of Draenor"] = EXPANSION_NAME5
-L["Legion"] = EXPANSION_NAME6
-L["Preview"] = PREVIEW
-L["Unknown"] = UNKNOWN
-L["Version"] = GAME_VERSION_LABEL
-L["SHIFT"] = SHIFT_KEY_TEXT
-L["ALT"] = ALT_KEY_TEXT
-L["CONTROL"] = CTRL_KEY_TEXT
-L["Mode"] = MODE

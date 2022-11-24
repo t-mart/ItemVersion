@@ -51,7 +51,7 @@ If so, I'd really appreciate your help. Here's what you need to do:
 - [ ] itIT
 - [ ] ptBR
 - [ ] ptPT
-- [ ] ruRU
+- [x] ruRU
 - [ ] koKR
 - [ ] zhTW
 - [ ] zhCN

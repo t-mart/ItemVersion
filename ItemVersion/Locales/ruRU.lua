@@ -48,28 +48,7 @@ L["Including community updates changes some items' version/expansion to the one 
             "большая часть будет принадлежать новому расширению, а меньшие части будут обнулены.\n\n" ..
             "Если Вы столкнулись с проблемой, которая не была исправлена этими обновлениями, пожалуйста, " ..
             "сообщите об этом на странице проекта."
-L["Override canonical version/expansion with a community update."] = "Переопределить каноническую версию/расширение с помощью обновления сообщества"
 -- эти expac-строки не известны в неосновной ветке, к сожалению
 L["Battle for Azeroth"] = "Battle for Azeroth"
 L["Shadowlands"] = "Shadowlands"
 L["Dragonflight"] = "Dragonflight"
-
--- следующие строки НЕ нуждаются в переводе, поскольку Blizzard уже перевела их в GlobalsStrings,
--- но мы сохраняем их в этом файле для согласованности с другими строками.
--- Клиент будет определять их в соответствии с текущей локалью. И AceLocale будет использовать по умолчанию
--- эти назначения, если они не переопределены в любом другом файле локали.
-L["Expansion"] = EXPANSION_FILTER_TEXT
-L["Classic"] = EXPANSION_NAME0
-L["The Burning Crusade"] = EXPANSION_NAME1
-L["Wrath of the Lich King"] = EXPANSION_NAME2
-L["Cataclysm"] = EXPANSION_NAME3
-L["Mists of Pandaria"] = EXPANSION_NAME4
-L["Warlords of Draenor"] = EXPANSION_NAME5
-L["Legion"] = EXPANSION_NAME6
-L["Preview"] = PREVIEW
-L["Unknown"] = UNKNOWN
-L["Version"] = GAME_VERSION_LABEL
-L["SHIFT"] = SHIFT_KEY_TEXT
-L["ALT"] = ALT_KEY_TEXT
-L["CONTROL"] = CTRL_KEY_TEXT
-L["Mode"] = MODE

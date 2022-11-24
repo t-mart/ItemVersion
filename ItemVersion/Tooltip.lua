@@ -2,23 +2,6 @@ local addonName, ItemVersion = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
--- Show with modifier keys:
--- - Show always
--- - Show with Shift
--- - Show with Ctrl
--- - Show with Alt
--- - Show with Shift + Ctrl
--- - Show with Shift + Alt
--- - Show with Ctrl + Alt
--- - Show with Shift + Ctrl + Alt
-
--- Show preview
-
-
-local function CreateColorNoAlpha(c)
-  return CreateColor(c.r, c.g, c.b, 1.0)
-end
-
 function ItemVersion:ConfiguredModifiersAreDown()
   if self.db.profile.keyModifiers.shift and not IsShiftKeyDown() then
     return false
@@ -27,6 +10,10 @@ function ItemVersion:ConfiguredModifiersAreDown()
     return false
   end
   if self.db.profile.keyModifiers.alt and not IsAltKeyDown() then
+    return false
+  end
+  -- this will only be able to be true on Mac clients
+  if self.db.profile.keyModifiers.meta and not IsMetaKeyDown() then
     return false
   end
   return true

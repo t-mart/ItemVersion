@@ -12,7 +12,7 @@ function ItemVersion:GetDefaultDB()
       showVersion = true,
       versionColor = { r = 1.0, g = 1.0, b = 1.0 },
       showWhenMissing = false,
-      keyModifiers = { shift = false, control = false, alt = false },
+      keyModifiers = { shift = false, control = false, alt = false, meta = false },
       includeCommunityUpdates = true,
     }
   }
@@ -83,6 +83,10 @@ function ItemVersion:PreviewTooltipText()
 end
 
 function ItemVersion:GetOptions()
+  local modifierKeyValues = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] }
+  if IsMacClient() then
+    modifierKeyValues.meta = L["META"]
+  end
   local options = {
     name = self.name,
     handler = self,
@@ -207,7 +211,7 @@ function ItemVersion:GetOptions()
                 "Display the tooltip only when the selected modifier keys being are " ..
                     "pressed. (No selections means always show.)"
                 ],
-            values = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] },
+            values = modifierKeyValues,
             set = function(_, key, value) self.db.profile.keyModifiers[key] = value end,
             get = function(...) return self.db.profile.keyModifiers[select(-1, ...)] end,
             width = "full",

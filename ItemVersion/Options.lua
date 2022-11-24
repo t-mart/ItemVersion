@@ -98,14 +98,14 @@ function ItemVersion:GetOptions()
             type = "toggle",
             order = 5,
             name = L["Include community updates"],
-            desc = "Including community updates changes some items' version/expansion to the one " ..
+            desc = L["Including community updates changes some items' version/expansion to the one " ..
             "that players expect. For example, the herb [Marrowroot] was actually added towards " ..
             "the end of BfA in pre-release development, but was only obtainable in SL. With this " ..
             "option turned on, ItemVersion would report SL in this case, instead of BfA.\n\n" ..
             "Because the updates are non-canonical, the version number will be a placeholder one: " ..
             "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
             "If you encounter an item that is not fixed by these updates, please consider " ..
-            "reporting it to the project page.",
+            "reporting it to the project page."],
             set = self:_SetScalarOptFn("includeCommunityUpdates"),
             get = self:_GetScalarOptFn("includeCommunityUpdates"),
             width = "full",

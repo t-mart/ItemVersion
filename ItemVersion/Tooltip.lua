@@ -1,54 +1,104 @@
-local _, AddonTable = ...
+local addonName, ItemVersion = ...
 
-local L = AddonTable.L
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
-local versionLabelText = L["Version"]
-local expacLabelText = L["Expansion"]
+-- Show with modifier keys:
+-- - Show always
+-- - Show with Shift
+-- - Show with Ctrl
+-- - Show with Alt
+-- - Show with Shift + Ctrl
+-- - Show with Shift + Alt
+-- - Show with Ctrl + Alt
+-- - Show with Shift + Ctrl + Alt
 
-local function tooltipString(itemId)
-  local version = AddonTable.getItemVersion(itemId)
-  local left, right
-  if version ~= nil then
-    left = format("|cFF1F77B4%s|r %s", versionLabelText, AddonTable.buildVersionString(version))
-    right = format("|cFF1F77B4%s|r %s", expacLabelText,
-                   AddonTable.getVersionExpac(version).canonName)
-  else
-    left = format("|cFF989898%s %s|r ", L["Item"], itemId)
-    right = format("|cFF989898%s", L["Unknown"] .. " (ItemVersion)")
-  end
-  return left, right
+-- Show preview
+
+
+local function CreateColorNoAlpha(c)
+  return CreateColor(c.r, c.g, c.b, 1.0)
 end
 
-local function OnTooltipSetItem(tooltip)
-  if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
-      return
+function ItemVersion:ConfiguredModifiersAreDown()
+  if self.db.profile.keyModifiers.shift and not IsShiftKeyDown() then
+    return false
+  end
+  if self.db.profile.keyModifiers.control and not IsControlKeyDown() then
+    return false
+  end
+  if self.db.profile.keyModifiers.alt and not IsAltKeyDown() then
+    return false
+  end
+  return true
+end
+
+function ItemVersion:TooltipLine(version)
+  local line = ""
+
+  -- prefix
+  if self.db.profile.showPrefix then
+    local prefixColor = CreateColorNoAlpha(self.db.profile.prefixColor)
+    line = line .. WrapTextInColor(L["Added in"], prefixColor) .. " "
   end
 
-  -- blizzard broke tooltips in some cases. we return out of this function in
-  -- those cases. These are known issues
-  local _, link = tooltip:GetItem()
+  -- expac
+  local expacName
+  if version then
+    local expac = self:getVersionExpac(version)
+    if self.db.profile.shortExpacNames then
+      expacName = L[expac.shortName]
+    else
+      expacName = L[expac.canonName]
+    end
+  else
+    expacName = L["Unknown"]
+  end
+  local expacColor = CreateColorNoAlpha(self.db.profile.expacColor)
+  line = line .. WrapTextInColor(expacName, expacColor)
 
-  -- will be nil for crafting spells at profession trainer vendor window
-  if not link then
+  -- version
+  if self.db.profile.showVersion then
+    local versionString
+    if version then
+      versionString = self:buildVersionString(version)
+    else
+      versionString = L["Unknown"]
+    end
+    local versionColor = CreateColorNoAlpha(self.db.profile.versionColor)
+    line = line .. WrapTextInColor(" (" .. versionString .. ")", versionColor)
+  end
+
+  return line
+end
+
+function ItemVersion:TooltipLineForItemId(itemId)
+  local version = self:getItemVersion(itemId)
+  return self:TooltipLine(version)
+end
+
+function ItemVersion:OnTooltipSetItem(tooltip, data)
+  if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
     return
   end
 
-  local itemId = tonumber(string.match(link, "item:(%d*)"))
+  if not self:ConfiguredModifiersAreDown() then
+    return
+  end
 
-  -- will be nil for crafting reagents in profession window and legion artifacts
+  local itemId = data.id
+
   if not itemId then
     return
   end
 
-  local left, right = tooltipString(itemId)
-  tooltip:AddDoubleLine(left, right)
+  local version = self:getItemVersion(itemId)
+
+  if not version and not self.db.profile.showWhenMissing then
+    return
+  end
+
+  local tooltipLine = self:TooltipLine(version)
+
+  tooltip:AddLine(tooltipLine)
   tooltip:Show()
 end
-
--- Not reliable, but I want this info at the bottom of the tooltip, and the
--- order of addons' stuff appearing in the tooltip is the same as the order of
--- those addons calling HookScript. So, delaying our call puts our stuff very
--- likely at the end of the tooltip.
-C_Timer.After(3, function()
-  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
-end)

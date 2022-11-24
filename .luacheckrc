@@ -14,9 +14,9 @@ files["ItemVersion/Data.lua"] = {
 
 globals = {
 	-- provided by WoW API
-	"format",
-	"strmatch",
-	"C_Timer",
+	-- "format",
+	-- "strmatch",
+	-- "C_Timer",
 	"GameTooltip",
 	"GetAddOnMetadata",
 	"SlashCmdList",
@@ -32,12 +32,27 @@ globals = {
 	"GAME_VERSION_LABEL",
 	"EXPANSION_FILTER_TEXT",
 	"UNKNOWN",
-	"HELPFRAME_ITEM_TITLE",
-	"EXPANSION_FILTER_TEXT",
-	"GetLocale",
 	"ItemRefTooltip",
 	"TooltipDataProcessor",
 	"Enum",
+	"RegisterNewSlashCommand",
+	"EXPANSION_NAME9",
+	"PREVIEW",
+	"SHIFT_KEY_TEXT",
+	"ALT_KEY_TEXT",
+	"CTRL_KEY_TEXT",
+	"MODE",
+	"SafePack",
+	"TableUtil",
+	"Settings",
+	"CreateColor",
+	"IsShiftKeyDown",
+	"IsControlKeyDown",
+	"IsAltKeyDown",
+	"WrapTextInColor",
+
+	-- provided by libs
+	"LibStub",
 
 	-- provided by ItemVersion
 	"ItemVersion",

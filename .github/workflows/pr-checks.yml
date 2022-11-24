@@ -14,4 +14,4 @@ jobs:
     - name: Check Lua
       uses: nebularg/actions-luacheck@v1
       with:
-        args: --no-color
+        args: ItemVersion --no-color --exclude-files 'ItemVersion/Libs/**/*.lua' --no-self

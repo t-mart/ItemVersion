@@ -22,20 +22,23 @@
         "tags": {
           "Title": "ItemVersion",
           "Author": "Tim Martin",
-          "Notes": "Shows what version of the game an item is from in the tooltip"
+          "Notes": "Shows in what version of the game an item was added in the tooltip",
+          "SavedVariables": ["ItemVersionDB"]
         },
         "files": [
+          "libs.xml",
+          "locales.xml",
           "Init.lua",
-          "Strings.lua",
+          "SlashCommand.lua",
+          "Options.lua",
           "Expac.lua",
           "Data.lua",
+          "Community.lua",
           "Api.lua",
           "Tooltip.lua"
         ]
       },
-      "include": [
-        "./LICENSE"
-      ]
+      "include": ["./LICENSE"]
     }
   ]
 }

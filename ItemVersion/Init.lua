@@ -1,15 +1,24 @@
-local AddonName = ...
+local addonName, addon = ...
 
-local version = GetAddOnMetadata(AddonName, "Version")
+-- pass in the `addon` table: AceAddon will use it instead of creating a new table
+-- this is important because our Data.lua file inserts into that addon table too
+ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceConsole-3.0")
 
--- slash command to get version of ItemVersion
-SLASH_ITEMVERSION1 = "/itemversion"
+function ItemVersion:OnInitialize()
+  self.version = GetAddOnMetadata(self.name, "Version")
 
-function SlashCmdList.ITEMVERSION()
-  print(AddonName .. " v" .. version)
+  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", self:GetDefaultDB())
+
+  LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
+
+  self:RegisterChatCommand("itemversion", function(...) self:HandleCommand(...) end)
+
+  local _, categoryId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name, nil, "tooltip")
+  self.settingsCategoryId = categoryId
+
+  LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, "Profiles", categoryId, "profile")
+
+
+  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
+                                          function(...) self:OnTooltipSetItem(...) end)
 end
-
--- create global table and expose version
-ItemVersion = {
-  version = version
-}

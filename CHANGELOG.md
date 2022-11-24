@@ -1,5 +1,10 @@
 # ItemVersion Changelog
 
+## [2022.47.2] - 2022-11-24
+
+- Fix bugs in the last release that were present because of API differences between mainline and
+  classic.
+
 ## [2022.47.1] - 2022-11-20
 
 - Change tooltip format to `Added in <expac> (<version>)`. Before, was

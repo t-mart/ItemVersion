@@ -59,7 +59,7 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
   a different expansion than ItemVersion reports, please lend a hand and create an
   [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
 
-- **An item still has the wrong versioned** or **An item is missing** or **I found a bug** or
+- **An item still has the wrong version** or **An item is missing** or **I found a bug** or
   **I want to request a feature**.
 
   Create an [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).

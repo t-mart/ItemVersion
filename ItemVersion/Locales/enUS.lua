@@ -32,6 +32,14 @@ L["Modifier keys"] = true
 L["Display the tooltip only when the selected modifier keys being are pressed. " ..
     "(No selections means always show.)"] = true
 L["Include community updates"] = true
+L["Including community updates changes some items' version/expansion to the one " ..
+            "that players expect. For example, the herb [Marrowroot] was actually added towards " ..
+            "the end of BfA in pre-release development, but was only obtainable in SL. With this " ..
+            "option turned on, ItemVersion would report SL in this case, instead of BfA.\n\n" ..
+            "Because the updates are non-canonical, the version number will be a placeholder one: " ..
+            "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
+            "If you encounter an item that is not fixed by these updates, please consider " ..
+            "reporting it to the project page."] = true
 L["Override canonical version/expansion with a community update."] = true
 -- these expac strings aren't known in non-mainline, unfortunately
 L["Battle for Azeroth"] = "Battle for Azeroth"

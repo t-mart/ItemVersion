@@ -85,7 +85,8 @@ end
 function ItemVersion:GetOptions()
   local modifierKeyValues = { shift = L["SHIFT"], control = L["CONTROL"], alt = L["ALT"] }
   if IsMacClient() then
-    modifierKeyValues.meta = L["META"]
+    -- call this CMD, which matches Mac vernacular better than META
+    modifierKeyValues.meta = L["CMD"]
   end
   local options = {
     name = self.name,

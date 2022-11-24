@@ -52,11 +52,14 @@ globals = {
 	"WrapTextInColor",
 	"IsMacClient",
 	"IsMetaKeyDown",
+	"META_KEY_TEXT",
+	"InterfaceOptionsFrame_OpenToCategory",
+	"Round",
+	"WrapTextInColorCode",
 
 	-- provided by libs
 	"LibStub",
 
 	-- provided by ItemVersion
 	"ItemVersion",
-	"SLASH_ITEMVERSION1",
 }

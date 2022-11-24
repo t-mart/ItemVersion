@@ -50,6 +50,8 @@ globals = {
 	"IsControlKeyDown",
 	"IsAltKeyDown",
 	"WrapTextInColor",
+	"IsMacClient",
+	"IsMetaKeyDown",
 
 	-- provided by libs
 	"LibStub",

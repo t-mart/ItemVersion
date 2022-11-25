@@ -9,6 +9,7 @@
 - Try to limit each pull request to _one_ change only.
 - Please document how you tested your changes in your PR.
 - Make sure your changes pass the status checks.
+- If you would like, please add your name to the `AUTHORS` file. Pseudonyms are fine.
 
 ## Developer Environment
 

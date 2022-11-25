@@ -2,6 +2,12 @@ name: Issue
 description: Create a report about a bug, feature request, or anything else.
 body:
   - type: input
+    id: flavor
+    attributes:
+      label: Which flavor of World of Warcraft are you running? (`retail`, `wrath`, or `classic`)
+    validations:
+      required: true
+  - type: input
     id: version
     attributes:
       label: What version of ItemVersion are you running?
@@ -18,7 +24,7 @@ body:
   - type: textarea
     id: screenshots
     attributes:
-      label: Can you provide any screenshots of what you describe?
-      description: Please add any relevant screenshots here, if any
+      label: (Optional) Can you provide any screenshots of what you describe?
+      description: Attach files by dragging & dropping, selecting, or pasting them.
     validations:
       required: false

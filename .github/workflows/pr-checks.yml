@@ -5,7 +5,7 @@ on:
 
 jobs:
   check:
-    name: check
+    name: Check Lua
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code

@@ -1,5 +1,12 @@
 # ItemVersion Changelog
 
+## [2022.47.3] - 2022-11-24
+
+- Use default profile by default, instead of a character specific one (#42)
+- Add zhCN translation (#41)
+- Add ruRU translation (#31)
+- Add CMD key as a modifier for Mac clients (#38)
+
 ## [2022.47.2] - 2022-11-24
 
 - Fix bugs in the last release that were present because of API differences between mainline and

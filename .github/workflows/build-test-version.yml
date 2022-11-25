@@ -22,5 +22,5 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        name: ItemVersion-${{ github.sha }}.zip
+        name: ItemVersion-${{ github.sha }}
         path: dist/*

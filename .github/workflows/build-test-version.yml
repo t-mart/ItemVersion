@@ -19,8 +19,20 @@ jobs:
       uses: t-mart/wap-action@master
       with:
         release-type: 'none'
+        
+    - name: Surface addons
+      # upload-artifact sets the root directory of the artifact zip to the path segment that has the first wildcard.
+      # our dist dir is in the format dist/ItemVersion-X.Y.Z/ItemVersion/foo.lua. Because
+      # we don't know X.Y.Z (and don't want to calculate it), we'd need a wildcard at
+      # that point (dist/ItemVersion*/*). But, then the ItemVersion-X.Y.Z dir would be at the root.
+      # We want just the addon folders at the root instead (matches normal addon zip structure). So, we move those
+      # addon folders up (or "surface" them) in new dir, and then pass dir that to upload-artifact
+      shell: bash
+      run: |
+        mkdir build-from-commit-artifact
+        mv dist/ItemVersion*/* build-from-commit-artifact
 
     - uses: actions/upload-artifact@v3
       with:
         name: ItemVersion-${{ github.sha }}
-        path: dist/*
+        path: build-from-commit-artifact/*

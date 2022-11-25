@@ -7,7 +7,7 @@ ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceConsole-3.0
 function ItemVersion:OnInitialize()
   self.version = GetAddOnMetadata(self.name, "Version")
 
-  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", self:GetDefaultDB())
+  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", self:GetDefaultDB(), true)
 
   LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
 

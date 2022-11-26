@@ -1,8 +1,8 @@
 local addonName, ItemVersion = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local AceConsole = LibStub("AceConsole-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
-local API = ItemVersion.API
 local Util = ItemVersion.Util
 
 local SlashCommandMixin = {}
@@ -29,13 +29,13 @@ end
 function SlashCommandMixin:HandleHelpSubcommand()
   local usage = (
       "\n" ..
-          "usage: /itemversion <command>\n" ..
+          L["usage"] .. ": /itemversion <" .. L["subcommand"] .. ">\n" ..
           "\n" ..
-          "Available Commands:\n" ..
-          "    config  Opens the configuration window\n" ..
-          "    issue   Opens a window with information to assist in creating an issue\n" ..
-          "    version Displays the version of ItemVersion\n" ..
-          "    help    Shows this help"
+          L["Available Subcommands"] .. ":\n" ..
+          "    config  " .. L["Opens the configuration window"] .. "\n" ..
+          "    issue   " .. L["Opens a window with information to assist in creating an issue"] .. "\n" ..
+          "    version " .. L["Displays the version of ItemVersion"] .. "\n" ..
+          "    help    " .. L["Shows this help"] .. ""
       )
   AceConsole:Print(usage)
 end
@@ -60,7 +60,7 @@ local GetFlavor = function()
     flavor = "Retail"
   elseif toc >= 30000 and toc <= 39999 then
     flavor = "Wrath"
-  elseif toc <= 10000 then
+  elseif toc <= 19999 then
     flavor = "Classic"
   end
   return string.format("%s (%s)", flavor, combined)
@@ -86,12 +86,12 @@ function SlashCommandMixin:HandleIssueSubcommand()
     AceGUI:Release(widget)
     self.issueFrame = nil
   end)
-  issueFrame:SetTitle(string.format("%s Issue Info", addonName))
+  issueFrame:SetTitle(string.format(L["%s Issue Information"], addonName))
   issueFrame:SetLayout("List")
-  issueFrame:SetAutoAdjustHeight(true)
+  issueFrame:SetHeight(300)
 
   local label = AceGUI:Create("Label")
-  label:SetText("Copy and paste this data when making a new issue for ItemVersion.")
+  label:SetText(L["Copy and paste this data when making a new issue for ItemVersion."])
   label:SetFont("Fonts\\FRIZQT__.TTF", 14, "")
   label:SetFullWidth(true)
   issueFrame:AddChild(label)

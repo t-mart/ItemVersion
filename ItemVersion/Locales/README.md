@@ -36,22 +36,10 @@ If so, I'd really appreciate your help. Here's what you need to do:
    L["Tooltip"] = "Translation of Tooltip in that language"
    ```
 
+   Or, if the text used in English is sufficient in the target language, set it to `true`:
+
+   ```lua
+   L["No change needed"] = true
+   ```
+
 3. Submit a pull request to the project at <https://github.com/t-mart/ItemVersion>.
-
-## Locale Completion Status
-
-- [x] enUS
-- [ ] enCN
-- [ ] enGB
-- [ ] enTW
-- [ ] frFR
-- [ ] deDE
-- [ ] esES
-- [ ] esMX
-- [ ] itIT
-- [ ] ptBR
-- [ ] ptPT
-- [x] ruRU
-- [ ] koKR
-- [ ] zhTW
-- [ ] zhCN

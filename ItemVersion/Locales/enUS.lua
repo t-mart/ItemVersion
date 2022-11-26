@@ -40,7 +40,17 @@ L["Including community updates changes some items' version/expansion to the one 
             "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
             "If you encounter an item that is not fixed by these updates, please consider " ..
             "reporting it to the project page."] = true
+L["usage"] = true
+L["subcommand"] = true
+L["Available Subcommands"] = true
+L["Opens the configuration window"] = true
+L["Opens a window with information to assist in creating an issue"] = true
+L["Displays the version of ItemVersion"] = true
+L["Shows this help"] = true
+L["%s Issue Information"] = true
+L["Copy and paste this data when making a new issue for ItemVersion."] = true
+
 -- these expac strings aren't known in non-mainline, unfortunately
-L["Battle for Azeroth"] = "Battle for Azeroth"
-L["Shadowlands"] = "Shadowlands"
-L["Dragonflight"] = "Dragonflight"
+L["Battle for Azeroth"] = true
+L["Shadowlands"] = true
+L["Dragonflight"] = true

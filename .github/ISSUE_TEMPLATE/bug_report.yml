@@ -1,0 +1,67 @@
+name: Bug Report
+description: Create a report to help us improve
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
+  - type: input
+    id: flavor
+    attributes:
+      label: What is your client flavor? (Retail, Wrath, or Classic)
+      description: "You can find this easily with `/itemversion issue`."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: What version of ItemVersion do you have installed?
+      description: "You can find this easily with `/itemversion issue`. Upgrade to the latest version that you can."
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: What platform are you playing on? (Windows, Mac, or Linux)
+      description: "You can find this easily with `/itemversion issue`."
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What is the bug?
+      description: Please provide steps to reproduce it. If you are reporting a missing item, please provide the Wowhead link for it.
+    validations:
+      required: true
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: false
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: false
+  - type: textarea
+    id: reproduce_steps
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. With this config...
+        2. Do...
+        3. See error...
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the bug here. Attach files by dragging & dropping, selecting, or pasting them.
+    validations:
+      required: false

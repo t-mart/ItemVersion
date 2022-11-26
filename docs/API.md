@@ -16,8 +16,7 @@ If the `includeCommunityUpdates` argument is truthy, community updates will be p
 ItemVersion's canonical database. These updates attempt to correct instances in which items have
 versions that are earlier than when they were usable. For example, Marrowroot was first usable
 during Shadowlands, but was actually added towards the end of Battle for Azeroth. If
-`includeCommunityUpdates` is false, these updates will not be considered. If `nil` this function
-will use the updates if the current profile's option "Include community updates" option is set.
+`includeCommunityUpdates` is false, these updates will not be considered.
 
 Examples:
 

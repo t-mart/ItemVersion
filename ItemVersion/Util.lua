@@ -2,7 +2,15 @@ local _, ItemVersion = ...
 
 ItemVersion.Util = {}
 
-function ItemVersion.Util.WrapTextInColor(text, color)
-  local hex = ("ff%.2x%.2x%.2x"):format(Round(color.r * 255), Round(color.g * 255), Round(color.b * 255));
-  return WrapTextInColorCode(text, hex);
+-- Mix key-value pairs from other tables (...) into object. This is commonly used to create
+-- class "instances" with a particular interface.
+function ItemVersion.Util.Mixin(object, ...)
+  for i = 1, select("#", ...) do
+    local mixin = select(i, ...);
+    for k, v in pairs(mixin) do
+      object[k] = v;
+    end
+  end
+
+  return object;
 end

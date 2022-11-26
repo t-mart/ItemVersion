@@ -1,0 +1,10 @@
+name: Something else
+description: Anything that doesn't fit in the other categories
+
+body:
+  - type: textarea
+    id: anything
+    attributes:
+      label: What's on your mind?
+    validations:
+      required: false

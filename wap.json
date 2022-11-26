@@ -31,14 +31,15 @@
           "libs.xml",
           "locales.xml",
           "Init.lua",
+          "Util.lua",
+          "Database.lua",
           "SlashCommand.lua",
           "Options.lua",
           "Expac.lua",
           "Data.lua",
           "Community.lua",
-          "Api.lua",
-          "Tooltip.lua",
-          "Util.lua"
+          "API.lua",
+          "Tooltip.lua"
         ]
       },
       "include": [

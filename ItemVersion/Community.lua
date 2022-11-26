@@ -7,7 +7,9 @@
 -- Marrowroot.
 
 local addonName, ItemVersion = ...
+
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local Expac = ItemVersion.Expac
 
 -- When an item's added-in expansion is different than its usable-in expansion, add it here to the
 -- appropriate list.
@@ -52,8 +54,8 @@ local communityUpdates = {
 
 -- cause tbl to use backupTbl for key lookups if key is not in tbl
 -- the original metatable is used if it exists. otherwise, a new one
--- is created.
-local function setBackupTable(tbl, backupTbl)
+-- is created. in both cases, the __index function is overwritten
+local function SetBackupTable(tbl, backupTbl)
   local getitem = function(_, key)
     return backupTbl[key]
   end
@@ -69,12 +71,12 @@ end
 -- put the communityUpdates table into the same form as Data.lua's itemIdToVersionId
 ItemVersion.communityItemIdToVersionId = {}
 for canonName, itemIds in pairs(communityUpdates) do
-  local versionId = -ItemVersion:getExpacIdFromCanonName(canonName) -- negate
+  local versionId = -Expac:GetExpacIdFromCanonName(canonName) -- negate
   for _, itemId in ipairs(itemIds) do
     ItemVersion.communityItemIdToVersionId[itemId] = versionId
   end
 end
-setBackupTable(ItemVersion.communityItemIdToVersionId, ItemVersion.itemIdToVersionId)
+SetBackupTable(ItemVersion.communityItemIdToVersionId, ItemVersion.itemIdToVersionId)
 
 
 -- placeholder versions for community updates
@@ -93,4 +95,4 @@ ItemVersion.communityVersionIdToVersion = {
   [-9] = { major = 9, minor = 0, patch = 0, build = 0 }, -- sl
   [-10] = { major = 10, minor = 0, patch = 0, build = 0 }, -- df
 }
-setBackupTable(ItemVersion.communityVersionIdToVersion, ItemVersion.versionIdToVersion)
+SetBackupTable(ItemVersion.communityVersionIdToVersion, ItemVersion.versionIdToVersion)

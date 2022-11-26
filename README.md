@@ -30,6 +30,8 @@
 
 Just install the addon like normal and mouse over any item!
 
+![Demo of tooltip](https://raw.githubusercontent.com/t-mart/ItemVersion/master/docs/images/demo.png)
+
 Access the options screen with `/itemversion`.
 
 ![Options screen](https://raw.githubusercontent.com/t-mart/ItemVersion/master/docs/images/options.png)
@@ -38,15 +40,21 @@ Access the options screen with `/itemversion`.
 
 See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md)
 
+## Translators Needed
+
+If you know another language and want to help translate ItemVersion, please
+[check this out](https://github.com/t-mart/ItemVersion/tree/master/ItemVersion/Locales).
+
+Translations are living things. If you see an improvement to make, don't hesitate to bring it up.
+
 ## Support
 
 - **An item has the wrong version.**
 
-  First, verify it on [wowhead.com](https://www.wowhead.com/). If Wowhead _does_ in fact disagree
-  with the data in ItemVersion, please create a GitHub issue.
+  First, verify it on [wowhead.com](https://www.wowhead.com/).
 
-  In some cases, items are added towards the end of an expansion that actually used in the _next_
-  expansion, making them appear to have too early of a version. For example,
+  Note that, in some cases, items are added towards the end of an expansion that actually used in
+  the _next_ expansion, making them appear to have too early of a version. For example,
   [Marrowroot](https://www.wowhead.com/item=168589/marrowroot), a herb used in Shadowlands, was
   actually added to the game during the previous expansion, Battle for Azeroth. And, ItemVersion
   will display Battle for Azeroth because it is canonically correct.
@@ -55,9 +63,9 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
   "Include community updates" option on the options screen. Then, the Marrowroot example would
   display Shadowlands.
 
-  (These community updates are an ongoing effort. If you have discovered an item that's usage is in
-  a different expansion than ItemVersion reports, please lend a hand and create an
-  [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
+  (These community updates are an ongoing effort. If you have discovered an item that feels like its
+  in the wrong expansion, please lend a hand and create an [issue on the GitHub project
+  page](https://github.com/t-mart/ItemVersion/issues).
 
 - **An item still has the wrong version** or **An item is missing** or **I found a bug** or
   **I want to request a feature**.

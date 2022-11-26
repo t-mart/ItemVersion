@@ -63,6 +63,9 @@ globals = {
 	"InterfaceOptionsFrame_OpenToCategory",
 	"Round",
 	"WrapTextInColorCode",
+	"GetBuildInfo",
+	"IsWindowsClient",
+	"IsLinuxClient",
 
 	-- provided by libs
 	"LibStub",

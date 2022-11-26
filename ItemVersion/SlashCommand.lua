@@ -1,29 +1,43 @@
 local addonName, ItemVersion = ...
 
-local subcommand_handlers = {
-  version = "HandleVersionSubcommand",
-  config = "HandleConfigSubcommand",
-  help = "HandleHelpSubcommand",
-}
+local AceConsole = LibStub("AceConsole-3.0")
+local Util = ItemVersion.Util
 
-function ItemVersion:HandleVersionSubcommand()
-  self:Print(string.format("%s v%s", self.name, self.version))
+local SlashCommandMixin = {}
+
+ItemVersion.SlashCommand = {}
+
+function ItemVersion.SlashCommand:New(settingsCategoryId, registerChatCommand)
+  local t = {
+    settingsCategoryId = settingsCategoryId,
+    registerChatCommand = registerChatCommand,
+  }
+
+  return Util.Mixin(t, SlashCommandMixin)
 end
 
-function ItemVersion:HandleHelpSubcommand()
+function SlashCommandMixin:Register()
+  AceConsole:RegisterChatCommand("itemversion", function(...) self:HandleCommand(...) end)
+end
+
+function SlashCommandMixin:HandleVersionSubcommand()
+  self:Print(string.format("%s v%s", addonName, GetAddOnMetadata(addonName, "Version")))
+end
+
+function SlashCommandMixin:HandleHelpSubcommand()
   local usage = (
-    "\n" ..
-        "usage: /itemversion <command>\n" ..
-        "\n" ..
-        "Available Commands:\n" ..
-        "    config  Opens the configuration window\n" ..
-        "    version Displays the version of ItemVersion\n" ..
-        "    help    Shows this help"
-    )
+      "\n" ..
+          "usage: /itemversion <command>\n" ..
+          "\n" ..
+          "Available Commands:\n" ..
+          "    config  Opens the configuration window\n" ..
+          "    version Displays the version of ItemVersion\n" ..
+          "    help    Shows this help"
+      )
   self:Print(usage)
 end
 
-function ItemVersion:HandleConfigSubcommand()
+function SlashCommandMixin:HandleConfigSubcommand()
   if Settings then
     -- mainline way
     Settings.OpenToCategory(self.settingsCategoryId)
@@ -31,12 +45,18 @@ function ItemVersion:HandleConfigSubcommand()
     -- classic way
     -- lol, this isn't a bug: gotta do it twice.
     InterfaceOptionsFrame_OpenToCategory(addonName)
-		InterfaceOptionsFrame_OpenToCategory(addonName)
+    InterfaceOptionsFrame_OpenToCategory(addonName)
   end
 end
 
-function ItemVersion:HandleCommand(input)
-  local subcommand, nextpos = self:GetArgs(input)
+function SlashCommandMixin:HandleCommand(input)
+  local subcommand, nextpos = AceConsole:GetArgs(input)
+
+  local subcommand_handlers = {
+    version = self.HandleVersionSubcommand,
+    config = self.HandleConfigSubcommand,
+    help = self.HandleHelpSubcommand,
+  }
 
   if not subcommand or subcommand:trim() == "" then
     subcommand = "config"
@@ -44,7 +64,6 @@ function ItemVersion:HandleCommand(input)
     subcommand = "help"
   end
 
-
   local left = string.sub(input, nextpos)
-  self[subcommand_handlers[subcommand]](self, left)
+  subcommand_handlers[subcommand](self, left)
 end

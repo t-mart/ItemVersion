@@ -2,23 +2,18 @@ local addonName, addon = ...
 
 -- pass in the `addon` table: AceAddon will use it instead of creating a new table
 -- this is important because our Data.lua file inserts into that addon table too
-ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceConsole-3.0")
+ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName)
 
 function ItemVersion:OnInitialize()
-  self.version = GetAddOnMetadata(self.name, "Version")
+  self.db = self.Database:New()
 
-  self.db = LibStub("AceDB-3.0"):New("ItemVersionDB", self:GetDefaultDB(), true)
+  self.tooltip = self.Tooltip:New(self.db)
+  self.tooltip:HookTooltipCall()
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable(self.name, self:GetOptions())
+  self.options = self.Options:New(self.db, self.tooltip)
+  self.options:Register()
+  local settingsCategoryId = self.options:AddToBlizOptions()
 
-  self:RegisterChatCommand("itemversion", function(...) self:HandleCommand(...) end)
-
-  local _, categoryId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, self.name, nil, "tooltip")
-  self.settingsCategoryId = categoryId
-
-  LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.name, "Profiles", categoryId, "profile")
-
-  self:HookTooltipCall()
-  -- TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
-  --                                         function(...) self:OnTooltipSetItem(...) end)
+  self.slashCommand = self.SlashCommand:New(settingsCategoryId, self.RegisterChatCommand)
+  self.slashCommand:Register()
 end

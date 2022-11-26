@@ -1,23 +1,22 @@
 local _, ItemVersion = ...
 
+local Expac = ItemVersion.Expac
+
+ItemVersion.API = {}
+
 ---Get the version for a given item, or nil if it does not exist in the database
 ---@param itemId number
 ---@param includeCommunityUpdates boolean | nil
 ---@return {major: number, minor: number, patch: number, build: number } | nil
-function ItemVersion:getItemVersion(itemId, includeCommunityUpdates)
+function ItemVersion.API:getItemVersion(itemId, includeCommunityUpdates)
   local itemIdToVersionId, versionIdToVersion
 
-  -- if argument not provided, ask profile for default
-  if includeCommunityUpdates == nil then
-    includeCommunityUpdates = self.db.profile.includeCommunityUpdates
-  end
-
   if includeCommunityUpdates then
-    itemIdToVersionId = self.communityItemIdToVersionId
-    versionIdToVersion = self.communityVersionIdToVersion
+    itemIdToVersionId = ItemVersion.communityItemIdToVersionId
+    versionIdToVersion = ItemVersion.communityVersionIdToVersion
   else
-    itemIdToVersionId = self.itemIdToVersionId
-    versionIdToVersion = self.versionIdToVersion
+    itemIdToVersionId = ItemVersion.itemIdToVersionId
+    versionIdToVersion = ItemVersion.versionIdToVersion
   end
 
   local versionId = itemIdToVersionId[itemId]
@@ -34,14 +33,14 @@ end
 ---database.
 ---@param version { major: number }
 ---@return {canonName:string,shortName:string} | nil
-function ItemVersion:getVersionExpac(version)
-  return self:getExpacFromMajor(version.major)
+function ItemVersion.API:getVersionExpac(version)
+  return Expac:GetExpacFromMajor(version.major)
 end
 
 ---Return a dot-separated string of the components of version
 ---@param version {major: number, minor: number, patch: number, build: number }
 ---@return string
-function ItemVersion:buildVersionString(version)
+function ItemVersion.API:buildVersionString(version)
   return string.format("%d.%d.%d.%d", version.major, version.minor, version.patch,
                        version.build)
 end

@@ -1,8 +1,28 @@
 local addonName, ItemVersion = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local API = ItemVersion.API
+local Util = ItemVersion.Util
 
-function ItemVersion:ConfiguredModifiersAreDown()
+local TooltipMixin = {}
+
+ItemVersion.Tooltip = {}
+
+function ItemVersion.Tooltip:New(db)
+  local t = {
+    db = db
+  }
+
+  return Util.Mixin(t, TooltipMixin)
+end
+
+local WrapTextInColor = function(text, color)
+  local hex = ("ff%.2x%.2x%.2x"):format(Round(color.r * 255), Round(color.g * 255),
+                                        Round(color.b * 255));
+  return WrapTextInColorCode(text, hex);
+end
+
+function TooltipMixin:ConfiguredModifiersAreDown()
   if self.db.profile.keyModifiers.shift and not IsShiftKeyDown() then
     return false
   end
@@ -19,18 +39,18 @@ function ItemVersion:ConfiguredModifiersAreDown()
   return true
 end
 
-function ItemVersion:TooltipLine(version)
+function TooltipMixin:GenerateLine(version)
   local line = ""
 
   -- prefix
   if self.db.profile.showPrefix then
-    line = line .. self.Util.WrapTextInColor(L["Added in"], self.db.profile.prefixColor) .. " "
+    line = line .. WrapTextInColor(L["Added in"], self.db.profile.prefixColor) .. " "
   end
 
   -- expac
   local expacName
   if version then
-    local expac = self:getVersionExpac(version)
+    local expac = API:getVersionExpac(version)
     if self.db.profile.shortExpacNames then
       expacName = L[expac.shortName]
     else
@@ -39,70 +59,71 @@ function ItemVersion:TooltipLine(version)
   else
     expacName = L["Unknown"]
   end
-  line = line .. self.Util.WrapTextInColor(expacName, self.db.profile.expacColor)
+  line = line .. WrapTextInColor(expacName, self.db.profile.expacColor)
 
   -- version
   if self.db.profile.showVersion then
     local versionString
     if version then
-      versionString = self:buildVersionString(version)
+      versionString = API:buildVersionString(version)
     else
       versionString = L["Unknown"]
     end
     line = line ..
-        self.Util.WrapTextInColor(" (" .. versionString .. ")", self.db.profile.versionColor)
+        WrapTextInColor(" (" .. versionString .. ")", self.db.profile.versionColor)
   end
 
   return line
 end
 
-function ItemVersion:TooltipLineForItemId(itemId)
-  local version = self:getItemVersion(itemId)
-  return self:TooltipLine(version)
+function TooltipMixin:GenerateLineForItemId(itemId)
+  local version = API:getItemVersion(itemId, self.db.profile.includeCommunityUpdates)
+  return self:GenerateLine(version)
 end
 
-function ItemVersion:OnTooltipSetItem(tooltip, data)
-  if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
-    return
-  end
-
-  if not self:ConfiguredModifiersAreDown() then
-    return
-  end
-
-  local itemId
-  if data then
-    -- mainline way
-    itemId = data.id
-  else
-    -- classic way
-    local name, link = GameTooltip:GetItem() -- will this break if its ItemRefTooltip?
-    if (link) and (name) then
-      itemId = tonumber(string.match(link, "item:(%d*)"))
+function TooltipMixin:GetOnTooltipSetItemFn()
+  return function(tooltip, data)
+    if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
+      return
     end
+
+    if not self:ConfiguredModifiersAreDown() then
+      return
+    end
+
+    local itemId
+    if data then
+      -- mainline way
+      itemId = data.id
+    else
+      -- classic way
+      local name, link = GameTooltip:GetItem() -- will this break if its ItemRefTooltip?
+      if (link) and (name) then
+        itemId = tonumber(string.match(link, "item:(%d*)"))
+      end
+    end
+
+    if not itemId then
+      return
+    end
+
+    local version = API:getItemVersion(itemId, self.db.profile.includeCommunityUpdates)
+
+    if not version and not self.db.profile.showWhenMissing then
+      return
+    end
+
+    local line = self:GenerateLine(version)
+
+    tooltip:AddLine(line)
+    tooltip:Show()
   end
-
-  if not itemId then
-    return
-  end
-
-  local version = self:getItemVersion(itemId)
-
-  if not version and not self.db.profile.showWhenMissing then
-    return
-  end
-
-  local tooltipLine = self:TooltipLine(version)
-
-  tooltip:AddLine(tooltipLine)
-  tooltip:Show()
 end
 
-function ItemVersion:HookTooltipCall()
+function TooltipMixin:HookTooltipCall()
   if TooltipDataProcessor then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,
-                                            function(...) self:OnTooltipSetItem(...) end)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self:GetOnTooltipSetItemFn())
   else
-    GameTooltip:HookScript("OnTooltipSetItem", function(...) self:OnTooltipSetItem(...) end)
+    GameTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())
   end
 end

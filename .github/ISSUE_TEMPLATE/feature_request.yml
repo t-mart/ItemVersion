@@ -6,6 +6,10 @@ body:
   - type: markdown
     attributes:
       value: |
+        ## Thanks for writing in!
+
+        Please fill out the fields below.
+
         You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
   - type: input
     id: flavor

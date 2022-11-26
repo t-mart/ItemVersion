@@ -6,6 +6,10 @@ body:
   - type: markdown
     attributes:
       value: |
+        ## Thanks for reporting!
+
+        Please fill out the fields below.
+
         You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
   - type: input
     id: flavor
@@ -31,24 +35,10 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: What is the bug?
-      description: Please provide steps to reproduce it. If you are reporting a missing item, please provide the Wowhead link for it.
+      label: What is the bug? And, what should happen instead?
+      description: Additionally, if you are reporting a missing item, please provide the Wowhead link for it.
     validations:
       required: true
-  - type: textarea
-    id: current_behavior
-    attributes:
-      label: Current Behavior
-      description: A concise description of what you're experiencing.
-    validations:
-      required: false
-  - type: textarea
-    id: expected_behavior
-    attributes:
-      label: Expected Behavior
-      description: A concise description of what you expected to happen.
-    validations:
-      required: false
   - type: textarea
     id: reproduce_steps
     attributes:

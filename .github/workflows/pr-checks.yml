@@ -1,4 +1,7 @@
 name: PR Checks
+
+# Run checks that ensure code quality of pull requests
+
 on:
   workflow_dispatch:
   pull_request:

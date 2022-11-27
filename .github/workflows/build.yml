@@ -1,4 +1,8 @@
 name: Build
+
+# This workflow creates a usable addon zip for each commit. One reason for this is that it lets
+# contributors get a build without having to install wap (begrudingly).
+
 on:
   workflow_dispatch:
   pull_request:

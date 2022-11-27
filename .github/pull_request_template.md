@@ -2,7 +2,7 @@
 
 - [ ] Bug fix
 - [ ] New feature
-- [ ] Community item version change
+- [ ] Item fix
 - [ ] Documentation
 - [ ] Other
 

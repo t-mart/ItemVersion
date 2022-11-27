@@ -50,7 +50,7 @@ body:
       label: How are you encountering this item? Is it in your bags? A chat link? Some other part of the UI?
     validations:
       required: true
-  - type: textarea
+  - type: input
     id: correction
     attributes:
       label: What should this item's expansion/version be instead?

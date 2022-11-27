@@ -1,4 +1,4 @@
-name: Build from commit
+name: Build
 on:
   workflow_dispatch:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
       uses: t-mart/wap-action@master
       with:
         release-type: 'none'
-        
+
     - name: Surface addons
       # upload-artifact sets the root directory of the artifact zip to the path segment that has the first wildcard.
       # our dist dir is in the format dist/ItemVersion-X.Y.Z/ItemVersion/foo.lua. Because

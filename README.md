@@ -40,6 +40,23 @@ Access the options screen with `/itemversion`.
 
 See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md)
 
+## Contributing
+
+- Beginners are welcome. If you are new to programming, Git, Lua, or anything related to the
+  project, then I can help you. Just ask.
+- No contribution is too small! Please submit as many fixes for typos and grammar bloopers as you
+  can.
+- Don't be afraid to open half-finished PRs, and ask questions if something is unclear!
+- Pull requests should be made on their own separate branches.
+- Try to limit each pull request to _one_ idea only.
+- Please document how you tested your changes in your pull request.
+- Make sure your changes pass the status checks.
+- If you would like, please add your name to the
+  [`AUTHORS.md`](https://github.com/t-mart/ItemVersion/blob/master/AUTHORS.md) file. Pseudonyms are
+  fine.
+
+See the Contributing document for more information
+
 ## Translators Needed
 
 If you know another language and want to help translate ItemVersion, please

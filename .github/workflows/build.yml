@@ -1,7 +1,11 @@
 name: Build
 
-# This workflow creates a usable addon zip for each commit. One reason for this is that it lets
-# contributors get a build without having to install wap (begrudingly).
+# This workflow creates a usable addon zip for each commit.
+#
+# One reason for this is that it lets contributors get a build without having to install wap
+# (begrudingly). To download it, head to this check's run page and click on "Summary" in the
+# left-hand column. There, towards the bottom of the page, there will be an "Artifacts" section
+# where the built addon zip file can be found.
 
 on:
   workflow_dispatch:

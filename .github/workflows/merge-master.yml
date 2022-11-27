@@ -1,0 +1,54 @@
+name: Merge Master
+
+# 1. Merge master into release branch
+# 2. Push release branch
+# 3. Run release workflow (see release.yml)
+#
+# This workflow is done manually (workflow_dispatch) when the work on master is in a releaseable
+# state
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "The type of wap release to perform (or none at all)"
+        type: choice
+        options:
+          - "none"
+          - "alpha"
+          - "beta"
+          - "release"
+        required: true
+
+jobs:
+  merge:
+    name: Merge Master into Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout addon code
+      uses: actions/checkout@v3
+      with:
+        ref: release
+        token: ${{ secrets.GH_PAT }}
+        fetch-depth: 0  # needed to know about origin/master
+
+    - name: Git Config
+      shell: bash
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+    - name: Put master on release
+      run: |
+        git merge origin/master
+
+    - name: Git Push
+      run: |
+        git push origin release
+
+  release:
+    needs: merge
+    uses: ./.github/workflows/release.yml
+    with:
+      release-type: ${{ inputs.release-type }}
+    secrets: inherit

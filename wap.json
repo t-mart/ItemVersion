@@ -12,7 +12,8 @@
       "projectId": "433258",
       "slug": "itemversion",
       "releaseType": "alpha",
-      "changelogFile": "./CHANGELOG.md"
+      "changelogText": "See <https://github.com/t-mart/ItemVersion/releases>.",
+      "changelogType": "markdown"
     }
   },
   "package": [

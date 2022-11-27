@@ -55,7 +55,8 @@ See the [API page](https://github.com/t-mart/ItemVersion/blob/master/docs/API.md
   [`AUTHORS.md`](https://github.com/t-mart/ItemVersion/blob/master/AUTHORS.md) file. Pseudonyms are
   fine.
 
-See the Contributing document for more information
+See the [Contributing document](https://github.com/t-mart/ItemVersion/blob/master/CONTRIBUTING.md)
+for more information.
 
 ## Translators Needed
 

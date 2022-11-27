@@ -1,31 +1,24 @@
 name: Release
 
+# On release branch:
+# 1. Add a version bump commit
+# 2. Tag it
+# 3. wap build/publish the addon
+# 4. Make a GH release (with the addon file)
+# 5. Merge it back to master branch (so that the two branches stay in sync)
+#
+# This workflow doesn't run on its own -- its called by other workflows that have put something
+# releaseable on release branch (refresh-data.yml or merge-master.yml)
+
 on:
-  workflow_dispatch:
-    inputs:
-      release-type:
-        description: "The type of wap release to perform (or none at all)"
-        type: choice
-        options:
-          - "none"
-          - "alpha"
-          - "beta"
-          - "release"
-        required: false
-        default: "beta"
   workflow_call:
     inputs:
-      git-ref:
-        type: string
-        required: false
-        default: ''
       release-type:
         type: string
-        required: false
-        default: "beta"
+        required: true
     secrets:
-      CF_API_KEY:
-        required: false
+      GH_PAT:
+        required: true
 
 jobs:
   release:
@@ -35,8 +28,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ inputs.git-ref }}
+        ref: release
         token: ${{ secrets.GH_PAT }}
+        fetch-depth: 0  # ensure git knows about shared history between release and master
 
     - name: Setup Node 18
       uses: actions/setup-node@v3
@@ -53,28 +47,38 @@ jobs:
       shell: bash
       run: |
         LAST_VERSION=$(jq <"wap.json" ".version" --raw-output)
-        echo "Last version was $LAST_VERSION"
-        NEXT_VERSION=$(calver inc --format yyyy.0w.patch --levels calendar.patch $LAST_VERSION)
-        echo "Next version is $NEXT_VERSION"
-        echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+        echo "Last version was ${LAST_VERSION}"
+        NEXT_VERSION=$(calver inc --format yyyy.0w.patch --levels calendar.patch ${LAST_VERSION})
+        echo "Next version is ${NEXT_VERSION}"
+        echo "version=${NEXT_VERSION}" >> ${GITHUB_OUTPUT}
 
     - name: Update wap.json version
       shell: bash
       run: |
-        jq  ".version = \"$NEXT_VERSION\"" <wap.json >wap-next.json
+        jq  ".version = \"${NEXT_VERSION}\"" <wap.json >wap-next.json
         mv wap-next.json wap.json
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 
-    - name: Commit, tag, and push
+    - name: Git Config
       shell: bash
       run: |
         git config user.name "${GITHUB_ACTOR}"
         git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+    - name: Git Commit & Tag
+      shell: bash
+      run: |
         git add wap.json
-        git commit -m "Release $NEXT_VERSION"
-        git tag -a "$NEXT_VERSION" -m "Release $NEXT_VERSION"
-        git push --atomic origin "${{ github.ref_name }}" "$NEXT_VERSION"
+        git commit -m "Release ${NEXT_VERSION}"
+        git tag -a "${NEXT_VERSION}" -m "Release ${NEXT_VERSION}"
+      env:
+        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
+
+    - name: Git Push
+      shell: bash
+      run: |
+        git push --atomic origin release "${NEXT_VERSION}"
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 
@@ -86,7 +90,13 @@ jobs:
 
     - name: GH Release
       run: |
-        gh release create --generate-notes "$NEXT_VERSION" dist/*.zip
+        gh release create --generate-notes "${NEXT_VERSION}" dist/*.zip
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Merge back into master
+      run: |
+        git checkout master
+        git merge release
+        git push origin master

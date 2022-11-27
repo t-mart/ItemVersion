@@ -1,19 +1,30 @@
 name: Refresh Data
 
-# jobs
-# 1. run scrape from item-version-scrape
-#   - output to dist/Data.lua and upload artifact
-#   - if cache has been updated, make a commit and push to that repo
-# 2. incorporate new Data.lua
-#   - download artifact
-#   - make commit and push
-# 3. run release workflow
+# 1. Run scrape from item-version-scrape
+#   - Output to dist/Data.lua and upload artifact
+#   - If cache has been updated, make a commit and push it back to save progress
+# 2. On release branch, download new Data.lua artifact, and commit and push it. (This is
+#    intentionally not done on master branch -- master branch has a different lifecycle than the
+#    weekly data refreshes. master branch is where we do development, and we don't want master's
+#    possibly-unfinished things to be auto-merged into release branch every week.)
+# 3. Run release workflow (see release.yml)
+#
+# This workflow is done automatically on Tuesdays at 16:00 UTC (1 hour after wow weekly reset), or
+# by manual workflow_dispatch.
 
 on:
   workflow_dispatch:
+    inputs:
+      release-type:
+        description: "The type of wap release to perform (or none at all)"
+        type: choice
+        options:
+          - "none"
+          - "alpha"
+          - "beta"
+          - "release"
+        required: true
   schedule:
-    # run on tuesdays at 16:00 UTC (1 hour after wow weekly reset)
-    # runs on the last commit on the default branch
     - cron: "0 16 * * 2"
 
 jobs:
@@ -21,83 +32,90 @@ jobs:
     name: Scrape
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: master
-          repository: t-mart/item-version-scrape
-          token: ${{ secrets.GH_PAT }}
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: master
+        repository: t-mart/item-version-scrape
+        token: ${{ secrets.GH_PAT }}
 
-      - name: Install Poetry
-        run: |
-          pipx install poetry
+    - name: Install Poetry
+      run: |
+        pipx install poetry
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "poetry"
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+        cache: "poetry"
 
-      - name: Install dependencies
-        run: |
-          poetry install
+    - name: Install dependencies
+      run: |
+        poetry install
 
-      - name: Scrape
-        run: |
-          poetry run ivs scrape
+    - name: Scrape
+      run: |
+        poetry run ivs scrape
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Data.lua
-          path: dist/Data.lua
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Data.lua
+        path: dist/Data.lua
 
-      - name: Check if cache updated
-        id: cache-updated
-        run: |
-          RESULT=$(git diff --exit-code --quiet ./cache && echo "0" || echo "1")
-          echo "CACHE_UPDATED=$RESULT" >> $GITHUB_OUTPUT
+    - name: Check if cache updated
+      id: cache-updated
+      run: |
+        RESULT=$(git diff --exit-code --quiet ./cache && echo "0" || echo "1")
+        echo "CACHE_UPDATED=${RESULT}" >> ${GITHUB_OUTPUT}
 
-      - name: Commit
-        if: steps.cache-updated.outputs.CACHE_UPDATED == '1'
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git add ./cache
-          git commit -m "Update cache"
-          git push origin "${{ github.ref_name }}"
+    - name: Commit
+      if: steps.cache-updated.outputs.CACHE_UPDATED == '1'
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        git add ./cache
+        git commit -m "Update cache"
+        git push origin "${{ github.ref_name }}"
 
   commit:
     name: Commit new item data
     runs-on: ubuntu-latest
     needs: scrape
     steps:
-      - name: Checkout addon code
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_PAT }}
+    - name: Checkout addon code
+      uses: actions/checkout@v3
+      with:
+        ref: release
+        token: ${{ secrets.GH_PAT }}
 
-      - name: Clear old data
-        run: |
-          rm ItemVersion/Data.lua
+    - name: Clear old data
+      run: |
+        rm ItemVersion/Data.lua
 
-      - name: Download generated lua artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: Data.lua
-          path: ItemVersion/
+    - name: Download generated lua artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: Data.lua
+        path: ItemVersion/
 
-      - name: Commit and push
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git add ItemVersion/Data.lua
-          git commit -m "Refresh item data"
-          git push origin master
+    - name: Git Config
+      shell: bash
+      run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+    - name: Commit & Push
+      run: |
+        git add ItemVersion/Data.lua
+        git commit -m "Refresh item data"
+
+    - name: Git Push
+      run: |
+        git push origin release
 
   release:
     needs: commit
     uses: ./.github/workflows/release.yml
     with:
-      git-ref: master
-      release-type: release
+      release-type: ${{ inputs.release-type || 'release' }}  # release if no input specified (cron)
     secrets: inherit

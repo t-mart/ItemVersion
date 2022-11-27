@@ -1,0 +1,65 @@
+name: Unknown item or wrong item version
+description: Fix an item's version
+labels: [item fix]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for reporting!
+
+        Please fill out the fields below.
+
+        You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
+  - type: input
+    id: flavor
+    attributes:
+      label: What is your client flavor? (Retail, Wrath, or Classic)
+      description: "You can find this easily with `/itemversion issue`."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: What version of ItemVersion do you have installed?
+      description: "You can find this easily with `/itemversion issue`. Upgrade to the latest version that you can."
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: What platform are you playing on? (Windows, Mac, or Linux)
+      description: "You can find this easily with `/itemversion issue`."
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: What's the name of the item?
+    validations:
+      required: true
+  - type: input
+    id: wowhead
+    attributes:
+      label: What's the Wowhead URL for the item?
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: How are you encountering this item? Is it in your bags? A chat link? Some other part of the UI?
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: What should this item's expansion/version be instead?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the bug here. Attach files by dragging & dropping, selecting, or pasting them.
+    validations:
+      required: false

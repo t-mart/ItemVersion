@@ -16,9 +16,9 @@
 ## Developer Environment
 
 ItemVersion uses [`wap`](https://t-mart.github.io/wap/) for most development tasks. See [wap for
-Contributors](https://t-mart.github.io/wap/contributors/) to get started. Using `wap` will give you
-a nice developer experience that automatically rebuilds on file changes and links ItemVersion into
-your `Interface/AddOns` directory.
+Collaborators](https://t-mart.github.io/wap/wap-for-collaborators/) to get started. Using `wap` will
+give you a nice developer experience that automatically rebuilds on file changes and links
+ItemVersion into your `Interface/AddOns` directory.
 
 In particular, if you do not use `wap` to build the addon, you won't be able to use it in the game.
 This is because `wap` transforms the source files here into a usable addon.

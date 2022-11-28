@@ -14,7 +14,7 @@
 ## Useful for
 
 - Clearing your bags and bank of old stuff
-- Identifying loot from your transmog runs
+- Identifying crafting reagents and loot from your transmog runs
 - Looking back on WoW history
 
 ## Features

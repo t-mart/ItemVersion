@@ -83,6 +83,8 @@ end
 
 function TooltipMixin:GetOnTooltipSetItemFn()
   return function(tooltip, data)
+    -- GameTooltip is the one attached to the mouse
+    -- ItemRefTooltip is the static one after clicking an item link
     if (tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip) then
       return
     end
@@ -97,7 +99,7 @@ function TooltipMixin:GetOnTooltipSetItemFn()
       itemId = data.id
     else
       -- classic way
-      local name, link = GameTooltip:GetItem() -- will this break if its ItemRefTooltip?
+      local name, link = tooltip:GetItem()
       if (link) and (name) then
         itemId = tonumber(string.match(link, "item:(%d*)"))
       end
@@ -125,5 +127,6 @@ function TooltipMixin:HookTooltipCall()
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self:GetOnTooltipSetItemFn())
   else
     GameTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())
+    ItemRefTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())
   end
 end

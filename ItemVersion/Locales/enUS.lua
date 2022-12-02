@@ -49,6 +49,10 @@ L["Displays the version of ItemVersion"] = true
 L["Shows this help"] = true
 L["%s Issue Information"] = true
 L["Copy and paste this data when making a new issue for ItemVersion."] = true
+L["Client flavor and version"] = true
+L["ItemVersion version"] = true
+L["Platform"] = true
+L["Issue URL"] = true
 
 -- these expac strings aren't known in non-mainline, unfortunately
 L["Battle for Azeroth"] = true

@@ -48,6 +48,20 @@ L["Including community updates changes some items' version/expansion to the one 
             "большая часть будет принадлежать новому расширению, а меньшие части будут обнулены.\n\n" ..
             "Если Вы столкнулись с проблемой, которая не была исправлена этими обновлениями, пожалуйста, " ..
             "сообщите об этом на странице проекта."
+L["usage"] = "использование"
+L["subcommand"] = "субкоманда"
+L["Available Subcommands"] = "Доступные субкоманды"
+L["Opens the configuration window"] = "Открывает окно конфигурации"
+L["Opens a window with information to assist in creating an issue"] = "Открывает окно с информацией для помощи в создании нового отчёта об ошибке"
+L["Displays the version of ItemVersion"] = "Отображает версию ItemVersion"
+L["Shows this help"] = "Показывает эту справку"
+L["%s Issue Information"] = "%s Информация о проблеме"
+L["Copy and paste this data when making a new issue for ItemVersion."] = "Скопируйте и вставьте эти данные при создании нового отчёта об ошибке для ItemVersion."
+L["Client flavor and version"] = "Тип и версия клиента"
+L["ItemVersion version"] = "Версия аддона ItemVersion"
+L["Platform"] = "Платформа"
+L["Issue URL"] = "URL-ссылка для отчёта об ошибке"
+
 -- эти expac-строки не известны в неосновной ветке, к сожалению
 L["Battle for Azeroth"] = "Battle for Azeroth"
 L["Shadowlands"] = "Shadowlands"

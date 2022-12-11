@@ -2,6 +2,7 @@
     <Include file="Locales\enUS.lua" />
     <Include file="Locales\ruRU.lua" />
     <Include file="Locales\zhCN.lua" />
+    <Include file="Locales\koKR.lua" />
 
     <!-- this should be last -->
     <Include file="Locales\Global.lua" />

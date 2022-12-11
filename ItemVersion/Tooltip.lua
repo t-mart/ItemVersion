@@ -51,9 +51,9 @@ function TooltipMixin:GenerateLine(version)
   if version then
     local expac = API:getVersionExpac(version)
     if self.db.profile.shortExpacNames then
-      expacName = L[expac.shortName]
+      expacName = expac.shortName
     else
-      expacName = L[expac.canonName]
+      expacName = expac.canonName
     end
   else
     expacName = L["Unknown"]

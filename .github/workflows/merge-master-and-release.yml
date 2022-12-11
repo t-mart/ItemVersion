@@ -1,4 +1,4 @@
-name: Merge Master
+name: Merge Master and Release
 
 # 1. Merge master into release branch
 # 2. Push release branch

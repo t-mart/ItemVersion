@@ -1,4 +1,4 @@
-name: Refresh Data
+name: Refresh Data and Release
 
 # 1. Run scrape from item-version-scrape
 #   - Output to dist/Data.lua and upload artifact

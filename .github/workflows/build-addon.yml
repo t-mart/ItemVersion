@@ -1,4 +1,4 @@
-name: Build
+name: Build Addon
 
 # This workflow creates a usable addon zip for each commit.
 #

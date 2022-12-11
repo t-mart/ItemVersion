@@ -1,7 +1,9 @@
 local addonName = ...
 
 local L = LibStub("AceLocale-3.0"):NewLocale(addonName, "enUS", true)
-if not L then return end
+if not L then
+	return
+end
 
 L["Tooltip"] = true
 L["Added in"] = true
@@ -29,17 +31,11 @@ L["DF"] = true
 L["Show for unknown items"] = true
 L["Show the tooltip line even when the item is not in the database"] = true
 L["Modifier keys"] = true
-L["Display the tooltip only when the selected modifier keys being are pressed. " ..
-    "(No selections means always show.)"] = true
+L["Display the tooltip only when the selected modifier keys being are pressed. (No selections means always show.)"] =
+	true
 L["Include community updates"] = true
-L["Including community updates changes some items' version/expansion to the one " ..
-            "that players expect. For example, the herb [Marrowroot] was actually added towards " ..
-            "the end of BfA in pre-release development, but was only obtainable in SL. With this " ..
-            "option turned on, ItemVersion would report SL in this case, instead of BfA.\n\n" ..
-            "Because the updates are non-canonical, the version number will be a placeholder one: " ..
-            "the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\n" ..
-            "If you encounter an item that is not fixed by these updates, please consider " ..
-            "reporting it to the project page."] = true
+L["Including community updates changes some items' version/expansion to the one that players expect. For example, the herb [Marrowroot] was actually added towards the end of BfA in pre-release development, but was only obtainable in SL. With this option turned on, ItemVersion would report SL in this case, instead of BfA.\n\nBecause the updates are non-canonical, the version number will be a placeholder one: the major part will be that of the new expansion, but the lesser parts will be zeroed.\n\nIf you encounter an item that is not fixed by these updates, please consider reporting it to the project page."] =
+	true
 L["usage"] = true
 L["subcommand"] = true
 L["Available Subcommands"] = true

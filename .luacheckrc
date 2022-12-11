@@ -8,15 +8,13 @@ std = "lua51"
 files["ItemVersion/Data.lua"] = {
 	ignore = {
 		"631", -- Line is too long.
-		"211" -- Unused local variable.
-	}
+		"211", -- Unused local variable.
+	},
 }
 
--- Different languages shouldn't have code formatting requirements
-files['ItemVersion/Locales/*.lua'] = {
-	ignore = {
-		"631", -- Line is too long.
-	}
+-- breaking down lines is hard sometimes.
+ignore = {
+	"631", -- Line is too long.
 }
 
 globals = {

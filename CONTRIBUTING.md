@@ -12,6 +12,8 @@
 - If you would like, please add your name to the
   [`AUTHORS.md`](https://github.com/t-mart/ItemVersion/blob/master/AUTHORS.md) file. Pseudonyms are
   fine.
+- This addon uses [StyLua] for Lua code formatting. See its documentation for how to apply it to
+  your contributions.
 
 ## Developer Environment
 

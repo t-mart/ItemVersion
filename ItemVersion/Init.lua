@@ -5,15 +5,15 @@ local addonName, addon = ...
 ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName)
 
 function ItemVersion:OnInitialize()
-	self.db = self.Database:New()
+  self.db = self.Database:New()
 
-	self.tooltip = self.Tooltip:New(self.db)
-	self.tooltip:HookTooltipCall()
+  self.tooltip = self.Tooltip:New(self.db)
+  self.tooltip:HookTooltipCall()
 
-	self.options = self.Options:New(self.db, self.tooltip)
-	self.options:Register()
-	local settingsCategoryId = self.options:AddToBlizOptions()
+  self.options = self.Options:New(self.db, self.tooltip)
+  self.options:Register()
+  local settingsCategoryId = self.options:AddToBlizOptions()
 
-	self.slashCommand = self.SlashCommand:New(settingsCategoryId, self.RegisterChatCommand)
-	self.slashCommand:Register()
+  self.slashCommand = self.SlashCommand:New(settingsCategoryId, self.RegisterChatCommand)
+  self.slashCommand:Register()
 end

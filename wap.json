@@ -3,9 +3,9 @@
   "name": "ItemVersion",
   "version": "2023.30.0",
   "wowVersions": {
-    "mainline": "10.1.0",
-    "wrath": "3.4.1",
-    "vanilla": "1.14.3"
+    "mainline": "10.1.5",
+    "wrath": "3.4.2",
+    "vanilla": "1.14.4"
   },
   "publish": {
     "curseforge": {

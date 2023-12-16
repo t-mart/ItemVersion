@@ -3,7 +3,7 @@
   "name": "ItemVersion",
   "version": "2023.50.1",
   "wowVersions": {
-    "mainline": "10.2.5",
+    "mainline": "10.2.0",
     "wrath": "3.4.3",
     "vanilla": "1.14.4"
   },

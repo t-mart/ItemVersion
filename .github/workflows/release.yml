@@ -32,15 +32,13 @@ jobs:
         token: ${{ secrets.GH_PAT }}
         fetch-depth: 0  # ensure git knows about shared history between release and master
 
-    - name: Setup Node 18
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+    - name: Install cargo-binstall
+      uses: cargo-bins/cargo-binstall@v1.6.3
 
-    - name: Install calver-cli
+    - name: Install nextver
       shell: bash
       run: |
-        npm install --global calver-cli
+        cargo binstall nextver
 
     - name: Determine next version
       id: next-version
@@ -48,7 +46,7 @@ jobs:
       run: |
         LAST_VERSION=$(jq <"wap.json" ".version" --raw-output)
         echo "Last version was ${LAST_VERSION}"
-        NEXT_VERSION=$(calver inc --format yyyy.0w.patch --levels calendar.patch ${LAST_VERSION})
+        NEXT_VERSION=$(nextver next ${LAST_VERSION} --format "<YYYY>.<0W>.<PATCH>" --sem-level patch)
         echo "Next version is ${NEXT_VERSION}"
         echo "version=${NEXT_VERSION}" >> ${GITHUB_OUTPUT}
 

@@ -32,13 +32,11 @@ jobs:
         token: ${{ secrets.GH_PAT }}
         fetch-depth: 0  # ensure git knows about shared history between release and master
 
-    - name: Install cargo-binstall
-      uses: cargo-bins/cargo-binstall@v1.6.3
-
+    # TODO: generate binaries on nextver release page and just use those (with binstall?)
     - name: Install nextver
       shell: bash
       run: |
-        cargo binstall nextver
+        cargo install nextver
 
     - name: Determine next version
       id: next-version

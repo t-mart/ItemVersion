@@ -88,11 +88,11 @@ jobs:
         curseforge-token: ${{ secrets.CF_API_KEY }}
 
     - name: GH Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
       run: |
         gh release create --generate-notes "${NEXT_VERSION}" dist/*.zip
-      env:
-        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Merge back into master
       run: |

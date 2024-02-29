@@ -82,13 +82,14 @@ jobs:
 
     - name: Update wap.json version
       run: |
-        jq  '.version = "${NEXT_VERSION}" | .wowVersions.mainline = "${MAINLINE}" | .wowVersions.wrath = "${WRATH}" | .wowVersions.vanilla = "${VANILLA}"' <wap.json >wap-next.json
+        jq \
+          --arg nextVersion "${{ steps.next-version.outputs.version }}" \
+          --arg mainline "${{ steps.wow-versions.outputs.mainline }}" \
+          --arg wrath "${{ steps.wow-versions.outputs.wrath }}" \
+          --arg vanilla "${{ steps.wow-versions.outputs.vanilla }}" \
+          '.version = $nextVersion | .wowVersions.mainline = $mainline | .wowVersions.wrath = $wrath | .wowVersions.vanilla = $vanilla' \
+          <wap.json >wap-next.json
         mv wap-next.json wap.json
-      env:
-        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
-        MAINLINE: "${{ steps.wow-versions.outputs.mainline }}"
-        WRATH: "${{ steps.wow-versions.outputs.wrath }}"
-        VANILLA: "${{ steps.wow-versions.outputs.vanilla }}"
 
     - name: Git Commit, Tag, and Push
       run: |
@@ -99,7 +100,7 @@ jobs:
         git commit -m "Release ${NEXT_VERSION}"
 
         git tag -a "${NEXT_VERSION}" -m "Release ${NEXT_VERSION}"
-        
+
         git push --atomic origin release "${NEXT_VERSION}"
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"

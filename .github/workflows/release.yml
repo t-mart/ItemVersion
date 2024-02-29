@@ -44,7 +44,7 @@ jobs:
     - name: Determine next version
       id: next-version
       run: |
-        LAST_VERSION="$(jq <"wap.json" ".version" --raw-output)"
+        LAST_VERSION="$(jq -r <wap.json '.version')"
         echo "::notice title=Last Version::${LAST_VERSION}"
 
         NEXT_VERSION=$(nextver next ${LAST_VERSION} --format "<YYYY>.<0W>.<PATCH>" --sem-level patch)

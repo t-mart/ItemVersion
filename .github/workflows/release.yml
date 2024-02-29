@@ -7,8 +7,13 @@ name: Release
 # 4. Make a GH release (with the addon file)
 # 5. Merge it back to master branch (so that the two branches stay in sync)
 #
-# This workflow doesn't run on its own -- its called by other workflows that have put something
-# releaseable on release branch (refresh-data.yml or merge-master.yml)
+# This workflow doesn't run on its own -- its called by other workflows that
+# have put something releaseable on release branch (refresh-data.yml or
+# merge-master.yml)
+#
+# This workflow requires a secret `CURSEFORGE_TOKEN` to be set up in the
+# repository. This can be created at
+# <https://legacy.curseforge.com/account/api-tokens>.
 
 on:
   workflow_call:
@@ -109,7 +114,7 @@ jobs:
       uses: t-mart/wap-action@master
       with:
         release-type: ${{ inputs.release-type }}
-        curseforge-token: ${{ secrets.CF_API_KEY }}
+        curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
     - name: GH Release
       env:

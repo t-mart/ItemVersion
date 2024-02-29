@@ -3,14 +3,24 @@ name: Refresh Data and Release
 # 1. Run scrape from item-version-scrape
 #   - Output to dist/Data.lua and upload artifact
 #   - If cache has been updated, make a commit and push it back to save progress
-# 2. On release branch, download new Data.lua artifact, and commit and push it. (This is
-#    intentionally not done on master branch -- master branch has a different lifecycle than the
-#    weekly data refreshes. master branch is where we do development, and we don't want master's
-#    possibly-unfinished things to be auto-merged into release branch every week.)
+# 2. On release branch, download new Data.lua artifact, and commit and push it.
+#    (This is intentionally not done on master branch -- master branch has a
+#    different lifecycle than the weekly data refreshes. master branch is where
+#    we do development, and we don't want master's possibly-unfinished things to
+#    be auto-merged into release branch every week.)
 # 3. Run release workflow (see release.yml)
 #
-# This workflow is done automatically on Tuesdays at 16:00 UTC (1 hour after wow weekly reset), or
-# by manual workflow_dispatch.
+# This workflow is done automatically on Tuesdays at 16:00 UTC (1 hour after wow
+# weekly reset), or by manual workflow_dispatch.
+#
+# This workflow requires a secret `ITEM_VERSION_SCRAPE_PAT` to be set up in the
+# repository. This should be a personal access token created at
+# <https://github.com/settings/tokens> with the following permissions:
+#  - Repository access: t-mart/item-version-scrape
+#  - Repositiory permissions
+#    - Contents: Read and write
+# It may need to be periodically regenerated if it expires, but you should get
+# an email before it happens.
 
 on:
   workflow_dispatch:
@@ -40,7 +50,7 @@ jobs:
       with:
         ref: ${{ env.item_version_scrape_ref }}
         repository: t-mart/item-version-scrape
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.ITEM_VERSION_SCRAPE_PAT }}
 
     - name: Install Poetry
       run: |

@@ -4,8 +4,8 @@ name: Merge Master into Release
 # 2. Push release branch
 # 3. Run release workflow (see release.yml)
 #
-# This workflow is done manually (workflow_dispatch) when the work on master is in a releaseable
-# state
+# This workflow should be dispatched manually when the work on master is
+# in a releaseable state
 
 on:
   workflow_dispatch:

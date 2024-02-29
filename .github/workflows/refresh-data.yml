@@ -24,18 +24,21 @@ on:
           - "beta"
           - "release"
         required: true
+        default: "release"
   schedule:
     - cron: "0 16 * * 2"
 
 jobs:
   scrape:
     name: Scrape
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    env:
+      item_version_scrape_ref: master
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: master
+        ref: ${{ env.item_version_scrape_ref }}
         repository: t-mart/item-version-scrape
         token: ${{ secrets.GH_PAT }}
 
@@ -57,7 +60,7 @@ jobs:
       run: |
         poetry run ivs scrape
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: Data.lua
         path: dist/Data.lua
@@ -65,57 +68,54 @@ jobs:
     - name: Check if cache updated
       id: cache-updated
       run: |
-        RESULT=$(git diff --exit-code --quiet ./cache && echo "0" || echo "1")
-        echo "CACHE_UPDATED=${RESULT}" >> ${GITHUB_OUTPUT}
+        CACHE_UPDATED=$(git diff --exit-code --quiet ./cache && echo "false" || echo "true")
+        echo "cache_updated=${CACHE_UPDATED}" >> ${GITHUB_OUTPUT}
 
-    - name: Commit
-      if: steps.cache-updated.outputs.CACHE_UPDATED == '1'
+    - name: Commit if needed
+      if: steps.cache-updated.outputs.cache_updated == 'true'
       run: |
         git config user.name "${GITHUB_ACTOR}"
         git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git add ./cache
         git commit -m "Update cache"
-        git push origin "${{ github.ref_name }}"
+        git push origin "${{ env.item_version_scrape_ref }}"
 
   commit:
     name: Commit new item data
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     needs: scrape
+    env:
+      release_ref: release
     steps:
     - name: Checkout addon code
       uses: actions/checkout@v4
       with:
-        ref: release
-        token: ${{ secrets.GH_PAT }}
+        ref: ${{ env.release_ref }}
 
     - name: Clear old data
       run: |
         rm ItemVersion/Data.lua
 
     - name: Download generated lua artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Data.lua
         path: ItemVersion/
 
-    - name: Git Config
+    - name: Commit & Push
       shell: bash
       run: |
         git config user.name "${GITHUB_ACTOR}"
         git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-    - name: Commit & Push
-      run: |
         git add ItemVersion/Data.lua
         git commit -m "Refresh item data"
-
-    - name: Git Push
-      run: |
-        git push origin release
+        git push origin "${{ env.release_ref }}"
 
   release:
     needs: commit
     uses: ./.github/workflows/release.yml
     with:
-      release-type: ${{ inputs.release-type || 'release' }}  # release if no input specified (cron)
+      release-type: ${{ inputs.release-type }}
     secrets: inherit

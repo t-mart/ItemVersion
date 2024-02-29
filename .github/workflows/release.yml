@@ -16,67 +16,90 @@ on:
       release-type:
         type: string
         required: true
-    secrets:
-      GH_PAT:
-        required: true
 
 jobs:
   release:
     name: Release
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         ref: release
-        token: ${{ secrets.GH_PAT }}
         fetch-depth: 0  # ensure git knows about shared history between release and master
     
     - name: Get binstall
       uses: cargo-bins/cargo-binstall@main
 
-    # TODO: generate binaries on nextver release page and just use those (with binstall?)
-    - name: Install nextver
-      shell: bash
+    - name: Install support tooling
       run: |
+        # nextver bumps our versions
         cargo binstall nextver --no-confirm
+
+        # wownow gives current wow versions
+        cargo binstall wownow --no-confirm
 
     - name: Determine next version
       id: next-version
-      shell: bash
       run: |
-        LAST_VERSION=$(jq <"wap.json" ".version" --raw-output)
-        echo "Last version was ${LAST_VERSION}"
+        LAST_VERSION="$(jq <"wap.json" ".version" --raw-output)"
+        echo "::notice title=Last Version::${LAST_VERSION}"
+
         NEXT_VERSION=$(nextver next ${LAST_VERSION} --format "<YYYY>.<0W>.<PATCH>" --sem-level patch)
-        echo "Next version is ${NEXT_VERSION}"
+        echo "::notice title=Next Version::${NEXT_VERSION}"
         echo "version=${NEXT_VERSION}" >> ${GITHUB_OUTPUT}
 
-    - name: Update wap.json version
-      shell: bash
+    - name: Determine current wow versions
+      id: wow-versions
       run: |
-        jq  ".version = \"${NEXT_VERSION}\"" <wap.json >wap-next.json
+        wownow >wownow.json
+
+        function get_version_by_product() {
+          local output=$(jq -r --arg product "$1" '.[] | select(.product == $product) | .version' < wownow.json)
+          if [[ -z $output ]]; then
+            echo "No version found for product: $1, possible error with this function or wownow output"
+            exit 1
+          else
+            echo "$output"
+          fi
+        }
+
+        MAINLINE="$(get_version_by_product "wow")"
+        echo "::notice title=Current Mainline Version::${MAINLINE}"
+        echo "mainline=${MAINLINE}" >> ${GITHUB_OUTPUT}
+
+        WRATH="$(get_version_by_product "wow_classic")"
+        echo "::notice title=Current Wrath Version::${WRATH}"
+        echo "wrath=${WRATH}" >> ${GITHUB_OUTPUT}
+
+        VANILLA="$(get_version_by_product "wow_classic_era")"
+        echo "::notice title=Current Vanilla Version::${VANILLA}"
+        echo "vanilla=${VANILLA}" >> ${GITHUB_OUTPUT}
+
+        rm wownow.json
+
+    - name: Update wap.json version
+      run: |
+        jq  '.version = "${NEXT_VERSION}" | .wowVersions.mainline = "${MAINLINE}" | .wowVersions.wrath = "${WRATH}" | .wowVersions.vanilla = "${VANILLA}"' <wap.json >wap-next.json
         mv wap-next.json wap.json
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
+        MAINLINE: "${{ steps.wow-versions.outputs.mainline }}"
+        WRATH: "${{ steps.wow-versions.outputs.wrath }}"
+        VANILLA: "${{ steps.wow-versions.outputs.vanilla }}"
 
-    - name: Git Config
-      shell: bash
+    - name: Git Commit, Tag, and Push
       run: |
         git config user.name "${GITHUB_ACTOR}"
         git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-    - name: Git Commit & Tag
-      shell: bash
-      run: |
         git add wap.json
         git commit -m "Release ${NEXT_VERSION}"
-        git tag -a "${NEXT_VERSION}" -m "Release ${NEXT_VERSION}"
-      env:
-        NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 
-    - name: Git Push
-      shell: bash
-      run: |
+        git tag -a "${NEXT_VERSION}" -m "Release ${NEXT_VERSION}"
+        
         git push --atomic origin release "${NEXT_VERSION}"
       env:
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"

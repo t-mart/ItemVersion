@@ -26,7 +26,8 @@
           "Notes": "Shows in what version of the game an item was added in the tooltip",
           "SavedVariables": [
             "ItemVersionDB"
-          ]
+          ],
+          "IconTexture": "Interface\\AddOns\\ItemVersion\\Images\\Icon.tga"
         },
         "files": [
           "libs.xml",

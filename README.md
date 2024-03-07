@@ -1,4 +1,4 @@
-# ItemVersion
+# <img src="docs/images/icon.png" alt="Icon of a silver armored gauntlet with a blue glow" style="max-height: 1em;"> ItemVersion
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/t-mart/ItemVersion)](https://github.com/t-mart/ItemVersion/releases)
 [![Release](https://github.com/t-mart/ItemVersion/actions/workflows/release.yml/badge.svg)](https://github.com/t-mart/ItemVersion/actions/workflows/release.yml)

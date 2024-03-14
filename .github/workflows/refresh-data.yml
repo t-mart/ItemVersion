@@ -41,7 +41,7 @@ on:
     # sufficiently high enough, some queued jobs may be dropped."
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
     # - cron: "20 16 * * 2"
-    - cron: "5 7 * * *" # test
+    - cron: "25 7 * * *" # test
 
 jobs:
   scrape:
@@ -132,5 +132,7 @@ jobs:
     needs: commit
     uses: ./.github/workflows/release.yml
     with:
-      release-type: ${{ inputs.release-type }}
+      # on cron triggers, `release-type` will be an empty string, so default to
+      # 'release' in that case
+      release-type: ${{ inputs.release-type || 'release' }}
     secrets: inherit

@@ -63,7 +63,8 @@ jobs:
         wownow >wownow.json
 
         function get_version_by_product() {
-          local output=$(jq -r --arg product "$1" '.[] | select(.product == $product) | .version' < wownow.json)
+          local region="us"
+          local output=$(jq -r --arg product "$1" --arg region "$REGION" '.products.[] | select(.name == $product).versions[] | select(.region == $region).version' < wownow.json)
           if [[ -z $output ]]; then
             echo "No version found for product: $1, possible error with this function or wownow output"
             exit 1

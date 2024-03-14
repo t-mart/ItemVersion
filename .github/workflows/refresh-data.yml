@@ -41,7 +41,7 @@ on:
     # sufficiently high enough, some queued jobs may be dropped."
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
     # - cron: "20 16 * * 2"
-    - cron: "0 7 * * 2" # test
+    - cron: "5 7 * * *" # test
 
 jobs:
   scrape:

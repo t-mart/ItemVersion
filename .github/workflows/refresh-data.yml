@@ -40,8 +40,7 @@ on:
     # because "High load times include the start of every hour. If the load is
     # sufficiently high enough, some queued jobs may be dropped."
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
-    # - cron: "20 16 * * 2"
-    - cron: "25 7 * * *" # test
+    - cron: "20 16 * * 2"
 
 jobs:
   scrape:

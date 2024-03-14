@@ -36,7 +36,12 @@ on:
         required: true
         default: "release"
   schedule:
-    - cron: "0 16 * * 2"
+    # 16:20 UTC is roughly 1 hour after weekly reset. We choose a non-round time
+    # because "High load times include the start of every hour. If the load is
+    # sufficiently high enough, some queued jobs may be dropped."
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+    # - cron: "20 16 * * 2"
+    - cron: "0 7 * * 2" # test
 
 jobs:
   scrape:

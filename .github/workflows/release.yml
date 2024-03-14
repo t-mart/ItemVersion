@@ -21,6 +21,7 @@ on:
       release-type:
         type: string
         required: true
+        default: "release"
 
 jobs:
   release:

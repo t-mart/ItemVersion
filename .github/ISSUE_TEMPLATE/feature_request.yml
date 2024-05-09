@@ -8,7 +8,7 @@ body:
       value: |
         ## Thanks for writing in!
 
-        Please fill out the fields below.
+        Could you please provide the following information? It helps me help you faster.
 
         You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
   - type: input

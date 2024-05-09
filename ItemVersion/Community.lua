@@ -32,6 +32,7 @@ local communityUpdates = {
     171315, -- Nightshade
   },
   [L["Dragonflight"]] = {},
+  [L["The War Within"]] = {},
 }
 
 -- cause tbl to use backupTbl for key lookups if key is not in tbl

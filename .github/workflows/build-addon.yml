@@ -42,7 +42,7 @@ jobs:
         mkdir ${NEW_DIR}
         mv dist/ItemVersion*/* ${NEW_DIR}
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ItemVersion-${{ github.sha }}
         path: ${{ env.NEW_DIR }}/*

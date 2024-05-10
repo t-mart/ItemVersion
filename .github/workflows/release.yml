@@ -119,6 +119,7 @@ jobs:
         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
     - name: GH Release
+      if: ${{ inputs.release-type }} != 'none'
       env:
         GH_TOKEN: ${{ github.token }}
         NEXT_VERSION: "${{ steps.next-version.outputs.version }}"

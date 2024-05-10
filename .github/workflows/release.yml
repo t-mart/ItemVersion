@@ -30,6 +30,11 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
+    
+    - name: Release info
+      run: |
+        echo "::notice title=Release type::${{ inputs.release-type }}"
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:

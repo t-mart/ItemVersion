@@ -76,5 +76,6 @@ ItemVersion.communityVersionIdToVersion = {
   [-8] = { major = 8, minor = 0, patch = 0, build = 0 }, -- bfa
   [-9] = { major = 9, minor = 0, patch = 0, build = 0 }, -- sl
   [-10] = { major = 10, minor = 0, patch = 0, build = 0 }, -- df
+  [-11] = { major = 11, minor = 0, patch = 0, build = 0 }, -- ww
 }
 SetBackupTable(ItemVersion.communityVersionIdToVersion, ItemVersion.versionIdToVersion)

@@ -52,7 +52,6 @@ L["Platform"] = true
 L["Issue URL"] = true
 
 -- these expac strings aren't known in non-mainline, unfortunately
-L["Battle for Azeroth"] = true
 L["Shadowlands"] = true
 L["Dragonflight"] = true
 L["The War Within"] = true

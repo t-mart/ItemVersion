@@ -25,7 +25,7 @@ function SlashCommandMixin:Register()
 end
 
 function SlashCommandMixin:HandleVersionSubcommand()
-  AceConsole:Print(string.format("%s v%s", addonName, GetAddOnMetadata(addonName, "Version")))
+  AceConsole:Print(string.format("%s v%s", addonName, C_AddOns.GetAddOnMetadata(addonName, "Version")))
 end
 
 function SlashCommandMixin:HandleHelpSubcommand()
@@ -62,8 +62,8 @@ local GetFlavor = function()
   local flavor = "Unknown flavor"
   if toc >= 100000 then
     flavor = "Retail"
-  elseif toc >= 30000 and toc <= 39999 then
-    flavor = "Wrath"
+  elseif toc >= 40000 and toc <= 49999 then
+    flavor = "Cata"
   elseif toc <= 19999 then
     flavor = "Classic"
   end

@@ -1,11 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/t-mart/wap/master/src/wap/schema/wap.schema.json",
   "name": "ItemVersion",
-  "version": "2024.21.0",
+  "version": "2024.21.1",
   "wowVersions": {
     "mainline": "10.2.7",
     "classic": "4.4.0",
-    "vanilla": "1.15.2"
+    "vanilla": "1.15.2",
+    "wrath": "4.4.0"
   },
   "publish": {
     "curseforge": {

@@ -64,6 +64,7 @@ globals = {
 	"GetBuildInfo",
 	"IsWindowsClient",
 	"IsLinuxClient",
+	"C_AddOns",
 
 	-- provided by libs
 	"LibStub",

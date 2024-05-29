@@ -121,7 +121,18 @@ function TooltipMixin:GetOnTooltipSetItemFn()
 end
 
 function TooltipMixin:HookTooltipCall()
-  if TooltipDataProcessor then
+  -- there's two ways to hook the tooltip:
+  -- 1. `TooltipDataProcessor.AddTooltipPostCall`. This is newer way and is more
+  --    ergonomic at getting tooltip data.
+  -- 2. `GameTooltip:HookScript("OnTooltipSetItem", ...)`. This works
+  --    everywhere, and requires more manual work to get the item id.
+
+  -- To decide which way, we used to just check for the existence of global
+  -- `TooltopDataProcessor`, but that became insufficient when Cata Classic came
+  -- out and this global was defined, but `AddTooltipPostCall` wouldn't work.
+  -- Therefore, we arbitrarily check if version 10 or higher (i.e. >= 100000 toc
+  -- version).
+  if TooltipDataProcessor and select(4, GetBuildInfo()) >= 100000 then
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self:GetOnTooltipSetItemFn())
   else
     GameTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())

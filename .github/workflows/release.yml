@@ -82,9 +82,9 @@ jobs:
         echo "::notice title=Current Mainline Version::${MAINLINE}"
         echo "mainline=${MAINLINE}" >> ${GITHUB_OUTPUT}
 
-        WRATH="$(get_version_by_product "wow_classic")"
-        echo "::notice title=Current Wrath Version::${WRATH}"
-        echo "wrath=${WRATH}" >> ${GITHUB_OUTPUT}
+        CLASSIC="$(get_version_by_product "wow_classic")"
+        echo "::notice title=Current Classic Version::${CLASSIC}"
+        echo "classic=${CLASSIC}" >> ${GITHUB_OUTPUT}
 
         VANILLA="$(get_version_by_product "wow_classic_era")"
         echo "::notice title=Current Vanilla Version::${VANILLA}"
@@ -97,9 +97,9 @@ jobs:
         jq \
           --arg nextVersion "${{ steps.next-version.outputs.version }}" \
           --arg mainline "${{ steps.wow-versions.outputs.mainline }}" \
-          --arg wrath "${{ steps.wow-versions.outputs.wrath }}" \
+          --arg classic "${{ steps.wow-versions.outputs.classic }}" \
           --arg vanilla "${{ steps.wow-versions.outputs.vanilla }}" \
-          '.version = $nextVersion | .wowVersions.mainline = $mainline | .wowVersions.wrath = $wrath | .wowVersions.vanilla = $vanilla' \
+          '.version = $nextVersion | .wowVersions.mainline = $mainline | .wowVersions.classic = $classic | .wowVersions.vanilla = $vanilla' \
           <wap.json >wap-next.json
         mv wap-next.json wap.json
 

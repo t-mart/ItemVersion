@@ -64,7 +64,7 @@ function TooltipMixin:GenerateLine(version)
   if self.db.profile.showVersion then
     local versionString
     if version then
-      versionString = API:buildVersionString(version)
+      versionString = API:buildVersionString(version, self.db.profile.showBuildNumber)
     else
       versionString = L["Unknown"]
     end

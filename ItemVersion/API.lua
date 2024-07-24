@@ -39,7 +39,12 @@ end
 
 ---Return a dot-separated string of the components of version
 ---@param version {major: number, minor: number, patch: number, build: number }
+---@param includeBuildNumber boolean if true, include the build number in the string
 ---@return string
-function ItemVersion.API:buildVersionString(version)
-  return string.format("%d.%d.%d.%d", version.major, version.minor, version.patch, version.build)
+function ItemVersion.API:buildVersionString(version, includeBuildNumber)
+  if includeBuildNumber then
+    return string.format("%d.%d.%d.%d", version.major, version.minor, version.patch, version.build)
+  else
+    return string.format("%d.%d.%d", version.major, version.minor, version.patch)
+  end
 end

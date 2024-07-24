@@ -49,6 +49,8 @@ L["Client flavor and version"] = true
 L["ItemVersion version"] = true
 L["Platform"] = true
 L["Issue URL"] = true
+L["Show build number"] = true
+L["Include or omit the build number in the tooltip"] = true
 
 -- these expac strings aren't known in non-mainline, unfortunately
 L["Shadowlands"] = true

@@ -14,6 +14,7 @@ function ItemVersion.Database:GetDefault()
       showVersion = true,
       versionColor = { r = 1.0, g = 1.0, b = 1.0 },
       showWhenMissing = false,
+      showBuildNumber = true,
       keyModifiers = { shift = false, control = false, alt = false, meta = false },
       includeCommunityUpdates = true,
     },

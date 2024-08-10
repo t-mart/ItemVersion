@@ -1,16 +1,8 @@
-## Type of changes
-
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Item fix
-- [ ] Documentation
-- [ ] Other
-
 ## Checklist
 
-- [ ] I've tested what I've added
-- [ ] I've updated AUTHORS.md with my name (if I want to)
+- [ ] Tested locally
+- [ ] Optionally added my name to `AUTHORS.md`
 
 ## Description
 
-Please describe your changes here. If this fixes a bug, please link to the issue, if possible.
+Describe your changes here. If this fixes a GitHub issue, please link to it.

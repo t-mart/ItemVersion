@@ -11,38 +11,32 @@ body:
         Could you please provide the following information? It helps me help you faster.
 
         You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
-  - type: input
+
+  - type: checkboxes
     id: flavor
     attributes:
-      label: What is your client flavor? (Retail, Wrath, or Classic)
-      description: "You can find this easily with `/itemversion issue`."
+      label: Which flavor are you suggesting this feature for?
+    options:
+      - label: Vanilla
+      - label: Classic
+      - label: Retail
     validations:
       required: true
-  - type: input
-    id: version
+
+  - type: dropdown
+    id: using_latest
     attributes:
-      label: What version of ItemVersion do you have installed?
-      description: "You can find this easily with `/itemversion issue`. Upgrade to the latest version that you can."
+      label: Are you using the latest version of ItemVersion?
+      description: "Compare the output of `/itemversion issue` to the latest release on GitHub or Curseforge. Upgrade to the latest version that you can."
+    options:
+      - label: "No"
+      - label: "Yes"
     validations:
       required: true
-  - type: input
-    id: platform
-    attributes:
-      label: What platform are you playing on? (Windows, Mac, or Linux)
-      description: "You can find this easily with `/itemversion issue`."
-    validations:
-      required: true
+
   - type: textarea
     id: description
     attributes:
-      label: What solution are you looking for?
-      description: A clear and concise description of what the problem is. Ex. I'm always frustrated when...
+      label: Describe the feature you'd like to see.
     validations:
       required: true
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional context
-      description: Add any other context or screenshots about the feature request here. Attach files by dragging & dropping, selecting, or pasting them.
-    validations:
-      required: false

@@ -83,10 +83,9 @@ Translations are living things. If you see an improvement to make, don't hesitat
 
   (These community updates are an ongoing effort. If you have discovered an item that feels like its
   in the wrong expansion, please lend a hand and create an [issue on the GitHub project
-  page](https://github.com/t-mart/ItemVersion/issues).
+  page](https://github.com/t-mart/ItemVersion/issues)).
 
-- **An item still has the wrong version** or **An item is missing** or **I found a bug** or
-  **I want to request a feature**.
+- **Anything else**
 
   Create an [issue on the GitHub project page](https://github.com/t-mart/ItemVersion/issues).
 

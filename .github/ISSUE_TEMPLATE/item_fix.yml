@@ -1,4 +1,4 @@
-name: Unknown item or wrong item version
+name: Item with wrong version
 description: Fix an item's version
 labels: [item fix]
 
@@ -11,55 +11,46 @@ body:
         Could you please provide the following information? It helps me help you faster.
 
         You can copy-paste some of the required information here by typing `/itemversion issue` in the in-game chat window
-  - type: input
+
+  - type: checkboxes
     id: flavor
     attributes:
-      label: What is your client flavor? (Retail, Wrath, or Classic)
-      description: "You can find this easily with `/itemversion issue`."
+      label: In which flavor are you seeing the wrong version?
+    options:
+      - label: Vanilla
+      - label: Classic
+      - label: Retail
     validations:
       required: true
-  - type: input
-    id: version
+
+  - type: dropdown
+    id: using_latest
     attributes:
-      label: What version of ItemVersion do you have installed?
-      description: "You can find this easily with `/itemversion issue`. Upgrade to the latest version that you can."
+      label: Are you using the latest version of ItemVersion?
+      description: "Compare the output of `/itemversion issue` to the latest release on GitHub or Curseforge. Upgrade to the latest version that you can."
+    options:
+      - label: "No"
+      - label: "Yes"
     validations:
       required: true
-  - type: input
-    id: platform
+
+  - type: textarea
+    id: wowhead_url
     attributes:
-      label: What platform are you playing on? (Windows, Mac, or Linux)
-      description: "You can find this easily with `/itemversion issue`."
+      label: Wowhead URL(s) for item.
     validations:
       required: true
-  - type: input
-    id: name
-    attributes:
-      label: What's the name of the item?
-    validations:
-      required: true
-  - type: input
-    id: wowhead
-    attributes:
-      label: What's the Wowhead URL for the item?
-    validations:
-      required: true
+
   - type: input
     id: where
     attributes:
       label: How are you encountering this item? Is it in your bags? A chat link? Some other part of the UI?
     validations:
       required: true
-  - type: input
+
+  - type: textarea
     id: correction
     attributes:
-      label: What should this item's expansion/version be instead?
+      label: What should this item's expansion/version be instead, and **why**?
     validations:
       required: true
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional context
-      description: Add any other context or screenshots about the bug here. Attach files by dragging & dropping, selecting, or pasting them.
-    validations:
-      required: false

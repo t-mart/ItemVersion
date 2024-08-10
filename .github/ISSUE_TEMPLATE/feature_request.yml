@@ -16,10 +16,10 @@ body:
     id: flavor
     attributes:
       label: Which flavor are you suggesting this feature for?
-    options:
-      - label: Vanilla
-      - label: Classic
-      - label: Retail
+      options:
+        - label: Vanilla
+        - label: Classic
+        - label: Retail
     validations:
       required: true
 
@@ -28,9 +28,9 @@ body:
     attributes:
       label: Are you using the latest version of ItemVersion?
       description: "Compare the output of `/itemversion issue` to the latest release on GitHub or Curseforge. Upgrade to the latest version that you can."
-    options:
-      - label: "No"
-      - label: "Yes"
+      options:
+        - label: "No"
+        - label: "Yes"
     validations:
       required: true
 

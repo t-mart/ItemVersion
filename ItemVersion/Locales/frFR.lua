@@ -35,7 +35,7 @@ L["Modifier keys"] = "Touches de modification"
 L["Display the tooltip only when the selected modifier keys being are pressed. (No selections means always show.)"] =
   "Affiche l’infobulle uniquement lorsque vous appuyez sur les touches de modification sélectionnées. (Pas de sélections, toujours affiché.)"
 L["Include community updates"] = "Inclure les mise à jours de la communauté"
-L["Correct the version for some items"] = "Corrige la version de certains objets"  
+L["Correct the version for some items"] = "Corrige la version de certains objets"
 L["usage"] = true
 L["subcommand"] = true
 L["Available Subcommands"] = true
@@ -50,7 +50,7 @@ L["ItemVersion version"] = true
 L["Platform"] = true
 L["Issue URL"] = true
 L["Show build number"] = "Afficher le numéro de build"
-L["Include or omit the build number in the tooltip"] = "Inclure ou omettre le numéro de build dans l’infobulle"      
+L["Include or omit the build number in the tooltip"] = "Inclure ou omettre le numéro de build dans l’infobulle"
 
 -- these expac strings aren't known in non-mainline, unfortunately
 L["Shadowlands"] = true

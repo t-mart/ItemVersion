@@ -29,15 +29,15 @@ body:
       label: Are you using the latest version of ItemVersion?
       description: "Compare the output of `/itemversion issue` to the latest release on GitHub or Curseforge. Upgrade to the latest version that you can."
       options:
-        - label: "No"
-        - label: "Yes"
+        - "No"
+        - "Yes"
     validations:
       required: true
 
   - type: textarea
     id: description
     attributes:
-      label: Describe the bug, what should happen instead, and **how to reproduce it**.
+      label: Describe the bug, what should happen instead, and how to reproduce it.
     validations:
       required: true
 

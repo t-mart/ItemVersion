@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/t-mart/wap/master/src/wap/schema/wap.schema.json",
   "name": "ItemVersion",
-  "version": "2024.31.1",
+  "version": "2024.32.0",
   "wowVersions": {
-    "mainline": "11.0.0",
+    "mainline": "11.0.2",
     "classic": "4.4.0",
     "vanilla": "1.15.3"
   },

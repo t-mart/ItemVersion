@@ -32,6 +32,7 @@ L["Including community updates changes some items' version/expansion to the one 
 L["Battle for Azeroth"] = "争霸艾泽拉斯"
 L["Shadowlands"] = "暗影国度"
 L["Dragonflight"] = "巨龙时代"
+L["The War Within"] = "地心之战"
 -- prevent AceLocale-3.0-6: ItemVersion: Missing entry for 'xxxxx'
 L["经典旧世"] = true
 L["燃烧的远征"] = true
@@ -43,3 +44,4 @@ L["军团再临"] = true
 L["争霸艾泽拉斯"] = true
 L["暗影国度"] = true
 L["巨龙时代"] = true
+L["地心之战"] = true

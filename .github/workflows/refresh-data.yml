@@ -49,50 +49,45 @@ jobs:
     env:
       item_version_scrape_ref: master
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ env.item_version_scrape_ref }}
-        repository: t-mart/item-version-scrape
-        token: ${{ secrets.ITEM_VERSION_SCRAPE_PAT }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.item_version_scrape_ref }}
+          repository: t-mart/item-version-scrape
+          token: ${{ secrets.ITEM_VERSION_SCRAPE_PAT }}
 
-    - name: Install Poetry
-      run: |
-        pipx install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        cache: "poetry"
+      - name: Set up Python
+        run: uv python install
 
-    - name: Install dependencies
-      run: |
-        poetry install
+      - name: Scrape
+        run: |
+          uv run ivs scrape
 
-    - name: Scrape
-      run: |
-        poetry run ivs scrape
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Data.lua
+          path: dist/Data.lua
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: Data.lua
-        path: dist/Data.lua
+      - name: Check if cache updated
+        id: cache-updated
+        run: |
+          CACHE_UPDATED=$(git diff --exit-code --quiet ./cache && echo "false" || echo "true")
+          echo "cache_updated=${CACHE_UPDATED}" >> ${GITHUB_OUTPUT}
 
-    - name: Check if cache updated
-      id: cache-updated
-      run: |
-        CACHE_UPDATED=$(git diff --exit-code --quiet ./cache && echo "false" || echo "true")
-        echo "cache_updated=${CACHE_UPDATED}" >> ${GITHUB_OUTPUT}
-
-    - name: Commit if needed
-      if: steps.cache-updated.outputs.cache_updated == 'true'
-      run: |
-        git config user.name "${GITHUB_ACTOR}"
-        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git add ./cache
-        git commit -m "Update cache"
-        git push origin "${{ env.item_version_scrape_ref }}"
+      - name: Commit if needed
+        if: steps.cache-updated.outputs.cache_updated == 'true'
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add ./cache
+          git commit -m "Update cache"
+          git push origin "${{ env.item_version_scrape_ref }}"
 
   commit:
     name: Commit new item data
@@ -103,29 +98,29 @@ jobs:
     env:
       release_ref: release
     steps:
-    - name: Checkout addon code
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ env.release_ref }}
+      - name: Checkout addon code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.release_ref }}
 
-    - name: Clear old data
-      run: |
-        rm ItemVersion/Data.lua
+      - name: Clear old data
+        run: |
+          rm ItemVersion/Data.lua
 
-    - name: Download generated lua artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: Data.lua
-        path: ItemVersion/
+      - name: Download generated lua artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Data.lua
+          path: ItemVersion/
 
-    - name: Commit & Push
-      shell: bash
-      run: |
-        git config user.name "${GITHUB_ACTOR}"
-        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git add ItemVersion/Data.lua
-        git commit -m "Refresh item data"
-        git push origin "${{ env.release_ref }}"
+      - name: Commit & Push
+        shell: bash
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add ItemVersion/Data.lua
+          git commit -m "Refresh item data"
+          git push origin "${{ env.release_ref }}"
 
   release:
     needs: commit

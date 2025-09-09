@@ -43,14 +43,17 @@ jobs:
     
     - name: Get binstall
       uses: cargo-bins/cargo-binstall@main
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Install support tooling
       run: |
         # nextver bumps our versions
         cargo binstall nextver --no-confirm
 
-        # wownow gives current wow versions
-        cargo binstall wownow --no-confirm
+        # wownow gets the current wow versions
+        uv tool install git+https://github.com/t-mart/wownowpy
 
     - name: Determine next version
       id: next-version

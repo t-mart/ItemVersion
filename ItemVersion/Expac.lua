@@ -16,6 +16,7 @@ local majorToExpac = {
   [9] = { canonName = L["Shadowlands"], shortName = L["SL"] },
   [10] = { canonName = L["Dragonflight"], shortName = L["DF"] },
   [11] = { canonName = L["The War Within"], shortName = L["WW"] },
+  [12] = { canonName = L["Midnight"], shortName = L["MN"] },
 }
 
 function ItemVersion.Expac:GetExpacFromMajor(major)

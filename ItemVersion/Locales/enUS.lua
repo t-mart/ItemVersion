@@ -56,3 +56,4 @@ L["Include or omit the build number in the tooltip"] = true
 L["Shadowlands"] = true
 L["Dragonflight"] = true
 L["The War Within"] = true
+L["Midnight"] = true

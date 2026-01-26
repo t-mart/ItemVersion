@@ -29,6 +29,7 @@ L["BfA"] = true
 L["SL"] = true
 L["DF"] = true
 L["WW"] = true
+L["MN"] = true
 L["Show for unknown items"] = true
 L["Show the tooltip line even when the item is not in the database"] = true
 L["Modifier keys"] = true

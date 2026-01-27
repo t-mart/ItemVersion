@@ -27,7 +27,7 @@
           "SavedVariables": [
             "ItemVersionDB"
           ],
-          "IconTexture": "Interface\\AddOns\\ItemVersion\\Images\\Icon.tga"
+          "IconTexture": "Interface\\AddOns\\ItemVersion\\Media\\Images\\ItemVersion.tga"
         },
         "files": [
           "libs.xml",
@@ -35,13 +35,16 @@
           "Init.lua",
           "Util.lua",
           "Database.lua",
-          "SlashCommand.lua",
+          "Expansion.lua",
           "Options.lua",
-          "Expac.lua",
+          "SlashCommand.lua",
           "Data.lua",
-          "Community.lua",
           "API.lua",
-          "Tooltip.lua"
+          "Tooltip.lua",
+          "Widgets/FormatHelpTable.lua",
+          "Widgets/TooltipFormatStringInput.lua",
+          "Widgets/MonoEditBox.lua",
+          "Widgets/PreviewIcon.lua"
         ]
       },
       "include": [

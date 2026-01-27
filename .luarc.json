@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "Lua 5.1",
+    "path": [
+      "?.lua",
+      "?/init.lua"
+    ]
+  },
+  "diagnostics": {
+    "enable": true
+  },
+  "workspace": {
+    "library": [
+      "ItemVersion/Libs"
+    ],
+    "ignoreDir": [
+      ".vscode",
+      "docs",
+      ".git",
+      "dist"
+    ],
+    "checkThirdParty": false
+  },
+  "completion": {
+    "enable": true,
+    "callSnippet": "Both",
+    "keywordSnippet": "Both"
+  },
+  "hint": {
+    "enable": true,
+    "setType": true,
+    "paramName": "All"
+  },
+  "format": {
+    "enable": false
+  },
+  "telemetry": {
+    "enable": false
+  }
+}

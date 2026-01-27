@@ -1,62 +1,84 @@
-
 # API
 
 Below are the main functions of the public API.
 
-## `ItemVersion:getItemVersion`
+## `ItemVersion.API.GetItemVersion`
 
-Type:
-`function(itemId: number, includeCommunityUpdates: bool | nil) -> {major: number, minor: number, patch: number, build: number} | nil`
+**Type:**
 
-Given an itemId, return the version in which the item was added to the game. The returned value is a
-table with fields `major`, `minor`, `patch`, and `build` that describe that version. If the itemId
-is not present in the database, return `nil`.
+```lua
+function(itemId: number, applyVersionCorrections: bool | nil) -> {
+  expac: table,
+  minor: number,
+  patch: number,
+  build: number,
+  isCorrected: boolean,
+} | nil
+```
 
-If the `includeCommunityUpdates` argument is truthy, community updates will be preferred over
-ItemVersion's canonical database. These updates attempt to correct instances in which items have
-versions that are earlier than when they were usable. For example, Marrowroot was first usable
-during Shadowlands, but was actually added towards the end of Battle for Azeroth. If
-`includeCommunityUpdates` is false, these updates will not be considered.
+**Description:**
 
-Examples:
+Given an `itemId`, return the version in which the item was added to the game.
+If the `itemId` is not present in the database, return `nil`.
 
-- ```lua
-  -- Morrowroot
-  local version = ItemVersion.getItemVersion(168589, false)
-  -- version = {major = 8, minor = 2, patch = 0, build = 30918}
-  ```
+The returned table contains:
 
-- ```lua
-  -- Morrowroot
-  local version = ItemVersion.getItemVersion(168589, true)
-  -- version = {major = 9, minor = 0, patch = 0, build = 0}
-  ```
+- **`expansion`**: The expansion table containing:
+  - `major`: The major version number (expansion number)
+  - `canonName`: The full expansion name (e.g., "Shadowlands")
+  - `shortName`: The abbreviated expansion name (e.g., "SL")
+  - `previewItemId`: Representative item ID for this expansion
+- **`minor`**: The minor version number
+- **`patch`**: The patch version number
+- **`build`**: The build number
+- **`isCorrected`**: Boolean indicating whether this result came from version
+  corrections
 
-- ```lua
-  local version = ItemVersion.getItemVersion(-1)
-  -- version = nil
-  ```
+**Version Corrections:**
 
-## `ItemVersion:getVersionExpac`
+If the `applyVersionCorrections` argument is `true`, version corrections will be
+checked first before consulting ItemVersion's canonical database. These
+corrections handle cases where items were added to the game in an earlier
+expansion but were not usable until a later expansion.
 
-Type: `function({major: number}) -> { canonName: string, shortName: string } | nil`
+For example, Marrowroot (168589) was technically added during Battle for Azeroth
+but wasn't usable until Shadowlands. With corrections enabled, it will show as
+Shadowlands. With corrections disabled, it will show its canonical BfA version.
 
-Given a table with field `major` (such as the table given by `ItemVersion.getItemVersion`), return
-a table for the expansion of the version. Has fields for `canonName` and `shortName`.
+**Examples:**
 
-Examples:
+```lua
+-- Marrowroot without corrections (canonical version)
+local version = ItemVersion.API.GetItemVersion(168589, false)
+-- Returns:
+-- {
+--   expansion = { major = 8, canonName = "Battle for Azeroth", shortName = "BfA", ... },
+--   minor = 2,
+--   patch = 0,
+--   build = 30918,
+--   isCorrected = false,
+--   buildVersionString = function
+-- }
+print(format("%d.%d.%d", version.expansion.major, version.patch, version.build)) -- "8.2.0"
+```
 
-- ```lua
-  local expac = ItemVersion.getVersionExpac(ItemVersion.getVersionExpac(19019))
-  -- expac = {canonName = "Classic", shortName = "Classic"}
-  ```
+```lua
+-- Marrowroot with corrections (usable version)
+local version = ItemVersion.API.GetItemVersion(168589, true)
+-- Returns:
+-- {
+--   expansion = { major = 9, canonName = "Shadowlands", shortName = "SL", ... },
+--   minor = 0,
+--   patch = 0,
+--   build = 0,
+--   isCorrected = true,
+--   buildVersionString = function
+-- }
+print(version.expansion.canonName)           -- "Shadowlands"
+```
 
-- ```lua
-  local expac = ItemVersion.getVersionExpac(ItemVersion.getVersionExpac(192466))
-  -- expac = {canonName = "Shadowlands", shortName = "SL"}
-  ```
-
-- ```lua
-  local expac = ItemVersion.getVersionExpac(ItemVersion.getVersionExpac(999999999))
-  -- expac = nil
-  ```
+```lua
+-- Non-existent item
+local version = ItemVersion.API.GetItemVersion(-1)
+-- version = nil
+```

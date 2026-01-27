@@ -1,50 +1,80 @@
-local _, ItemVersion = ...
+local _, Private = ...
 
-local Expac = ItemVersion.Expac
+local Expansion = Private.Expansion
 
-ItemVersion.API = {}
+Private.API = {}
+local API = Private.API
+
+---@class ItemVersionLookup
+---@field expansion {major: number, canonName: string, shortName: string}
+---@field minor number
+---@field patch number
+---@field build number
+---@field isCorrected boolean
 
 ---Get the version for a given item, or nil if it does not exist in the database
----@param itemId number
----@param includeCommunityUpdates boolean | nil
----@return {major: number, minor: number, patch: number, build: number } | nil
-function ItemVersion.API:getItemVersion(itemId, includeCommunityUpdates)
-  local itemIdToVersionId, versionIdToVersion
-
-  if includeCommunityUpdates then
-    itemIdToVersionId = ItemVersion.communityItemIdToVersionId
-    versionIdToVersion = ItemVersion.communityVersionIdToVersion
-  else
-    itemIdToVersionId = ItemVersion.itemIdToVersionId
-    versionIdToVersion = ItemVersion.versionIdToVersion
+---@param itemId number The item ID to look up
+---@param applyVersionCorrections boolean|nil Whether to apply version corrections
+---@return ItemVersionLookup|nil lookup The version information, or nil if not found
+function API.GetItemVersion(itemId, applyVersionCorrections)
+  -- first lookup in corrections
+  local expansion
+  if applyVersionCorrections then
+    expansion = Expansion:GetCorrectedExpansionForItemId(itemId)
+    if expansion then
+      return {
+        expansion = {
+          major = expansion.major,
+          canonName = expansion.canonName,
+          shortName = expansion.shortName,
+        },
+        minor = 0,
+        patch = 0,
+        build = 0,
+        isCorrected = true,
+      }
+    end
   end
 
-  local versionId = itemIdToVersionId[itemId]
 
-  -- item id not found in database
-  if versionId == nil then
+  -- then lookup in main database
+  local versionId = Private.itemIdToVersionId[itemId]
+  if not versionId then
     return nil
   end
 
-  return versionIdToVersion[versionId]
-end
-
----Get the expansion for a given version (from it's major field), or nil if it does not exist in the
----database.
----@param version { major: number }
----@return {canonName:string,shortName:string} | nil
-function ItemVersion.API:getVersionExpac(version)
-  return Expac:GetExpacFromMajor(version.major)
-end
-
----Return a dot-separated string of the components of version
----@param version {major: number, minor: number, patch: number, build: number }
----@param includeBuildNumber boolean if true, include the build number in the string
----@return string
-function ItemVersion.API:buildVersionString(version, includeBuildNumber)
-  if includeBuildNumber then
-    return string.format("%d.%d.%d.%d", version.major, version.minor, version.patch, version.build)
-  else
-    return string.format("%d.%d.%d", version.major, version.minor, version.patch)
+  local version = Private.versionIdToVersion[versionId]
+  if not version then
+    return nil
   end
+
+  expansion = Expansion:GetExpansionFromMajor(version.major)
+  if not expansion then
+    return nil
+  end
+
+  return {
+    expansion = {
+      major = expansion.major,
+      canonName = expansion.canonName,
+      shortName = expansion.shortName,
+    },
+    minor = version.minor,
+    patch = version.patch,
+    build = version.build,
+    isCorrected = false,
+  }
+end
+
+---Format a tooltip string by replacing tokens with values from the lookup
+---@param formatString string The format string containing tokens like {expacLong}, {versionTriple}, etc.
+---@param lookup ItemVersionLookup The version lookup data
+---@return string formatted The formatted string with tokens replaced
+function API.FormatTooltip(formatString, lookup)
+  for _, tokenInfo in ipairs(Private.Tokens) do
+    local resolved = tokenInfo.resolve(lookup)
+    formatString = formatString:gsub(tokenInfo.string, resolved)
+  end
+
+  return formatString
 end

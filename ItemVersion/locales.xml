@@ -5,6 +5,4 @@
     <Include file="Locales\koKR.lua" />
     <Include file="Locales\deDE.lua" />
     <Include file="Locales\frFR.lua" />
-    <!-- this should be last -->
-    <Include file="Locales\Global.lua" />
 </Ui>

@@ -11,10 +11,12 @@ jobs:
     name: Check Lua
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-    - name: Check Lua
-      uses: nebularg/actions-luacheck@v1
-      with:
-        args: ItemVersion --no-color --exclude-files 'ItemVersion/Libs/**/*.lua' --no-self
+      - name: Check Lua
+        uses: nebularg/actions-luacheck@v1
+        with:
+          args:
+            ItemVersion --no-color --exclude-files 'ItemVersion/Libs/**/*.lua'
+            --no-self

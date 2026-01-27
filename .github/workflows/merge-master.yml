@@ -28,22 +28,22 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout addon code
-      uses: actions/checkout@v4
-      with:
-        ref: release
-        fetch-depth: 0  # needed to know about origin/master
+      - name: Checkout addon code
+        uses: actions/checkout@v6
+        with:
+          ref: release
+          fetch-depth: 0 # needed to know about origin/master
 
-    - name: Git Config
-      shell: bash
-      run: |
-        git config user.name "${GITHUB_ACTOR}"
-        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      - name: Git Config
+        shell: bash
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-    - name: Put master on release and push
-      run: |
-        git merge origin/master
-        git push origin release
+      - name: Put master on release and push
+        run: |
+          git merge origin/master
+          git push origin release
 
   release:
     needs: merge

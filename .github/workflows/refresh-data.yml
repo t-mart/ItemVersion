@@ -50,14 +50,14 @@ jobs:
       item_version_scrape_ref: master
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.item_version_scrape_ref }}
           repository: t-mart/item-version-scrape
           token: ${{ secrets.ITEM_VERSION_SCRAPE_PAT }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -69,7 +69,7 @@ jobs:
         run: |
           uv run ivs scrape
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: Data.lua
           path: dist/Data.lua
@@ -99,7 +99,7 @@ jobs:
       release_ref: release
     steps:
       - name: Checkout addon code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.release_ref }}
 
@@ -108,7 +108,7 @@ jobs:
           rm ItemVersion/Data.lua
 
       - name: Download generated lua artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: Data.lua
           path: ItemVersion/

@@ -1,16 +1,20 @@
-local _, ItemVersion = ...
+local _, Private = ...
 
-ItemVersion.Util = {}
 
--- Mix key-value pairs from other tables (...) into object. This is commonly used to create
--- class "instances" with a particular interface.
-function ItemVersion.Util.Mixin(object, ...)
-  for i = 1, select("#", ...) do
-    local mixin = select(i, ...)
-    for k, v in pairs(mixin) do
-      object[k] = v
-    end
+local function deepCopy(obj)
+  -- Does not handle cyclic references
+  if type(obj) ~= 'table' then return obj end
+
+  local res = {}
+  for k, v in pairs(obj) do
+    -- Recursively copy the key and the value
+    res[deepCopy(k)] = deepCopy(v)
   end
 
-  return object
+  return res
 end
+
+
+Private.Util = {
+  DeepCopy = deepCopy,
+}

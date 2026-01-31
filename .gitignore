@@ -1,3 +1,5 @@
 dist
 node_modules/
 ItemVersion/ItemVersion.toc
+docs/frame-xml-reference
+docs/ace3

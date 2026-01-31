@@ -1,0 +1,13 @@
+<Bindings>
+  <Binding name="Reload UI" default="R">
+  C_UI.Reload()
+  </Binding>
+  <Binding name="Open Config" default="C">
+        local ACD = LibStub("AceConfigDialog-3.0")
+        if ACD.OpenFrames["ItemVersionOptions"] then
+            ACD:Close("ItemVersionOptions")
+        else
+            ACD:Open("ItemVersionOptions")
+        end
+  </Binding>
+</Bindings>

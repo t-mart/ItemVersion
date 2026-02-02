@@ -7,22 +7,12 @@ Below are the main functions of the public API.
 **Type:**
 
 ```lua
-function(itemId: number, applyVersionCorrections: bool | nil) -> {
-  expansion: table,
-  minor: number,
-  patch: number,
-  build: number,
-  isCorrected: boolean,
-} | nil
+function(itemId: number, applyVersionCorrections: bool | nil) -> ItemVersionLookup | nil
 ```
 
-**Description:**
+Where `ItemVersionLookup` is a table with the following fields and methods:
 
-Given an `itemId`, return the version in which the item was added to the game.
-If the `itemId` is not present in the database, return `nil`.
-
-The returned table contains:
-
+**Fields:**
 - **`expansion`**: The expansion table containing:
   - `major`: The major version number (expansion number)
   - `canonName`: The full expansion name (e.g., "Shadowlands")
@@ -32,6 +22,17 @@ The returned table contains:
 - **`build`**: The build number
 - **`isCorrected`**: Boolean indicating whether this result came from version
   corrections
+
+**Methods:**
+- **`Format(formatString)`**: Formats a string by replacing tokens with values from this lookup (see below)
+
+**Description:**
+
+Given an `itemId`, return the version in which the item was added to the game.
+If the `itemId` is not present in the database, return `nil`.
+
+The returned lookup object contains version information fields and provides
+methods for formatting the data
 
 **Version Corrections:**
 
@@ -80,22 +81,23 @@ local version = ItemVersion.API.GetItemVersion(-1)
 -- version = nil
 ```
 
-## `ItemVersion.API.FormatTooltip`
+## `ItemVersionLookup:Format`
 
 **Type:**
 
 ```lua
-function(formatString: string, lookup: ItemVersionLookup) -> string
+method(formatString: string) -> string
 ```
 
 **Description:**
 
-Formats a tooltip string by replacing tokens with values from the version lookup data.
+Formats a string by replacing tokens with values from the lookup object.
+
+This is a method available on `ItemVersionLookup` objects returned by `GetItemVersion`.
 
 **Parameters:**
 
-- **`formatString`**: A string containing tokens like `{expacLong}`, `{versionTriple}`, etc. that will be replaced with actual values
-- **`lookup`**: An `ItemVersionLookup` table returned from `GetItemVersion`
+- **`formatString`**: A string containing tokens like `{expacLong}`, `{versionTriple}`, etc. that will be replaced with actual values from this lookup
 
 **Returns:**
 
@@ -106,7 +108,7 @@ A formatted string with all tokens replaced by their corresponding values from t
 ```lua
 local version = ItemVersion.API.GetItemVersion(168589, true)
 if version then
-  local formatted = ItemVersion.API.FormatTooltip("Added in {expacLong} ({versionTriple})", version)
+  local formatted = version:Format("Added in {expacLong} ({versionTriple})")
   print(formatted)  -- "Added in Shadowlands (9.0.0)"
 end
 ```

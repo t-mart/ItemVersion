@@ -1,9 +1,35 @@
 local _, Private = ...
 
 local Expansion = Private.Expansion
+local Table = Private.Table
 
 Private.API = {}
 local API = Private.API
+
+--Turn an Expansion into one that goes into the lookup
+--@param expansion Expansion The expansion to convert
+--@return table The lookup expansion data
+local function toLookupExpansion(expansion)
+  return {
+    major = expansion.major,
+    canonName = expansion.canonName,
+    shortName = expansion.shortName,
+  }
+end
+
+local ItemLookupMixin = {}
+
+---Format a string by replacing tokens with values from the lookup
+---@param formatString string The format string containing tokens like {expacLong}, {versionTriple}, etc.
+---@return string formatted The formatted string with tokens replaced
+function ItemLookupMixin:Format(formatString)
+  for _, tokenInfo in ipairs(Private.Tokens) do
+    local resolved = tokenInfo.resolve(self)
+    formatString = formatString:gsub(tokenInfo.string, resolved)
+  end
+
+  return formatString
+end
 
 ---@class ItemVersionLookup
 ---@field expansion {major: number, canonName: string, shortName: string}
@@ -22,17 +48,13 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
   if applyVersionCorrections then
     expansion = Expansion:GetCorrectedExpansionForItemId(itemId)
     if expansion then
-      return {
-        expansion = {
-          major = expansion.major,
-          canonName = expansion.canonName,
-          shortName = expansion.shortName,
-        },
+      return Table.Mixin({
+        expansion = toLookupExpansion(expansion),
         minor = 0,
         patch = 0,
         build = 0,
         isCorrected = true,
-      }
+      }, ItemLookupMixin)
     end
   end
 
@@ -53,28 +75,11 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
     return nil
   end
 
-  return {
-    expansion = {
-      major = expansion.major,
-      canonName = expansion.canonName,
-      shortName = expansion.shortName,
-    },
+  return Table.Mixin({
+    expansion = toLookupExpansion(expansion),
     minor = version.minor,
     patch = version.patch,
     build = version.build,
     isCorrected = false,
-  }
-end
-
----Format a tooltip string by replacing tokens with values from the lookup
----@param formatString string The format string containing tokens like {expacLong}, {versionTriple}, etc.
----@param lookup ItemVersionLookup The version lookup data
----@return string formatted The formatted string with tokens replaced
-function API.FormatTooltip(formatString, lookup)
-  for _, tokenInfo in ipairs(Private.Tokens) do
-    local resolved = tokenInfo.resolve(lookup)
-    formatString = formatString:gsub(tokenInfo.string, resolved)
-  end
-
-  return formatString
+  }, ItemLookupMixin)
 end

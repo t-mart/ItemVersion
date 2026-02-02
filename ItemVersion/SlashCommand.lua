@@ -107,7 +107,7 @@ local function HandleLookup(itemArg)
     return
   end
 
-  local formatted = API.FormatTooltip(profile.tooltipFormat, lookup)
+  local formatted = lookup:Format(profile.tooltipFormat)
   AceConsole:Print(formatted)
 end
 

@@ -67,7 +67,7 @@ local function hook(tooltip, data)
   end
 
   local line = Private.Color.WrapTextWithColor(
-    Private.API.FormatTooltip(profile.tooltipFormat, lookup),
+    lookup:Format(profile.tooltipFormat),
     profile.lineColor
   )
 

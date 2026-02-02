@@ -59,7 +59,7 @@ local function Constructor()
     -- Create FontStrings for each row
     for i, row in ipairs(labels) do
         local token, description = row[1], row[2]
-        local example = Private.API.FormatTooltip(token, lookup)
+        local example = lookup:Format(token)
         local leftLabel = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
         leftLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PADDING, -(i - 1) * ROW_HEIGHT)
         if i == 1 then

@@ -31,7 +31,7 @@ local AccessHandler = {
 
 local previewWidgets = {}
 for _, expansion in ipairs(Private.Expansion.All) do
-  if expansion:IsActive() then
+  if expansion:IsPresent() then
     previewWidgets[format("preview-%d", expansion.major)] = {
       order = expansion.major,
       type = "description",

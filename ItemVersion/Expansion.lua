@@ -129,9 +129,9 @@ Private.Expansion.All = {
 
 local ExpansionMixin = {}
 
----Check if this expansion is active on the current server
----@return boolean active True if the expansion is available on the server
-function ExpansionMixin:IsActive()
+---Check if this expansion is present on the current server
+---@return boolean present True if the expansion is available on the server
+function ExpansionMixin:IsPresent()
   local serverExpansionLevel = GetServerExpansionLevel()
   return self.expansionLevel <= serverExpansionLevel
 end

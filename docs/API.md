@@ -8,7 +8,7 @@ Below are the main functions of the public API.
 
 ```lua
 function(itemId: number, applyVersionCorrections: bool | nil) -> {
-  expac: table,
+  expansion: table,
   minor: number,
   patch: number,
   build: number,
@@ -27,7 +27,6 @@ The returned table contains:
   - `major`: The major version number (expansion number)
   - `canonName`: The full expansion name (e.g., "Shadowlands")
   - `shortName`: The abbreviated expansion name (e.g., "SL")
-  - `previewItemId`: Representative item ID for this expansion
 - **`minor`**: The minor version number
 - **`patch`**: The patch version number
 - **`build`**: The build number
@@ -52,14 +51,13 @@ Shadowlands. With corrections disabled, it will show its canonical BfA version.
 local version = ItemVersion.API.GetItemVersion(168589, false)
 -- Returns:
 -- {
---   expansion = { major = 8, canonName = "Battle for Azeroth", shortName = "BfA", ... },
+--   expansion = { major = 8, canonName = "Battle for Azeroth", shortName = "BfA" },
 --   minor = 2,
 --   patch = 0,
 --   build = 30918,
---   isCorrected = false,
---   buildVersionString = function
+--   isCorrected = false
 -- }
-print(format("%d.%d.%d", version.expansion.major, version.patch, version.build)) -- "8.2.0"
+print(format("%d.%d.%d", version.expansion.major, version.minor, version.patch)) -- "8.2.0"
 ```
 
 ```lua
@@ -67,12 +65,11 @@ print(format("%d.%d.%d", version.expansion.major, version.patch, version.build))
 local version = ItemVersion.API.GetItemVersion(168589, true)
 -- Returns:
 -- {
---   expansion = { major = 9, canonName = "Shadowlands", shortName = "SL", ... },
+--   expansion = { major = 9, canonName = "Shadowlands", shortName = "SL" },
 --   minor = 0,
 --   patch = 0,
 --   build = 0,
---   isCorrected = true,
---   buildVersionString = function
+--   isCorrected = true
 -- }
 print(version.expansion.canonName)           -- "Shadowlands"
 ```
@@ -81,4 +78,35 @@ print(version.expansion.canonName)           -- "Shadowlands"
 -- Non-existent item
 local version = ItemVersion.API.GetItemVersion(-1)
 -- version = nil
+```
+
+## `ItemVersion.API.FormatTooltip`
+
+**Type:**
+
+```lua
+function(formatString: string, lookup: ItemVersionLookup) -> string
+```
+
+**Description:**
+
+Formats a tooltip string by replacing tokens with values from the version lookup data.
+
+**Parameters:**
+
+- **`formatString`**: A string containing tokens like `{expacLong}`, `{versionTriple}`, etc. that will be replaced with actual values
+- **`lookup`**: An `ItemVersionLookup` table returned from `GetItemVersion`
+
+**Returns:**
+
+A formatted string with all tokens replaced by their corresponding values from the lookup data.
+
+**Example:**
+
+```lua
+local version = ItemVersion.API.GetItemVersion(168589, true)
+if version then
+  local formatted = ItemVersion.API.FormatTooltip("Added in {expacLong} ({versionTriple})", version)
+  print(formatted)  -- "Added in Shadowlands (9.0.0)"
+end
 ```

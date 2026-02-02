@@ -48,6 +48,12 @@ globals:
   GameTooltip.Hide:
     method: true
     args: []
+  GameTooltip.HasScript:
+    method: true
+    args:
+      - type: string # Event name
+    return: 
+      - type: boolean
   ItemRefTooltip:
     property: read-only
   ItemRefTooltip.GetItem:
@@ -73,6 +79,12 @@ globals:
   ItemRefTooltip.Show:
     method: true
     args: []
+  ItemRefTooltip.HasScript:
+    method: true
+    args:
+      - type: string # Event name
+    return: 
+      - type: boolean
   TooltipDataProcessor:
     property: read-only
   TooltipDataProcessor.AddTooltipPostCall:

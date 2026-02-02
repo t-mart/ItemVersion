@@ -77,10 +77,15 @@ end
 
 ---Hook into the tooltip system to add item version information
 function Private.Tooltip.HookTooltip()
-  if TooltipDataProcessor then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hook)
-  else
+  local hasOnTooltipSetItem = GameTooltip:HasScript("OnTooltipSetItem") and ItemRefTooltip:HasScript("OnTooltipSetItem")
+  if hasOnTooltipSetItem then
+    -- old way
     GameTooltip:HookScript("OnTooltipSetItem", hook)
     ItemRefTooltip:HookScript("OnTooltipSetItem", hook)
+  elseif TooltipDataProcessor then
+    -- new way
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hook)
+  else
+    error("ItemVersion: Unable to hook into tooltips!")
   end
 end

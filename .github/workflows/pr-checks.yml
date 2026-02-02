@@ -21,4 +21,4 @@ jobs:
         run: cargo binstall --no-confirm --locked selene
 
       - name: Check Lua with Selene
-        run: selene --exclude 'ItemVersion/Libs/**/*.lua' ItemVersion
+        run: selene ItemVersion

@@ -81,7 +81,7 @@ end
 ---@param itemArg string|nil The item ID or link argument
 local function HandleLookup(itemArg)
   if not itemArg then
-    AceConsole:Print(L["Must supply an item ID or link to lookup."])
+    AceConsole:Print(L["Must supply an item ID or link to lookup"])
     return
   end
 
@@ -94,7 +94,7 @@ local function HandleLookup(itemArg)
   end
 
   if not itemID then
-    AceConsole:Print(L["Invalid item ID or link provided."])
+    AceConsole:Print(L["Invalid item ID or link provided"])
     return
   end
 

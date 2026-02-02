@@ -45,7 +45,7 @@ L["WoW Build Date"] = true
 L["Platform"] = true
 L["Must supply an item ID or link to lookup."]= true
 L["Invalid item ID or link provided."] = true
-L["No version information found for item ID %d."] = true
+L["No version information found for item ID %d"] = true
 
 -- Options screen strings
 L["Line Color"] = true

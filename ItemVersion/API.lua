@@ -14,7 +14,7 @@ local API = Private.API
 
 ---Get the version for a given item, or nil if it does not exist in the database
 ---@param itemId number The item ID to look up
----@param applyVersionCorrections boolean|nil Whether to apply version corrections
+---@param applyVersionCorrections boolean|nil Whether to apply version corrections that fix items whose release version is different than their usable version.
 ---@return ItemVersionLookup|nil lookup The version information, or nil if not found
 function API.GetItemVersion(itemId, applyVersionCorrections)
   -- first lookup in corrections

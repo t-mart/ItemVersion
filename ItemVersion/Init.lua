@@ -1,19 +1,22 @@
-local addonName, addon = ...
+local AddonName, Private = ...
 
--- pass in the `addon` table: AceAddon will use it instead of creating a new table
--- this is important because our Data.lua file inserts into that addon table too
-ItemVersion = LibStub("AceAddon-3.0"):NewAddon(addon, addonName)
+ItemVersion = LibStub("AceAddon-3.0"):NewAddon(AddonName)
 
+local LSM = LibStub("LibSharedMedia-3.0")
+
+LSM:Register("font", "JetBrains Mono NL",
+  "Interface\\AddOns\\" .. AddonName .. "\\Media\\Fonts\\JetBrainsMonoNL-Regular.ttf",
+  LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU)
+
+---Initialize the addon
 function ItemVersion:OnInitialize()
-  self.db = self.Database:New()
+  Private.DatabaseManager.Initialize()
 
-  self.tooltip = self.Tooltip:New(self.db)
-  self.tooltip:HookTooltipCall()
+  Private.Options.Register()
 
-  self.options = self.Options:New(self.db, self.tooltip)
-  self.options:Register()
-  local settingsCategoryId = self.options:AddToBlizOptions()
+  self.API = Private.API
 
-  self.slashCommand = self.SlashCommand:New(settingsCategoryId, self.RegisterChatCommand)
-  self.slashCommand:Register()
+  Private.Tooltip.HookTooltip()
+
+  Private.SlashCommands.Initialize()
 end

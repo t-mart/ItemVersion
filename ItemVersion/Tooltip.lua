@@ -1,141 +1,91 @@
-local addonName, ItemVersion = ...
+local _, Private = ...
 
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-local API = ItemVersion.API
-local Util = ItemVersion.Util
+Private.Tooltip = {}
 
-local TooltipMixin = {}
-
-ItemVersion.Tooltip = {}
-
-function ItemVersion.Tooltip:New(db)
-  local t = {
-    db = db,
-  }
-
-  return Util.Mixin(t, TooltipMixin)
-end
-
-local WrapTextInColor = function(text, color)
-  local hex = ("ff%.2x%.2x%.2x"):format(Round(color.r * 255), Round(color.g * 255), Round(color.b * 255))
-  return WrapTextInColorCode(text, hex)
-end
-
-function TooltipMixin:ConfiguredModifiersAreDown()
-  if self.db.profile.keyModifiers.shift and not IsShiftKeyDown() then
+---Check if the required key modifiers are being held down
+---@return boolean areDown True if all required modifiers are pressed (or none are required)
+local function keyModifiersAreDown()
+  local profile = Private.Database.profile
+  if profile.showOnShift and not IsShiftKeyDown() then
     return false
   end
-  if self.db.profile.keyModifiers.control and not IsControlKeyDown() then
+  if profile.showOnControl and not IsControlKeyDown() then
     return false
   end
-  if self.db.profile.keyModifiers.alt and not IsAltKeyDown() then
+  if profile.showOnAlt and not IsAltKeyDown() then
     return false
   end
   -- this will only be able to be true on Mac clients
-  if self.db.profile.keyModifiers.meta and not IsMetaKeyDown() then
+  if profile.showOnMeta and not IsMetaKeyDown() then
     return false
   end
   return true
 end
 
-function TooltipMixin:GenerateLine(version)
-  local line = ""
-
-  -- prefix
-  if self.db.profile.showPrefix then
-    line = line .. WrapTextInColor(L["Added in"], self.db.profile.prefixColor) .. " "
+---Extract the item ID from a tooltip
+---@param tooltip table The tooltip frame
+---@param data table|nil The tooltip data (mainline only)
+---@return number|nil itemId The item ID, or nil if not found
+local function getItemId(tooltip, data)
+  -- mainline way
+  if data then
+    return data.id
   end
 
-  -- expac
-  local expacName
-  if version then
-    local expac = API:getVersionExpac(version)
-    if self.db.profile.shortExpacNames then
-      expacName = expac.shortName
-    else
-      expacName = expac.canonName
-    end
+  -- classic way
+  local name, link = tooltip:GetItem()
+  if name and link then
+    return tonumber(string.match(link, "item:(%d*)"))
+  end
+end
+
+---Hook function called when a tooltip is shown
+---@param tooltip table The tooltip frame
+---@param data table|nil The tooltip data (mainline only)
+local function hook(tooltip, data)
+  -- GameTooltip is the one attached to the mouse
+  -- ItemRefTooltip is the static one after clicking an item link
+  if tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip then
+    return
+  end
+
+  if not keyModifiersAreDown() then
+    return
+  end
+
+  local itemId = getItemId(tooltip, data)
+
+  if not itemId then
+    return
+  end
+
+  local profile = Private.Database.profile
+  local lookup = Private.API.GetItemVersion(itemId, profile.applyCorrections)
+
+  if not lookup then
+    return
+  end
+
+  local line = Private.Color.WrapTextWithColor(
+    Private.API.FormatTooltip(profile.tooltipFormat, lookup),
+    profile.lineColor
+  )
+
+  tooltip:AddLine(line)
+  tooltip:Show()
+end
+
+---Hook into the tooltip system to add item version information
+function Private.Tooltip.HookTooltip()
+  local hasOnTooltipSetItem = GameTooltip:HasScript("OnTooltipSetItem") and ItemRefTooltip:HasScript("OnTooltipSetItem")
+  if hasOnTooltipSetItem then
+    -- old way
+    GameTooltip:HookScript("OnTooltipSetItem", hook)
+    ItemRefTooltip:HookScript("OnTooltipSetItem", hook)
+  elseif TooltipDataProcessor then
+    -- new way
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hook)
   else
-    expacName = L["Unknown"]
-  end
-  line = line .. WrapTextInColor(expacName, self.db.profile.expacColor)
-
-  -- version
-  if self.db.profile.showVersion then
-    local versionString
-    if version then
-      versionString = API:buildVersionString(version, self.db.profile.showBuildNumber)
-    else
-      versionString = L["Unknown"]
-    end
-    line = line .. WrapTextInColor(" (" .. versionString .. ")", self.db.profile.versionColor)
-  end
-
-  return line
-end
-
-function TooltipMixin:GenerateLineForItemId(itemId)
-  local version = API:getItemVersion(itemId, self.db.profile.includeCommunityUpdates)
-  return self:GenerateLine(version)
-end
-
-function TooltipMixin:GetOnTooltipSetItemFn()
-  return function(tooltip, data)
-    -- GameTooltip is the one attached to the mouse
-    -- ItemRefTooltip is the static one after clicking an item link
-    if tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip then
-      return
-    end
-
-    if not self:ConfiguredModifiersAreDown() then
-      return
-    end
-
-    local itemId
-    if data then
-      -- mainline way
-      itemId = data.id
-    else
-      -- classic way
-      local name, link = tooltip:GetItem()
-      if link and name then
-        itemId = tonumber(string.match(link, "item:(%d*)"))
-      end
-    end
-
-    if not itemId then
-      return
-    end
-
-    local version = API:getItemVersion(itemId, self.db.profile.includeCommunityUpdates)
-
-    if not version and not self.db.profile.showWhenMissing then
-      return
-    end
-
-    local line = self:GenerateLine(version)
-
-    tooltip:AddLine(line)
-    tooltip:Show()
-  end
-end
-
-function TooltipMixin:HookTooltipCall()
-  -- there's two ways to hook the tooltip:
-  -- 1. `TooltipDataProcessor.AddTooltipPostCall`. This is newer way and is more
-  --    ergonomic at getting tooltip data.
-  -- 2. `GameTooltip:HookScript("OnTooltipSetItem", ...)`. This works
-  --    everywhere, and requires more manual work to get the item id.
-
-  -- To decide which way, we used to just check for the existence of global
-  -- `TooltopDataProcessor`, but that became insufficient when Cata Classic came
-  -- out and this global was defined, but `AddTooltipPostCall` wouldn't work.
-  -- Therefore, we arbitrarily check if version 10 or higher (i.e. >= 100000 toc
-  -- version).
-  if TooltipDataProcessor and select(4, GetBuildInfo()) >= 100000 then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, self:GetOnTooltipSetItemFn())
-  else
-    GameTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())
-    ItemRefTooltip:HookScript("OnTooltipSetItem", self:GetOnTooltipSetItemFn())
+    error("ItemVersion: Unable to hook into tooltips!")
   end
 end

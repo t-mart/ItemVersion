@@ -4,7 +4,8 @@ name: PR Checks
 
 on:
   workflow_dispatch:
-  pull_request:
+  # TODO: re-enable when selene binstall-able. slowing things down too much right now to build each PR
+  # pull_request: 
 
 jobs:
   check:
@@ -14,9 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Check Lua
-        uses: nebularg/actions-luacheck@v1
-        with:
-          args:
-            ItemVersion --no-color --exclude-files 'ItemVersion/Libs/**/*.lua'
-            --no-self
+      - name: Install Cargo Binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install Selene
+        run: cargo binstall --no-confirm --locked selene
+
+      - name: Check Lua with Selene
+        run: selene ItemVersion

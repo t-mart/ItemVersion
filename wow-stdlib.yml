@@ -1,0 +1,164 @@
+# The WoW Lua standard library as far as this addon is concerned
+base: lua51
+
+lua_versions:
+  - lua51
+
+globals:
+  LibStub:
+    args:
+      - type: string
+      - type: any
+        required: false
+    must_use: true # The return value should be used
+  IsShiftKeyDown:
+    args: []
+  IsControlKeyDown:
+    args: []
+  IsAltKeyDown:
+    args: []
+  IsMetaKeyDown:
+    args: []
+  GameTooltip:
+    property: read-only
+  GameTooltip.GetItem:
+    method: true
+    args: []
+  GameTooltip.HookScript:
+    method: true
+    args:
+      - type: string # Event name like "OnTooltipSetItem"
+      - type: function # Handler function
+  GameTooltip.AddLine:
+    method: true
+    args:
+      - type: string # Text to add
+  GameTooltip.Show:
+    method: true
+    args: []
+  GameTooltip.SetOwner:
+    method: true
+    args:
+      - type: table
+      - type: string
+  GameTooltip.SetItemByID:
+    method: true
+    args:
+      - type: number
+  GameTooltip.Hide:
+    method: true
+    args: []
+  GameTooltip.HasScript:
+    method: true
+    args:
+      - type: string # Event name
+    return: 
+      - type: boolean
+  ItemRefTooltip:
+    property: read-only
+  ItemRefTooltip.GetItem:
+    method: true
+    args: []
+  ItemRefTooltip.HookScript:
+    method: true
+    args:
+      - type: string
+      - type: function
+  ItemRefTooltip.AddLine:
+    method: true
+    args:
+      - type: string
+      - type: number
+        required: false
+      - type: number
+        required: false
+      - type: number
+        required: false
+      - type: number
+        required: false
+  ItemRefTooltip.Show:
+    method: true
+    args: []
+  ItemRefTooltip.HasScript:
+    method: true
+    args:
+      - type: string # Event name
+    return: 
+      - type: boolean
+  TooltipDataProcessor:
+    property: read-only
+  TooltipDataProcessor.AddTooltipPostCall:
+    args:
+      - type: any # Enum.TooltipDataType value
+      - type: function # Callback function
+  Enum.TooltipDataType.Item:
+    property: read-only
+  IsWindowsClient:
+    args: []
+    return: boolean
+  IsMacClient:
+    args: []
+    return: boolean
+  IsLinuxClient:
+    args: []
+    return: boolean
+  GetBuildInfo:
+    args: []
+    return:
+      - type: string # version
+      - type: number # build
+      - type: string # date
+      - type: number # tocversion
+  format:
+    args:
+      - type: string # format string
+        required: true
+      - type: "..." # variadic arguments
+        required: "format should only be used for strings that need formatting"
+    return:
+      - type: string # formatted string
+  C_AddOns:
+    property: read-only
+  C_AddOns.GetAddOnMetadata:
+    args:
+      - type: string # addon name
+      - type: string # field name
+    return:
+      - type: string # field value
+  SHIFT_KEY_TEXT:
+    property: read-only
+  CTRL_KEY_TEXT:
+    property: read-only
+  ALT_KEY_TEXT:
+    property: read-only
+  CMD_KEY_TEXT:
+    property: read-only
+  GetServerExpansionLevel:
+    args: []
+    return:
+      - type: number # expansion level
+  C_Item:
+    property: read-only
+  C_Item.GetItemIconByID:
+    args:
+      - type: number # itemID
+    return:
+      - type: string # icon path
+  CreateFrame:
+    args:
+      - type: "..."
+    return:
+      - type: table # created frame
+  UIParent:
+    property: read-only
+  GameFontNormal:
+    property: read-only
+  GameFontNormal.GetFont:
+    method: true
+    args: []
+    return :
+      - type: string # font path
+      - type: number # font size
+      - type: string # font flags
+  GameFontHighlight:
+    property: read-only

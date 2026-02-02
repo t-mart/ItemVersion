@@ -1,0 +1,6 @@
+std = "wow-stdlib"
+
+exclude = ["ItemVersion/Libs/**"]
+
+[config]
+unscoped_variables = { ignore_pattern = "ItemVersion" }

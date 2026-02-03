@@ -1,0 +1,23 @@
+## Title: ItemVersion
+## Version: 2026.05.0
+## Interface: 120000, 50503, 20505, 11508
+## X-BuildDateTime: @build-date-iso@
+## Author: Tim Martin
+## Notes: Shows in what version of the game an item was added in the tooltip
+## SavedVariables: ItemVersionDB
+## IconTexture: Interface\AddOns\ItemVersion\Media\Images\ItemVersion.tga
+
+Libs.xml
+Locales.xml
+Init.lua
+Table.lua
+Color.lua
+Database.lua
+Expansion.lua
+Tokens.lua
+Options.lua
+SlashCommand.lua
+Data.lua
+API.lua
+Tooltip.lua
+Widgets.xml

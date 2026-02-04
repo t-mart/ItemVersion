@@ -1,11 +1,9 @@
 package-as: ItemVersion
 
-# Use manual changelog instead of auto-generated from git
 manual-changelog:
   filename: CHANGELOG.md
   markup-type: markdown
 
-# External library dependencies
 externals:
   ItemVersion/Libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
   ItemVersion/Libs/AceConsole-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConsole-3.0

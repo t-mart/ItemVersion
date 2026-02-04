@@ -1,5 +1,3 @@
-dist
-docs/frame-xml-reference
-docs/ace3
-ItemVersion/Bindings.xml
-.release
+/ItemVersion/Bindings.xml
+/.release
+/ItemVersion/Libs

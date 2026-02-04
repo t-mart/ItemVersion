@@ -6,6 +6,7 @@
 ## Notes: Shows in what version of the game an item was added in the tooltip
 ## SavedVariables: ItemVersionDB
 ## IconTexture: Interface\AddOns\ItemVersion\Media\Images\ItemVersion.tga
+## X-Curse-Project-ID: 433258
 
 Libs.xml
 Locales.xml

@@ -26,4 +26,5 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: ItemVersion
-          path: .release/ItemVersion
+          path: |
+            .release/

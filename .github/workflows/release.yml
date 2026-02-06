@@ -40,82 +40,38 @@ jobs:
           ref: release
           fetch-depth: 0 # ensure git knows about shared history between release and master
 
-      - name: Get binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
       - name: Install support tooling
         run: |
           # nextver bumps our versions
-          cargo binstall nextver --no-confirm
+          uv tool install bump-my-version
 
           # wownow gets the current wow versions
           uv tool install git+https://github.com/t-mart/wownowpy
 
-      - name: Determine next version
-        id: next-version
+      - name: Configure Git
         run: |
-          LAST_VERSION="$(jq -r <wap.json '.version')"
-          echo "::notice title=Last Version::${LAST_VERSION}"
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-          NEXT_VERSION=$(nextver next ${LAST_VERSION} --format "<YYYY>.<0W>.<PATCH>" --sem-level patch)
-          echo "::notice title=Next Version::${NEXT_VERSION}"
-          echo "version=${NEXT_VERSION}" >> ${GITHUB_OUTPUT}
-
-      - name: Determine current wow versions
-        id: wow-versions
+      - name: Update Interface versions
         run: |
-          wownow >wownow.json
+          NEW_INTERFACES=$(wownow | jq -r '[.products[] | .versions[] | select(.region == "us") | .interface] | join(", ")')
+          sed -i "s/^## Interface:.*/## Interface: ${NEW_INTERFACES}/" ItemVersion/ItemVersion.toc
 
-          function get_version_by_product() {
-            local region="us"
-            local output=$(jq -r --arg product "$1" --arg region "${region}" '.products[] | select(.name == $product).versions[] | select(.region == $region).version' < wownow.json)
-            if [[ -z $output ]]; then
-              echo "No version found for product: $1, possible error with this function or wownow output"
-              exit 1
-            else
-              echo "$output"
-            fi
-          }
+          if [[ -n $(git status --porcelain ItemVersion/ItemVersion.toc) ]]; then
+            echo "Updated interface versions to ${NEW_INTERFACES}, committing changes."
+            git add ItemVersion/ItemVersion.toc
+            git commit -m "Updated interfaces to ${NEW_INTERFACES}"
+          else
+            echo "Interface versions are up to date. No commit needed."
+          fi
 
-          MAINLINE="$(get_version_by_product "wow")"
-          echo "::notice title=Current Mainline Version::${MAINLINE}"
-          echo "mainline=${MAINLINE}" >> ${GITHUB_OUTPUT}
-
-          CLASSIC="$(get_version_by_product "wow_classic")"
-          echo "::notice title=Current Classic Version::${CLASSIC}"
-          echo "classic=${CLASSIC}" >> ${GITHUB_OUTPUT}
-
-          VANILLA="$(get_version_by_product "wow_classic_era")"
-          echo "::notice title=Current Vanilla Version::${VANILLA}"
-          echo "vanilla=${VANILLA}" >> ${GITHUB_OUTPUT}
-
-          rm wownow.json
-
-      - name: Update wap.json version
+      - name: Bump (with commit and tag)
         run: |
-          jq \
-            --arg nextVersion "${{ steps.next-version.outputs.version }}" \
-            --arg mainline "${{ steps.wow-versions.outputs.mainline }}" \
-            --arg classic "${{ steps.wow-versions.outputs.classic }}" \
-            --arg vanilla "${{ steps.wow-versions.outputs.vanilla }}" \
-            '.version = $nextVersion | .wowVersions.mainline = $mainline | .wowVersions.classic = $classic | .wowVersions.vanilla = $vanilla' \
-            <wap.json >wap-next.json
-          mv wap-next.json wap.json
-
-      - name: Git Commit, Tag, and Push
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-          git add wap.json
-          git commit -m "Release ${NEXT_VERSION}"
-
-          git tag -a "${NEXT_VERSION}" -m "Release ${NEXT_VERSION}"
-
-          git push --atomic origin release "${NEXT_VERSION}"
+          bump-my-version --part patch --tag --push origin release
         env:
           NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
 

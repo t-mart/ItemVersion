@@ -21,12 +21,14 @@ plain-copy:
 
 # Files and directories to ignore when packaging
 ignore:
-  - CONTRIBUTING.md
   - AUTHORS.md
   - CHANGELOG.md
-  - docs
   - CLAUDE.md
+  - CONTRIBUTING.md
+  - docs
+  - Makefile
   - README.md
+  - scripts
   - selene.toml
   - stylua.toml
   - wow-stdlib.yml

@@ -1,6 +1,6 @@
-.PHONY: dev-build watch clean
+.PHONY: build dev clean
 
-ALL: watch
+ALL: dev
 
 clean:
 # get rid of all build artifacts
@@ -10,11 +10,11 @@ clean-cache:
 # get rid of cached libs only
 	rm -rf ItemVersion/Libs
 
-dev-build:
+build:
 # development build using cached libs
 	@echo Building ItemVersion for development
 	./scripts/dev-build-with-cached-libs.sh
 
-watch:
-# start a loop that triggers a dev-build on file changes in the ItemVersion directory
-	watchexec --watch ItemVersion --restart make dev-build
+dev:
+# start a loop that triggers a build on file changes in the ItemVersion directory
+	watchexec --watch ItemVersion --restart make build

@@ -1,11 +1,10 @@
 name: Release
 
-# On release branch:
-# 1. Add a version bump commit
-# 2. Tag it
-# 3. wap build/publish the addon
-# 4. Make a GH release (with the addon file)
-# 5. Merge it back to master branch (so that the two branches stay in sync)
+# On release branch, this action:
+# - updates the interface versions in the .toc file, commits if needed
+# - bumps the version (with commit and tag)
+# - runs big wigs release.sh script (which creates the GitHub release and uploads to CurseForge)
+# - merges the release branch back into master
 #
 # This workflow doesn't run on its own -- its called by other workflows that
 # have put something releaseable on release branch (refresh-data.yml or
@@ -53,8 +52,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Update Interface versions
         run: |
@@ -69,25 +68,56 @@ jobs:
             echo "Interface versions are up to date. No commit needed."
           fi
 
-      - name: Bump (with commit and tag)
+      - name: (Release) Bump (with commit and tag) and push
+        if: ${{ inputs.release-type == 'release' }}
         run: |
-          bump-my-version --part patch --tag --push origin release
-        env:
-          NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
+          bump-my-version bump patch
+          VERSION=$(bump-my-version show --format json | jq -r ".current_version")
 
-      - name: wap
-        uses: t-mart/wap-action@master
+          PACKAGER_ARGS="-n ItemVersion-${VERSION}"
+          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
+
+      - # big wigs packager only allows an alpha or beta release to CF if the tag
+        # contains the word "alpha" or "beta". because we use calver and because
+        # bump-my-version doesn't work well for this kind of optional tag,
+        # we create a completely out-of-band tag that has nothing to do
+        # with any particular version.
+        name: (Alpha/Beta) Tag
+        if:
+          ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
+        run: |
+          RELEASE_TYPE="${{ inputs.release-type }}"
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date +%s)
+          TAG_NAME="${RELEASE_TYPE}-${SHORT_SHA}-${TIMESTAMP}"
+
+          echo "Creating tag: ${TAG_NAME}"
+          git tag -a "${TAG_NAME}" -m "${RELEASE_TYPE} release"
+
+          PACKAGER_ARGS="-n ItemVersion-${TAG_NAME}"
+          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
+
+      - name: (No release) Skip bumping version and pushing
+        if: ${{ inputs.release-type == 'none' }}
+        run: |
+          PACKAGER_ARGS="-d"
+          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
+
+      - name: Git Push
+        run: git push --follow-tags
+
+      - uses: BigWigsMods/packager@v2
         with:
-          release-type: ${{ inputs.release-type }}
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-
-      - name: GH Release
-        if: ${{ inputs.release-type != 'none' }}
+          args: ${{ env.PACKAGER_ARGS }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          NEXT_VERSION: "${{ steps.next-version.outputs.version }}"
-        run: |
-          gh release create --generate-notes "${NEXT_VERSION}" dist/*.zip
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          CF_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ItemVersion
+          path: .release/ItemVersion
 
       - name: Merge back into master
         run: |

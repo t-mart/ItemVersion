@@ -16,25 +16,22 @@
 - This addon uses [StyLua] for Lua code formatting. See its documentation for
   how to apply it to your contributions.
 
-## Developer Environment
+## Developer Operations
 
-**Update: I know `wap` is crusty now. Talk to me if you can't get it working.**
+`make build` will perform a one-time build of the addon, placing the result in
+the `.release/ItemVersion` directory. This requires
+[BigWigs packager's `release.sh`](https://github.com/BigWigsMods/packager) to be
+in your `PATH`.
 
-ItemVersion uses [`wap`](https://t-mart.github.io/wap/) for most development
-tasks. See
-[wap for Collaborators](https://t-mart.github.io/wap/wap-for-collaborators/) to
-get started. Using `wap` will give you a nice developer experience that
-automatically rebuilds on file changes and links ItemVersion into your
-`Interface/AddOns` directory.
+Run `make dev` to automatically build the addon whenever a source file changes.
+This additionally requires [watchexec](https://github.com/watchexec/watchexec)
+to be installed.
 
-In particular, if you do not use `wap` to build the addon, you won't be able to
-use it in the game. This is because `wap` transforms the source files here into
-a usable addon.
+These commands become even more powerful if you soft-link the
+`.release/ItemVersion` directory to your WoW AddOns directory, so that the built
+addon is immediately available in-game after you reload the UI.
 
-_(If you really don't want to use `wap`, you can just download the built addon
-artifact that is created after each pull request by the `Build` workflow. But,
-you'll only be able to access it after a one-time grant by me, and further, only
-after you push. If you need `wap` help, just ask me.)_
+Commits on PRs will trigger a workflow that builds the addon.
 
 ## Versioning
 

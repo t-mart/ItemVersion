@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: "The type of wap release to perform (or none at all)"
+        description: "The type of release to perform (or none at all)"
         type: choice
         options:
           - "none"
@@ -116,8 +116,8 @@ jobs:
       - name: Commit & Push
         shell: bash
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ItemVersion/Data.lua
           git commit -m "Refresh item data"
           git push origin "${{ env.release_ref }}"

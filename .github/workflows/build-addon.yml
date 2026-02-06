@@ -13,8 +13,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      NEW_DIR: build-from-commit-artifact
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -29,4 +27,4 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: ItemVersion
-          path: .release/*
+          path: .release

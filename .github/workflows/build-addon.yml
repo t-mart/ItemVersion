@@ -1,11 +1,6 @@
 name: Build Addon
 
 # This workflow creates a usable addon zip for each commit.
-#
-# One reason for this is that it lets contributors get a build without having to install wap
-# (begrudingly). To download it, head to this check's run page and click on "Summary" in the
-# left-hand column. There, towards the bottom of the page, there will be an "Artifacts" section
-# where the built addon zip file can be found.
 
 on:
   workflow_dispatch:
@@ -18,31 +13,24 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      NEW_DIR: build-from-commit-artifact
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: wap
-        uses: t-mart/wap-action@master
+      - uses: BigWigsMods/packager@v2
         with:
-          release-type: "none"
+          args: -d
 
-      - name: Surface addons
-        # upload-artifact sets the root directory of the artifact zip to the path segment that has the
-        # first wildcard. our dist dir is in the format dist/ItemVersion-X.Y.Z/ItemVersion/foo.lua.
-        # Because we don't know X.Y.Z (and don't want to calculate it), we'd need a wildcard at that
-        # point (dist/ItemVersion*/*). But, then the ItemVersion-X.Y.Z dir would be at the root. We
-        # want just the addon folders at the root instead (matches normal addon zip structure). So, we
-        # move those addon folders up (or "surface" them) in new dir, and then pass dir that to
-        # upload-artifact
-        shell: bash
+      - name: debug
         run: |
-          mkdir ${NEW_DIR}
-          mv dist/ItemVersion*/* ${NEW_DIR}
+          # ls -laR .release
+          pwd && find .release
 
-      - uses: actions/upload-artifact@v6
+      - name: Upload build
+        uses: actions/upload-artifact@v6
         with:
-          name: ItemVersion-${{ github.sha }}
-          path: ${{ env.NEW_DIR }}/*
+          name: ItemVersion
+          include-hidden-files: true
+          path: |
+            .release/
+            !.release/*.zip

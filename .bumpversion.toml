@@ -1,0 +1,25 @@
+[tool.bumpversion]
+current_version = "2026.05.2"
+parse = """(?x)     # Turn on verbose mode
+    (?P<release>    # Start release part
+        (?:\\d{4})  #   YYYY
+        \\.         #   dot
+        (?:\\d{2})  #   WW
+    )               # End release part
+    \\.             # dot
+    (?P<patch>\\d+) # patch
+"""
+serialize = ["{release}.{patch}"]
+tag = true
+tag_name = "{new_version}"
+tag_message = "Release {new_version}"
+commit = true
+message = "Release {new_version}"
+
+[tool.bumpversion.parts.release]
+calver_format = "{YYYY}.{0W}"
+
+[[tool.bumpversion.files]]
+filename = "ItemVersion/ItemVersion.toc"
+search = "## Version: {current_version}"
+replace = "## Version: {new_version}"

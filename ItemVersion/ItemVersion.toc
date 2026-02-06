@@ -1,5 +1,5 @@
 ## Title: ItemVersion
-## Version: 2026.05.0
+## Version: 2026.05.2
 ## Interface: 120000, 50503, 20505, 11508
 ## X-BuildDateTime: @build-date-iso@
 ## Author: Tim Martin

@@ -26,7 +26,8 @@ jobs:
           # ls -laR .release
           pwd && find .release
 
-      - uses: actions/upload-artifact@v6
+      - name: Upload build
+        uses: actions/upload-artifact@v6
         with:
           name: ItemVersion
           include-hidden-files: true

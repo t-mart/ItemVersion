@@ -113,11 +113,14 @@ jobs:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           CF_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
 
-      - name: Upload release artifacts
+      - name: Upload build
         uses: actions/upload-artifact@v6
         with:
           name: ItemVersion
-          path: .release/ItemVersion
+          include-hidden-files: true
+          path: |
+            .release/
+            !.release/*.zip
 
       - name: Merge back into master
         run: |

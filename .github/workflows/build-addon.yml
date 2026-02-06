@@ -22,9 +22,11 @@ jobs:
           args: -d
 
       - name: debug
-        run: ls -laR .release
+        run: |
+          # ls -laR .release
+          pwd && find .release
 
       - uses: actions/upload-artifact@v6
         with:
           name: ItemVersion
-          path: .release
+          path: .release/

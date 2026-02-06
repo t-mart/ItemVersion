@@ -23,6 +23,9 @@ jobs:
         with:
           args: -d
 
+      - name: debug
+        run: ls -laR .release
+
       - uses: actions/upload-artifact@v6
         with:
           name: ItemVersion

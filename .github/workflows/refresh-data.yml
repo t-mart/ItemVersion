@@ -58,9 +58,6 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
 
       - name: Set up Python
         run: uv python install
@@ -83,8 +80,8 @@ jobs:
       - name: Commit if needed
         if: steps.cache-updated.outputs.cache_updated == 'true'
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ./cache
           git commit -m "Update cache"
           git push origin "${{ env.item_version_scrape_ref }}"

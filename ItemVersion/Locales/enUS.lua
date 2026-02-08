@@ -48,6 +48,8 @@ L["Invalid item ID or link provided"] = true
 L["No version information found for item ID %d"] = true
 
 -- Options screen strings
+L["Enable tooltip integration"] = true
+L["Show item version information in tooltips."] = true
 L["Line Color"] = true
 L["Color of the line of text in the tooltip"] = true
 L["Key Modifiers Needed to Show Info"] = true

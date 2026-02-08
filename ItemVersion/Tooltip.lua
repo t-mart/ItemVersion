@@ -43,6 +43,11 @@ end
 ---@param tooltip table The tooltip frame
 ---@param data table|nil The tooltip data (mainline only)
 local function hook(tooltip, data)
+  local profile = Private.Database.profile
+  if not profile.enableTooltip then
+    return
+  end
+
   -- GameTooltip is the one attached to the mouse
   -- ItemRefTooltip is the static one after clicking an item link
   if tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip then
@@ -58,8 +63,6 @@ local function hook(tooltip, data)
   if not itemId then
     return
   end
-
-  local profile = Private.Database.profile
   local lookup = Private.API.GetItemVersion(itemId, profile.applyCorrections)
 
   if not lookup then

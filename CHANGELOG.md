@@ -9,9 +9,14 @@
   [CurseForge translations](https://legacy.curseforge.com/wow/addons/itemversion/localization).
   This lowers the barrier to entry for translators to make contributions.
 
+## Unreleased
+
+- Make tooltip integration optional. This is useful if you are using ItemVersion
+  as a data API.
+
 ## 2026.05.3
 
-- Started this changelog.
+- Start this changelog.
 - Use [Big Wigs packager](https://github.com/BigWigsMods/packager) for releases.
 
 ## 2026.05.1

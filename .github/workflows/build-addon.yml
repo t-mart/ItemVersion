@@ -20,11 +20,8 @@ jobs:
       - uses: BigWigsMods/packager@v2
         with:
           args: -d
-
-      - name: debug
-        run: |
-          # ls -laR .release
-          pwd && find .release
+        env:
+          CF_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - name: Upload build
         uses: actions/upload-artifact@v6

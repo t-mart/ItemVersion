@@ -1,6 +1,15 @@
 local AddonName = ...
 
-local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "enUS", true)
+local debug = false
+--@debug@
+-- omfg. packager is just bad. this will be preserved only as-is, here in code.
+-- when its built, it gets commented.
+-- but when until its built, we don't have downloaded libs
+-- PICK ONE YOU STUPID PACKAGER
+debug = true
+--@end-debug@
+
+local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "enUS", true, debug)
 --@localization(locale="enUS", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "deDE")

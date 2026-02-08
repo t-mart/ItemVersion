@@ -9,7 +9,12 @@
 ## X-Curse-Project-ID: 433258
 
 Libs.xml
+
 Locales.lua
+#@debug@
+DevLocales.lua
+#@end-debug@
+
 Init.lua
 Table.lua
 Color.lua

@@ -1,6 +1,6 @@
 # ItemVersion Changelog
 
-> [!NOTE]  
+> [!NOTE]
 > If a release is not documented here, it was likely an automated item database
 > refresh.
 

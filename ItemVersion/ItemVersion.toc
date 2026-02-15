@@ -9,9 +9,7 @@
 ## X-Curse-Project-ID: 433258
 
 Libs.xml
-
 Locales.lua
-
 Init.lua
 Table.lua
 Color.lua

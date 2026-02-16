@@ -16,7 +16,7 @@ Private.DatabaseManager = {}
 local Color = Private.Color
 
 local NAME = "ItemVersionDB"
-local CURRENT_VERSION_NUMBER = 1
+local CURRENT_VERSION_NUMBER = 2
 
 local VERSION_DEFAULTS = {
   -- back before versioning
@@ -44,6 +44,19 @@ local VERSION_DEFAULTS = {
       applyCorrections = true,
       tooltipFormat = L["Added in {expacIcon} ({versionTriple})"],
       version = 1,
+    }
+  },
+  [2] = {
+    profile = {
+      enableTooltip = true,
+      lineColor = Color.White(),
+      showOnShift = false,
+      showOnControl = false,
+      showOnAlt = false,
+      showOnMeta = false,
+      applyCorrections = true,
+      tooltipFormat = L["Added in {expacIcon} ({versionTriple})"],
+      version = 2,
     },
   }
 }
@@ -54,6 +67,7 @@ local CURRENT_VERSION_DEFAULTS = VERSION_DEFAULTS[CURRENT_VERSION_NUMBER]
 ---@param database table The AceDB database object
 local function migrate(database)
   local profile = database.profile
+
   if profile.version == nil then
     -- from nil to version 1
     local target_defaults = VERSION_DEFAULTS[1].profile
@@ -68,9 +82,21 @@ local function migrate(database)
     Private.Table.KeepOnlyKnownKeys(profile, target_defaults)
   end
 
-  -- if profile.version == 1 then
-  --   future migrations go here
+  if profile.version == 1 then
+    -- from version 1 to version 2
+    local target_defaults = VERSION_DEFAULTS[2].profile
+    profile.enableTooltip = true
+    profile.version = 2
+    Private.Table.KeepOnlyKnownKeys(profile, target_defaults)
+  end
+
+  -- if profile.version == 2 then
+  --   -- future migrations would go here
   -- end
+
+  if profile.version ~= CURRENT_VERSION_NUMBER then
+    error(("Profile version %d is not supported by this version of ItemVersion. Please update your profile or reset to defaults."):format(profile.version))
+  end
 end
 
 ---Initialize the database and apply migrations

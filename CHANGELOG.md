@@ -1,8 +1,13 @@
 # ItemVersion Changelog
 
-> [!NOTE]
-> If a release is not documented here, it was likely an automated item database
-> refresh.
+> [!NOTE] If a release is not documented here, it was likely an automated item
+> database refresh.
+
+## Unreleased
+
+- Use
+  [CurseForge translations](https://legacy.curseforge.com/wow/addons/itemversion/localization).
+  This lowers the barrier to entry for translators to make contributions.
 
 ## 2026.05.3
 

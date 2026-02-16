@@ -1,17 +1,11 @@
 local AddonName = ...
 
-local IsDevelopment = false
---@debug@
-IsDevelopment = true
---@end-debug@
-
 local AceLocale = LibStub("AceLocale-3.0")
 
 local L = AceLocale:NewLocale(
     AddonName,
     "enUS",
-    true,
-    IsDevelopment -- During dev, don't error on missing translations (that will be added at build)
+    true
 )
 L["Added in {expacIcon} ({versionTriple})"] = true
 L["Addon Version"] = true

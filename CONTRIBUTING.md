@@ -61,8 +61,8 @@ recommended way to achieve this is as follows:
 
 ### Player-facing Strings
 
-If you add any strings that are displayed to the player, make sure to perform a
-lookup on the locale table. For example, instead of writing
+If you add any strings that are displayed to the player, make sure to state them
+as a lookup on the locale table. For example, instead of writing
 `print("Hello world")`, you would write:
 
 ```lua
@@ -71,7 +71,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 print(L["Hello world"])
 ```
 
-Further, please list any new strings in your pull request. This is so I can add
+Further, please add your strings to the English table in [`ItemVersion/Locales.lua`](https://github.com/t-mart/ItemVersion/blob/master/ItemVersion/Locales.lua). Then, list any new strings in your pull request. This is so I can add
 them to
 [the localization system](https://legacy.curseforge.com/wow/addons/itemversion/localization)
 for later translation.

@@ -11,3 +11,5 @@ Describe your changes here. If this fixes a GitHub issue, please link to it.
 ### Strings Added
 
 If you've added any strings that are displayed to the player, please list them here. This is necessary to ensure that they are added to [the localization system](https://legacy.curseforge.com/wow/addons/itemversion/localization) and can be translated.
+
+Omit this section if you haven't added any player-facing strings.

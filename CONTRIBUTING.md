@@ -1,7 +1,8 @@
 # Contributing
 
 - Beginners are welcome.
-- Use LLMs to help you understand the codebase and development process.
+- Use LLMs to help you understand the codebase and development process. If that
+  fails, ask your question in an issue or pull request.
 - No contribution is too small! Please submit as many fixes for typos and
   grammar bloopers as you can.
 - Don't be afraid to open half-finished PRs, and ask questions if something is
@@ -15,10 +16,6 @@
   file. Usernames or pseudonyms are fine.
 
 ## Developing for ItemVersion
-
-> [!TIP] 
-> If you have any questions about the development process, please ask me
-> or an LLM.
 
 ### Repo Setup
 

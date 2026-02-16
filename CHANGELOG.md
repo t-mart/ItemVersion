@@ -10,6 +10,7 @@
   This lowers the barrier to entry for translators to make contributions.
 - Make tooltip integration optional. This is useful if you are using ItemVersion
   as a data API.
+- Support Anniversary flavor of the game.
 
 ## 2026.05.3
 

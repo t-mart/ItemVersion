@@ -1,20 +1,27 @@
-.PHONY: build dev clean
+.PHONY: libs clean build
 
-ALL: dev
+SOURCE_DIR := ItemVersion
+BUILD_ROOT := .release
+BUILD_DIR := $(BUILD_ROOT)/$(SOURCE_DIR)
+BUILD_LIBS_DIR := $(BUILD_DIR)/Libs
+LIBS_DIR := $(SOURCE_DIR)/Libs
+SOURCES := $(shell find ./$(SOURCE_DIR) -type f -not -path "./$(LIBS_DIR)*")
+
+ALL: build
 
 clean:
-# get rid of all build artifacts
-	rm -rf .release
+	rm -rf $(BUILD_ROOT)
+	rm -rf $(LIBS_DIR)
 
-clean-cache:
-# get rid of cached libs only
-	rm -rf ItemVersion/Libs
+$(BUILD_DIR): $(SOURCES)
+	release.sh -ze
 
-build:
-# development build using cached libs
-	@echo Building ItemVersion for development
-	./scripts/dev-build-with-cached-libs.sh
+$(BUILD_LIBS_DIR):
+	release.sh -z
 
-dev:
-# start a loop that triggers a build on file changes in the ItemVersion directory
-	watchexec --watch ItemVersion --restart make build
+$(LIBS_DIR): $(BUILD_LIBS_DIR)
+	cp -r $(BUILD_LIBS_DIR) $(SOURCE_DIR)/
+
+libs: $(LIBS_DIR)
+
+build: $(BUILD_DIR)

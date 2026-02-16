@@ -133,7 +133,7 @@ globals:
     property: read-only
   CMD_KEY_TEXT:
     property: read-only
-  GetServerExpansionLevel:
+  GetClientDisplayExpansionLevel:
     args: []
     return:
       - type: number # expansion level

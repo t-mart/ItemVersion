@@ -3,6 +3,11 @@
 > [!NOTE] If a release is not documented here, it was likely an automated item
 > database refresh.
 
+## 2026.07.2
+
+- Use more reliable method of determining expansion availability for showing
+  previews on the options screen.
+
 ## 2026.07.0
 
 - Use

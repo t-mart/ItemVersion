@@ -8,9 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 ---@field shortName string The abbreviated name of the expansion
 ---@field previewItemId number Item ID used for preview icon
 ---@field texture string Path to the expansion icon texture
----@field expansionLevel number The expansion level as returned by GetServerExpansionLevel()
+---@field expansionLevel number The expansion level as returned by GetClientDisplayExpansionLevel()
 ---@field corrections number[]|nil Optional list of item IDs that need version correction
----@field IsActive fun(self: Expansion): boolean Check if this expansion is active on the server
+---@field IsPresent fun(self: Expansion): boolean Check if this expansion is available
 
 Private.Expansion = {}
 
@@ -130,10 +130,10 @@ Private.Expansion.All = {
 local ExpansionMixin = {}
 
 ---Check if this expansion is present on the current server
----@return boolean present True if the expansion is available on the server
+---@return boolean present True if the expansion is available
 function ExpansionMixin:IsPresent()
-  local serverExpansionLevel = GetServerExpansionLevel()
-  return self.expansionLevel <= serverExpansionLevel
+  local clientExpansionLevel = GetClientDisplayExpansionLevel()
+  return self.expansionLevel <= clientExpansionLevel
 end
 
 -- attach mixin

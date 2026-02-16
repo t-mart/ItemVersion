@@ -1,4 +1,4 @@
-# Contributing
+# Contributing Guidelines
 
 - Beginners are welcome.
 - Use LLMs to help you understand the codebase and development process. If that
@@ -58,6 +58,23 @@ recommended way to achieve this is as follows:
 > [!IMPORTANT]  
 > Please test your changes before submitting a pull request and document thusly
 > in your PR.
+
+### Player-facing Strings
+
+If you add any strings that are displayed to the player, make sure to perform a
+lookup on the locale table. For example, instead of writing
+`print("Hello world")`, you would write:
+
+```lua
+local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
+
+print(L["Hello world"])
+```
+
+Further, please list any new strings in your pull request. This is so I can add
+them to
+[the localization system](https://legacy.curseforge.com/wow/addons/itemversion/localization)
+for later translation.
 
 ## BigWigs Packager
 

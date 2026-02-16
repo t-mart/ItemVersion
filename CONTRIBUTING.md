@@ -1,7 +1,7 @@
 # Contributing
 
-- Beginners are welcome. If you are new to programming, Git, Lua, or anything
-  related to the project, then I can help you. Just ask.
+- Beginners are welcome.
+- Use LLMs to help you understand the codebase and development process.
 - No contribution is too small! Please submit as many fixes for typos and
   grammar bloopers as you can.
 - Don't be afraid to open half-finished PRs, and ask questions if something is
@@ -12,26 +12,77 @@
 - Make sure your changes pass the status checks.
 - If you would like, please add your name to the
   [`AUTHORS.md`](https://github.com/t-mart/ItemVersion/blob/master/AUTHORS.md)
-  file. Pseudonyms are fine.
-- This addon uses [StyLua] for Lua code formatting. See its documentation for
-  how to apply it to your contributions.
+  file. Usernames or pseudonyms are fine.
 
-## Developer Operations
+## Developing for ItemVersion
 
-`make build` will perform a one-time build of the addon, placing the result in
-the `.release/ItemVersion` directory. This requires
-[BigWigs packager's `release.sh`](https://github.com/BigWigsMods/packager) to be
-in your `PATH`.
+> [!TIP] 
+> If you have any questions about the development process, please ask me
+> or an LLM.
 
-Run `make dev` to automatically build the addon whenever a source file changes.
-This additionally requires [watchexec](https://github.com/watchexec/watchexec)
-to be installed.
+### Repo Setup
 
-These commands become even more powerful if you soft-link the
-`.release/ItemVersion` directory to your WoW AddOns directory, so that the built
-addon is immediately available in-game after you reload the UI.
+Clone the repository to a development location such as `~/code/ItemVersion`. Do
+**not** clone directly into your `Interface/AddOns` directory, as this project's
+structure differs from what WoW expects.
 
-Commits on PRs will trigger a workflow that builds the addon.
+Once cloned, create a new branch off of `master` for your changes.
+
+### Testing Your Changes In-Game
+
+After you've made changes, you'll want to see how they behave in-game. The
+recommended way to achieve this is as follows:
+
+1. Download the addon dependencies in to `ItemVersion/Libs`. After putting the
+   [BigWigs packager in your `PATH`](#bigwigs-packager), you can do this with
+   the following command:
+
+   ```bash
+   make libs
+   ```
+
+2. Create a symbolic link from your development directory to your WoW
+   `Interface/AddOns` directory. For example:
+
+   ```bash
+   ln -s ~/code/ItemVersion /path/to/WoW/Interface/AddOns/ItemVersion
+   ```
+
+   Or on Windows:
+
+   ```cmd
+   mklink /D C:\path\to\WoW\Interface\AddOns\ItemVersion C:\path\to\code\ItemVersion
+   ```
+
+3. Load the game up and try it out. Note that **whenever you make a change**,
+   you must reload the UI in-game for it to take effect. You can do this by
+   typing `/reload` in the chat.
+
+> [!IMPORTANT]  
+> Please test your changes before submitting a pull request and document thusly
+> in your PR.
+
+## BigWigs Packager
+
+This project uses the
+[BigWigs packager](https://github.com/BigWigsMods/packager) for building
+releases.
+
+To install it locally, place
+[`release.sh`](https://github.com/BigWigsMods/packager/blob/master/release.sh)
+somewhere in your `PATH`. Ask an LLM for help if you don't know how to do this.
+
+## Building a Release
+
+To create a packaged release build:
+
+```bash
+make build
+```
+
+This requires the [BigWigs packager to be installed locally](#bigwigs-packager).
+
+Note that any replacements for `debug` will be omitted from the build.
 
 ## Versioning
 
@@ -41,6 +92,8 @@ This is the format: `year.weeknumber.patch`.
 
 Data refresh releases will bump the `year.weeknumber` part. Intraweek
 development releases will bump the `patch` part.
+
+See `.bumpversion.toml` for more details.
 
 ## Release Process
 

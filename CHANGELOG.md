@@ -3,7 +3,7 @@
 > [!NOTE] If a release is not documented here, it was likely an automated item
 > database refresh.
 
-## Unreleased
+## 2026.07.0
 
 - Use
   [CurseForge translations](https://legacy.curseforge.com/wow/addons/itemversion/localization).

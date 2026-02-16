@@ -8,9 +8,6 @@
 - Use
   [CurseForge translations](https://legacy.curseforge.com/wow/addons/itemversion/localization).
   This lowers the barrier to entry for translators to make contributions.
-
-## Unreleased
-
 - Make tooltip integration optional. This is useful if you are using ItemVersion
   as a data API.
 

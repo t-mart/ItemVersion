@@ -16,7 +16,7 @@ Private.DatabaseManager = {}
 local Color = Private.Color
 
 local NAME = "ItemVersionDB"
-local CURRENT_VERSION_NUMBER = 1
+local CURRENT_VERSION_NUMBER = 2
 
 local VERSION_DEFAULTS = {
   -- back before versioning
@@ -56,7 +56,7 @@ local VERSION_DEFAULTS = {
       showOnMeta = false,
       applyCorrections = true,
       tooltipFormat = L["Added in {expacIcon} ({versionTriple})"],
-      version = 1,
+      version = 2,
     },
   }
 }

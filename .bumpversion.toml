@@ -1,5 +1,5 @@
 [tool.bumpversion]
-current_version = "2026.07.3"
+current_version = "2026.08.0"
 parse = """(?x)     # Turn on verbose mode
     (?P<release>    # Start release part
         (?:\\d{4})  #   YYYY

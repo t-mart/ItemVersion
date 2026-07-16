@@ -5,6 +5,12 @@
 
 ## Unreleased
 
+- Fix settings migration, which never ran. If you used ItemVersion before the
+  2026.05.1 overhaul, your key modifier and version correction choices were
+  silently ignored and replaced with defaults. They are now restored for any
+  setting you have not since changed, and anything you did change is left as you
+  set it. Long-obsolete settings are also cleared out of your saved variables
+  ([#108](https://github.com/t-mart/ItemVersion/issues/108)).
 - Fix an "Invalid font asset" error thrown when opening the options panel. Thanks
   to [@HectorZaGa](https://github.com/HectorZaGa) for the report and the fix
   ([#105](https://github.com/t-mart/ItemVersion/pull/105)).

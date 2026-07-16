@@ -1,25 +1,5 @@
 local _, Private = ...
 
----Creates a deep copy of a table
----Note: Does not handle cyclic references
----@generic T
----@param obj T The object to copy
----@return T copy The deep copy of the object
-local function deepCopy(obj)
-  -- Does not handle cyclic references
-  if type(obj) ~= "table" then
-    return obj
-  end
-
-  local res = {}
-  for k, v in pairs(obj) do
-    -- Recursively copy the key and the value
-    res[deepCopy(k)] = deepCopy(v)
-  end
-
-  return res
-end
-
 ---Mixes in properties from one or more mixin tables into a target object
 ---@generic T
 ---@param object T The target object to receive the mixin properties
@@ -48,7 +28,6 @@ local function keepOnlyKnownKeys(t, allowed)
 end
 
 Private.Table = {
-  DeepCopy = deepCopy,
   Mixin = mixin,
   KeepOnlyKnownKeys = keepOnlyKnownKeys,
 }

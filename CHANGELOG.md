@@ -5,6 +5,11 @@
 
 ## Unreleased
 
+- Fix the tooltip line breaking when an expansion name contains a `%`. Depending
+  on the character following it, the line either threw an error or silently
+  rendered the wrong text. This only affected translated names, so it was
+  invisible in English
+  ([#109](https://github.com/t-mart/ItemVersion/issues/109)).
 - Fix settings migration, which never ran. If you used ItemVersion before the
   2026.05.1 overhaul, your key modifier and version correction choices were
   silently ignored and replaced with defaults. They are now restored for any

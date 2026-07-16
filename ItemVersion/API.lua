@@ -19,13 +19,49 @@ end
 
 local ItemLookupMixin = {}
 
+---Replaces every occurrence of needle in subject, matching literally
+---
+---Deliberately not gsub, which reads the needle as a pattern and the replacement
+---as a replacement string. Both sides carry text that can contain the characters
+---those grammars reserve: a token could one day hold a `-`, and a resolved value
+---can hold a `%`, since expansion names come from translators.
+---@param subject string The string to search
+---@param needle string The literal text to find
+---@param replacement string The literal text to put in its place
+---@return string
+local function replacePlain(subject, needle, replacement)
+  -- An empty needle matches at every position without advancing, so the loop
+  -- below would never terminate. No token is empty, but a hung client is a
+  -- steep price for being wrong about that.
+  if needle == "" then
+    return subject
+  end
+
+  local pieces = {}
+  local searchFrom = 1
+
+  while true do
+    local matchStart, matchEnd = subject:find(needle, searchFrom, true)
+    if not matchStart then
+      break
+    end
+
+    table.insert(pieces, subject:sub(searchFrom, matchStart - 1))
+    table.insert(pieces, replacement)
+    searchFrom = matchEnd + 1
+  end
+
+  table.insert(pieces, subject:sub(searchFrom))
+
+  return table.concat(pieces)
+end
+
 ---Format a string by replacing tokens with values from the lookup
 ---@param formatString string The format string containing tokens like {expacLong}, {versionTriple}, etc.
 ---@return string formatted The formatted string with tokens replaced
 function ItemLookupMixin:Format(formatString)
   for _, tokenInfo in ipairs(Private.Tokens) do
-    local resolved = tokenInfo.resolve(self)
-    formatString = formatString:gsub(tokenInfo.string, resolved)
+    formatString = replacePlain(formatString, tokenInfo.string, tokenInfo.resolve(self))
   end
 
   return formatString

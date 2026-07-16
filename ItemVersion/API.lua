@@ -1,7 +1,6 @@
 local _, Private = ...
 
 local Expansion = Private.Expansion
-local Table = Private.Table
 
 Private.API = {}
 local API = Private.API
@@ -18,6 +17,11 @@ local function toLookupExpansion(expansion)
 end
 
 local ItemLookupMixin = {}
+
+-- Shared by every lookup rather than copied into each one. The mixin is fixed,
+-- so there is nothing per-lookup to copy, and this keeps Format off the result
+-- itself, where it would otherwise turn up in pairs() alongside the data.
+local ItemLookupMeta = { __index = ItemLookupMixin }
 
 ---Replaces every occurrence of needle in subject, matching literally
 ---
@@ -84,13 +88,13 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
   if applyVersionCorrections then
     expansion = Expansion:GetCorrectedExpansionForItemId(itemId)
     if expansion then
-      return Table.Mixin({
+      return setmetatable({
         expansion = toLookupExpansion(expansion),
         minor = 0,
         patch = 0,
         build = 0,
         isCorrected = true,
-      }, ItemLookupMixin)
+      }, ItemLookupMeta)
     end
   end
 
@@ -110,11 +114,11 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
     return nil
   end
 
-  return Table.Mixin({
+  return setmetatable({
     expansion = toLookupExpansion(expansion),
     minor = version.minor,
     patch = version.patch,
     build = version.build,
     isCorrected = false,
-  }, ItemLookupMixin)
+  }, ItemLookupMeta)
 end

@@ -51,7 +51,7 @@ local function Constructor()
 
     -- Get JetBrains Mono font
     local fontPath = LSM:Fetch("font", "JetBrains Mono NL")
-    local _, fontSize, fontFlags = GameFontNormal:GetFont()
+    local gameFontFile, fontSize, fontFlags = GameFontNormal:GetFont()
 
     -- lookup the hearthstone
     local lookup = Private.API.GetItemVersion(EXAMPLE_ITEM_ID, true)
@@ -63,7 +63,7 @@ local function Constructor()
         local leftLabel = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
         leftLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PADDING, -(i - 1) * ROW_HEIGHT)
         if i == 1 then
-            leftLabel:SetFont("GameFontNormal", fontSize + 2, "OUTLINE")
+            leftLabel:SetFont(gameFontFile, fontSize + 2, "OUTLINE")
             leftLabel:SetTextColor(1.0, 0.82, 0.0)
         else
             leftLabel:SetFont(fontPath, fontSize, fontFlags)
@@ -75,7 +75,7 @@ local function Constructor()
         local middleLabel = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
         middleLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PADDING + LEFT_COL_WIDTH + COL_GAP, -(i - 1) * ROW_HEIGHT)
         if i == 1 then
-            middleLabel:SetFont("GameFontNormal", fontSize + 2, "OUTLINE")
+            middleLabel:SetFont(gameFontFile, fontSize + 2, "OUTLINE")
             middleLabel:SetTextColor(1.0, 0.82, 0.0)
         else
             middleLabel:SetTextColor(0.9, 0.9, 0.9)
@@ -87,7 +87,7 @@ local function Constructor()
         rightLabel:SetPoint("TOP", frame, "TOPLEFT", LEFT_PADDING + LEFT_COL_WIDTH + COL_GAP + 300,
             -(i - 1) * ROW_HEIGHT)
         if i == 1 then
-            rightLabel:SetFont("GameFontNormal", fontSize + 2, "OUTLINE")
+            rightLabel:SetFont(gameFontFile, fontSize + 2, "OUTLINE")
             rightLabel:SetTextColor(1.0, 0.82, 0.0)
             rightLabel:SetText(L["Example"])
         else

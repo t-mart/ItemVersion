@@ -7,7 +7,9 @@ local _, Private = ...
 ---@return T copy The deep copy of the object
 local function deepCopy(obj)
   -- Does not handle cyclic references
-  if type(obj) ~= 'table' then return obj end
+  if type(obj) ~= "table" then
+    return obj
+  end
 
   local res = {}
   for k, v in pairs(obj) do
@@ -44,7 +46,6 @@ local function keepOnlyKnownKeys(t, allowed)
     end
   end
 end
-
 
 Private.Table = {
   DeepCopy = deepCopy,

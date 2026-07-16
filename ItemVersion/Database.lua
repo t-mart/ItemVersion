@@ -44,7 +44,7 @@ local VERSION_DEFAULTS = {
       applyCorrections = true,
       tooltipFormat = L["Added in {expacIcon} ({versionTriple})"],
       version = 1,
-    }
+    },
   },
   [2] = {
     profile = {
@@ -58,7 +58,7 @@ local VERSION_DEFAULTS = {
       tooltipFormat = L["Added in {expacIcon} ({versionTriple})"],
       version = 2,
     },
-  }
+  },
 }
 
 local CURRENT_VERSION_DEFAULTS = VERSION_DEFAULTS[CURRENT_VERSION_NUMBER]
@@ -95,14 +95,20 @@ local function migrate(database)
   -- end
 
   if profile.version ~= CURRENT_VERSION_NUMBER then
-    error(("Profile version %d is not supported by this version of ItemVersion. Please update your profile or reset to defaults."):format(profile.version))
+    error(
+      ("Profile version %d is not supported by this version of ItemVersion. Please update your profile or reset to defaults."):format(
+        profile.version
+      )
+    )
   end
 end
 
 ---Initialize the database and apply migrations
 ---@return table database The initialized AceDB database
 function Private.DatabaseManager.Initialize()
-  if Private.Database then return Private.Database end
+  if Private.Database then
+    return Private.Database
+  end
 
   local database = LibStub("AceDB-3.0"):New(NAME, CURRENT_VERSION_DEFAULTS, true)
 

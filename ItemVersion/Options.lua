@@ -65,14 +65,18 @@ local OPTIONS_TABLE = {
       set = "SetColor",
       arg = "lineColor",
       order = 1,
-      disabled = function() return not Private.Database.profile.enableTooltip end,
+      disabled = function()
+        return not Private.Database.profile.enableTooltip
+      end,
     },
     keyModifierGroup = {
       type = "group",
       name = L["Key Modifiers Needed to Show Info"],
       inline = true,
       order = 3,
-      disabled = function() return not Private.Database.profile.enableTooltip end,
+      disabled = function()
+        return not Private.Database.profile.enableTooltip
+      end,
       args = {
         showOnShift = {
           type = "toggle",
@@ -105,31 +109,37 @@ local OPTIONS_TABLE = {
           type = "toggle",
           name = CMD_KEY_TEXT,
           desc = format(L["Show item version info in tooltips when the %s key is held down."], CMD_KEY_TEXT),
-          hidden = function() return not IsMacClient() end,
+          hidden = function()
+            return not IsMacClient()
+          end,
           get = "GetValue",
           set = "SetValue",
           arg = "showOnMeta",
           order = 4,
         },
-      }
+      },
     },
     applyVersionCorrections = {
-      type  = "toggle",
-      name  = L["Apply version corrections"],
-      desc  = L["Correct the version for some items whose release version is different than their usable version."],
-      get   = "GetValue",
-      set   = "SetValue",
-      arg   = "applyVersionCorrections",
+      type = "toggle",
+      name = L["Apply version corrections"],
+      desc = L["Correct the version for some items whose release version is different than their usable version."],
+      get = "GetValue",
+      set = "SetValue",
+      arg = "applyVersionCorrections",
       width = "full",
       order = 4,
-      disabled = function() return not Private.Database.profile.enableTooltip end,
+      disabled = function()
+        return not Private.Database.profile.enableTooltip
+      end,
     },
     tooltipFormatGroup = {
       type = "group",
       name = L["Tooltip format"],
       inline = true,
       order = 5,
-      disabled = function() return not Private.Database.profile.enableTooltip end,
+      disabled = function()
+        return not Private.Database.profile.enableTooltip
+      end,
       args = {
         intro = {
           type = "description",
@@ -162,7 +172,7 @@ local OPTIONS_TABLE = {
             },
           },
         },
-      }
+      },
     },
     preview = {
       type = "group",
@@ -170,7 +180,7 @@ local OPTIONS_TABLE = {
       inline = true,
       order = 6,
       args = previewWidgets,
-    }
+    },
   },
 }
 

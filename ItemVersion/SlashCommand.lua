@@ -55,18 +55,17 @@ local function HandleVersion()
   frame:SetWidth(400)
   frame:SetHeight(200)
   frame:SetCallback("OnClose", function(widget)
-      AceGUI:Release(widget)
-    end
-  )
+    AceGUI:Release(widget)
+  end)
 
   local version, build, date = GetBuildInfo()
 
-  local text = "" ..
-      string.format("%s: %s\n", L["Addon Version"], C_AddOns.GetAddOnMetadata(AddonName, "Version")) ..
-      string.format("%s: %s\n", L["WoW Version"], version) ..
-      string.format("%s: %s\n", L["WoW Build"], build) ..
-      string.format("%s: %s\n", L["WoW Build Date"], date) ..
-      string.format("%s: %s\n", L["Platform"], GetPlatform())
+  local text = ""
+    .. string.format("%s: %s\n", L["Addon Version"], C_AddOns.GetAddOnMetadata(AddonName, "Version"))
+    .. string.format("%s: %s\n", L["WoW Version"], version)
+    .. string.format("%s: %s\n", L["WoW Build"], build)
+    .. string.format("%s: %s\n", L["WoW Build Date"], date)
+    .. string.format("%s: %s\n", L["Platform"], GetPlatform())
 
   local multiLineEditBox = AceGUI:Create("MultiLineEditBox")
   multiLineEditBox:SetLabel(L["Version Information"])

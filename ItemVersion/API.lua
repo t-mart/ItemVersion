@@ -58,7 +58,6 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
     end
   end
 
-
   -- then lookup in main database
   local versionId = Private.itemIdToVersionId[itemId]
   if not versionId then

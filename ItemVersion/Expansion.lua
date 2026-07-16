@@ -99,7 +99,7 @@ Private.Expansion.All = {
       168589, -- Marrowroot
       169701, -- Death Blossom
       171315, -- Nightshade
-    }
+    },
   },
   {
     major = 10,

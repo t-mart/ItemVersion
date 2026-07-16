@@ -4,9 +4,12 @@ ItemVersion = LibStub("AceAddon-3.0"):NewAddon(AddonName)
 
 local LSM = LibStub("LibSharedMedia-3.0")
 
-LSM:Register("font", "JetBrains Mono NL",
+LSM:Register(
+  "font",
+  "JetBrains Mono NL",
   "Interface\\AddOns\\" .. AddonName .. "\\Media\\Fonts\\JetBrainsMonoNL-Regular.ttf",
-  LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU)
+  LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU
+)
 
 ---Initialize the addon
 function ItemVersion:OnInitialize()

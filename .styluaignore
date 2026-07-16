@@ -1,0 +1,7 @@
+# Generated file. It is a single line of roughly 1.9 MB, so formatting it would
+# explode it into millions of lines and destroy every future diff.
+Data.lua
+
+# Vendored Ace3 externals. Not ours to format. These are also gitignored, which
+# stylua honours on its own, but relying on that is too subtle to trust.
+Libs/

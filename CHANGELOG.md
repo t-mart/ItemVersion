@@ -5,6 +5,10 @@
 
 ## Unreleased
 
+- Show and hide the version line as you press and release your chosen modifier
+  key, without having to move the mouse away and back. If you have not set a
+  modifier key, nothing changes
+  ([#110](https://github.com/t-mart/ItemVersion/issues/110)).
 - Fix the tooltip line breaking when an expansion name contains a `%`. Depending
   on the character following it, the line either threw an error or silently
   rendered the wrong text. This only affected translated names, so it was

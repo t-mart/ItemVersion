@@ -5,6 +5,9 @@
 
 ## Unreleased
 
+- Fix an "Invalid font asset" error thrown when opening the options panel. Thanks
+  to [@HectorZaGa](https://github.com/HectorZaGa) for the report and the fix
+  ([#105](https://github.com/t-mart/ItemVersion/pull/105)).
 - Fix the "Apply version corrections" option, which did nothing. It always
   appeared unchecked no matter what you set it to, and corrections were always
   applied. It now shows the real setting and turning it off takes effect

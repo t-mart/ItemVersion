@@ -3,6 +3,13 @@
 > [!NOTE] If a release is not documented here, it was likely an automated item
 > database refresh.
 
+## Unreleased
+
+- Fix the "Apply version corrections" option, which did nothing. It always
+  appeared unchecked no matter what you set it to, and corrections were always
+  applied. It now shows the real setting and turning it off takes effect
+  ([#107](https://github.com/t-mart/ItemVersion/issues/107)).
+
 ## 2026.07.2
 
 - Use more reliable method of determining expansion availability for showing

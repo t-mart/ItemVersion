@@ -119,13 +119,13 @@ local OPTIONS_TABLE = {
         },
       },
     },
-    applyVersionCorrections = {
+    applyCorrections = {
       type = "toggle",
       name = L["Apply version corrections"],
       desc = L["Correct the version for some items whose release version is different than their usable version."],
       get = "GetValue",
       set = "SetValue",
-      arg = "applyVersionCorrections",
+      arg = "applyCorrections",
       width = "full",
       order = 4,
       disabled = function()

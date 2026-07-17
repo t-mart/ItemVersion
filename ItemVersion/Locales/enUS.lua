@@ -1,8 +1,8 @@
 -- The English strings, and the source of truth for what keys exist.
 --
 -- Unlike the translations beside it, this file is written by hand and the
--- locale tool only checks it. `make locales` will not reformat it, so the
--- comments below survive.
+-- locale tool only checks it. The tool will not reformat it, so the comments
+-- below survive.
 
 local AddonName = ...
 

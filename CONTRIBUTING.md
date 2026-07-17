@@ -25,6 +25,27 @@ structure differs from what WoW expects.
 
 Once cloned, create a new branch off of `master` for your changes.
 
+### Tools
+
+Everything is driven by one script, `scripts/dev.py`, run through
+[uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+```bash
+uv run scripts/dev.py help
+```
+
+uv is the only thing you need to install for it. It fetches the right Python and
+the script's dependencies on first run, so there is no virtualenv to create or
+activate.
+
+Some individual commands want a tool on your `PATH`, and each one tells you if
+something it needs is missing:
+
+- `check` and `format` want [selene](https://kampfkarren.github.io/selene/) and
+  [stylua](https://github.com/JohnnyMorganz/StyLua).
+- `libs` and `build` want the [BigWigs packager](#bigwigs-packager), which is a
+  bash script.
+
 ### Testing Your Changes In-Game
 
 After you've made changes, you'll want to see how they behave in-game. The
@@ -35,23 +56,33 @@ recommended way to achieve this is as follows:
    the following command:
 
    ```bash
-   make libs
+   uv run scripts/dev.py libs
    ```
 
-2. Create a symbolic link from your development directory to your WoW
-   `Interface/AddOns` directory. For example:
+2. Tell the tooling where WoW lives, by copying the template and editing it:
 
    ```bash
-   ln -s ~/code/ItemVersion /path/to/WoW/Interface/AddOns/ItemVersion
+   cp .env.template .env
    ```
 
-   Or on Windows:
+   Set `WOW_ROOT` to the directory that contains `_retail_`, `_classic_` and
+   friends. `.env` is gitignored, so your path stays out of the repo.
 
-   ```cmd
-   mklink /D C:\path\to\WoW\Interface\AddOns\ItemVersion C:\path\to\code\ItemVersion
+3. Link the addon into every flavor you have installed:
+
+   ```bash
+   uv run scripts/dev.py install
    ```
 
-3. Load the game up and try it out. Note that **whenever you make a change**,
+   This symlinks `ItemVersion/` into each flavor's `Interface/AddOns`, so your
+   edits are live with no build step. It refuses to touch a real directory, so
+   it will not eat a copy of ItemVersion you installed normally. The `status`
+   command shows what is linked, and `uninstall` removes the links again.
+
+   On Windows, creating a symlink needs either Developer Mode turned on
+   (Settings > System > For developers) or an Administrator terminal.
+
+4. Load the game up and try it out. Note that **whenever you make a change**,
    you must reload the UI in-game for it to take effect. You can do this by
    typing `/reload` in the chat.
 
@@ -83,11 +114,11 @@ L["Hello world"] = true
 is already English". You don't need to do anything for the other languages:
 
 ```bash
-make locales
+uv run scripts/dev.py locales
 ```
 
 will add a commented stub for your new string to every locale file, ready for a
-translator to fill in, and `make check` will tell you if you forgot.
+translator to fill in, and the `check` command will tell you if you forgot.
 
 There's nothing else to do. Translations live in this repo, so there is no
 separate system to notify.
@@ -108,7 +139,7 @@ has to fit in a tooltip, and a language may want those to differ.
 
 Note that such a key needs its English spelled out, as above, and **not** `true`.
 `true` makes the value the key, so a language without a translation for it would
-show the player `Legion|canon`, marker and all. `make check` enforces this, but
+show the player `Legion|canon`, marker and all. `check` enforces this, but
 it's easier to just remember.
 
 ### Translations
@@ -117,9 +148,9 @@ See [Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/READM
 in the README. Editing one file under `ItemVersion/Locales/` is the whole
 process, and no Lua knowledge is needed beyond the quotes.
 
-`make locales` maintains those files: it sorts them, stubs out anything
+The `locales` command maintains those files: it sorts them, stubs out anything
 untranslated, and drops keys that no longer exist. It rewrites every locale
-except `enUS.lua`, which is written by hand. `make check` runs the same checks
+except `enUS.lua`, which is written by hand. `check` runs the same checks
 without writing anything, which is what CI does.
 
 ## BigWigs Packager
@@ -137,7 +168,7 @@ somewhere in your `PATH`. Ask an LLM for help if you don't know how to do this.
 To create a packaged release build:
 
 ```bash
-make build
+uv run scripts/dev.py build
 ```
 
 This requires the [BigWigs packager to be installed locally](#bigwigs-packager).

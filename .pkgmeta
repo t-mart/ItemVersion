@@ -27,7 +27,6 @@ ignore:
   - CLAUDE.md
   - CONTRIBUTING.md
   - docs
-  - Makefile
   - README.md
   - scripts
   - selene.toml

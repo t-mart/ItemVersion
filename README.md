@@ -61,8 +61,10 @@ for more information.
 
 ## Translators Needed
 
-If you know another language and want to help translate ItemVersion, please
-[check this out](https://github.com/t-mart/ItemVersion/tree/master/ItemVersion/Locales).
+If you know another language and want to help translate ItemVersion, please use
+[the localization page on CurseForge](https://legacy.curseforge.com/wow/addons/itemversion/localization).
+Translations submitted there are pulled in automatically when the addon is
+built, so there's no need to open a pull request.
 
 Translations are living things. If you see an improvement to make, don't
 hesitate to bring it up.

@@ -5,6 +5,11 @@
 
 ## Unreleased
 
+- Fix translations never loading. Only German could ever apply. Every other
+  language silently fell back to English, including the Chinese and Brazilian
+  Portuguese translations that were already finished and waiting. Thanks to
+  [@HectorZaGa](https://github.com/HectorZaGa) for spotting this
+  ([#104](https://github.com/t-mart/ItemVersion/pull/104)).
 - Show and hide the version line as you press and release your chosen modifier
   key, without having to move the mouse away and back. If you have not set a
   modifier key, nothing changes

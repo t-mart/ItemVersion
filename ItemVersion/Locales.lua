@@ -1,6 +1,19 @@
+-- The @localization@ comments below are replaced with the translations held on
+-- CurseForge when the addon is packaged, so the blocks they sit in are only
+-- empty here in source.
+--# selene: allow(empty_if)
+
 local AddonName = ...
 
 local AceLocale = LibStub("AceLocale-3.0")
+
+-- Each locale is guarded with `if L then` rather than an early return.
+-- NewLocale returns nil for every locale except the client's, and a return at
+-- file scope would leave the rest of the file unread, so only the first locale
+-- listed could ever load.
+--
+-- Translations belong on CurseForge, not here. Filling these blocks in by hand
+-- would take the locale out of that pipeline.
 
 local L = AceLocale:NewLocale(AddonName, "enUS", true)
 L["Added in {expacIcon} ({versionTriple})"] = true
@@ -67,61 +80,51 @@ L["Wrath of the Lich King"] = true
 L["WW"] = true
 
 L = AceLocale:NewLocale(AddonName, "deDE")
-if not L then
-  return
+if L then
+  --@localization(locale="deDE", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="deDE", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "esES")
-if not L then
-  return
+if L then
+  --@localization(locale="esES", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="esES", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "esMX")
-if not L then
-  return
+if L then
+  --@localization(locale="esMX", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="esMX", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "frFR")
-if not L then
-  return
+if L then
+  --@localization(locale="frFR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="frFR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "itIT")
-if not L then
-  return
+if L then
+  --@localization(locale="itIT", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="itIT", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "koKR")
-if not L then
-  return
+if L then
+  --@localization(locale="koKR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="koKR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "ptBR")
-if not L then
-  return
+if L then
+  --@localization(locale="ptBR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="ptBR", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "ruRU")
-if not L then
-  return
+if L then
+  --@localization(locale="ruRU", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="ruRU", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "zhCN")
-if not L then
-  return
+if L then
+  --@localization(locale="zhCN", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="zhCN", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 
 L = AceLocale:NewLocale(AddonName, "zhTW")
-if not L then
-  return
+if L then
+  --@localization(locale="zhTW", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@
 end
---@localization(locale="zhTW", format="lua_additive_table", same-key-is-true=true, handle-subnamespaces="concat")@

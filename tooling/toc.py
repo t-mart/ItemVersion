@@ -32,3 +32,11 @@ def set_toc_field(text: str, field: str, value: str) -> str:
 
 def version_from_toc(text: str) -> str | None:
     return toc_field(text, "Version")
+
+
+def require_version(text: str) -> str:
+    """The TOC version, or a fatal error. Building a release without one is a bug."""
+    version = version_from_toc(text)
+    if version is None:
+        raise Die("the TOC has no ## Version line")
+    return version

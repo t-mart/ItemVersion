@@ -6,8 +6,10 @@ from __future__ import annotations
 import pytest  # type: ignore[ty:unresolved-import]
 
 import common
+import config
 import interfaces
 import toc
+from config import Config
 
 
 # A real response from http://us.patch.battle.net:1119/wow/versions, trimmed to
@@ -81,6 +83,25 @@ class TestInterfaceVersion:
             interfaces.interface_version("not.a.version.here")
 
 
+class TestVersionFromInterface:
+    def test_the_four_products_we_ship(self):
+        # The inverse of interface_version, giving CurseForge's game-version names.
+        assert interfaces.version_from_interface("120007") == "12.0.7"
+        assert interfaces.version_from_interface("50504") == "5.5.4"
+        assert interfaces.version_from_interface("20506") == "2.5.6"
+        assert interfaces.version_from_interface("11508") == "1.15.8"
+
+    def test_round_trips_with_interface_version(self):
+        for name in ("12.0.7.68453", "5.5.4.68716", "1.15.8.67156"):
+            interface = interfaces.interface_version(name)
+            major, minor, patch, _build = name.split(".")
+            assert interfaces.version_from_interface(interface) == f"{major}.{minor}.{patch}"
+
+    def test_junk_dies(self):
+        with pytest.raises(common.Die, match="not an interface number"):
+            interfaces.version_from_interface("nope")
+
+
 class TestFetchText:
     def test_a_network_error_becomes_a_die(self, monkeypatch):
         def boom(*args, **kwargs):
@@ -115,13 +136,15 @@ class TestInterfaceFor:
 class TestCmdInterfaces:
     @pytest.fixture
     def stale(self, tmp_path, monkeypatch):
-        toc = tmp_path / "ItemVersion.toc"
-        toc.write_text("## Title: ItemVersion\n## Interface: 1, 2\n", encoding="utf-8")
-        monkeypatch.setattr(interfaces, "TOC_PATH", toc)
+        monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
+        cfg = Config(name="ItemVersion", curseforge_project_id=1, ignore=(), libs=(("A", "svn://x"),))
+        cfg.toc_path.parent.mkdir(parents=True)
+        cfg.toc_path.write_text("## Title: ItemVersion\n## Interface: 1, 2\n", encoding="utf-8")
+        monkeypatch.setattr(interfaces, "load_config", lambda: cfg)
         # relative() reports paths against the repo root, so move it here too.
         monkeypatch.setattr(common, "REPO_ROOT", tmp_path)
         monkeypatch.setattr(interfaces, "current_interfaces", lambda: "120007, 50504")
-        return toc
+        return cfg.toc_path
 
     def test_writes_the_new_interfaces(self, stale):
         assert interfaces.cmd_interfaces() == 0
@@ -170,7 +193,7 @@ class TestCurrentInterfaces:
         # The TOC and WOW_PRODUCTS have to stay the same length, or the Interface
         # line silently loses a flavor.
         listed = toc.toc_field(
-            interfaces.TOC_PATH.read_text(encoding="utf-8"), "Interface"
+            config.load_config().toc_path.read_text(encoding="utf-8"), "Interface"
         )
         assert listed is not None
         assert len(listed.split(",")) == len(interfaces.WOW_PRODUCTS)

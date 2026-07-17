@@ -5,17 +5,18 @@
 # dependencies = [
 #   "luaparser>=3.2.1",
 #   "python-dotenv>=1.0",
+#   "pyyaml>=6.0",
 #   "watchfiles>=1.0",
 # ]
 # ///
 """ItemVersion development helper.
 
   ./dev help
-
-The commands live in tooling/, which this adds to the import path. This file owns
-the dependency list for all of them, so uv fetches them on the way in and the
-modules under tooling/ stay plain imports.
 """
+
+# The commands live in tooling/, which this adds to the import path. This file owns
+# the dependency list for all of them, so uv fetches them on the way in and the
+# modules under tooling/ stay plain imports.
 
 import sys
 from pathlib import Path

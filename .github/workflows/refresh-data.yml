@@ -102,20 +102,20 @@ jobs:
 
       - name: Clear old data
         run: |
-          rm ItemVersion/Data.lua
+          rm src/ItemVersion/Data.lua
 
       - name: Download generated lua artifact
         uses: actions/download-artifact@v7
         with:
           name: Data.lua
-          path: ItemVersion/
+          path: src/ItemVersion/
 
       - name: Commit & Push
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ItemVersion/Data.lua
+          git add src/ItemVersion/Data.lua
           git commit -m "Refresh item data"
           git push origin "${{ env.release_ref }}"
 

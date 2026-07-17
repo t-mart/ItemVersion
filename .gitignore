@@ -1,5 +1,5 @@
-/ItemVersion/Bindings.xml
-/.release
-/ItemVersion/Libs
+/src/ItemVersion/Bindings.xml
+/dist
+/src/ItemVersion/Libs
 /.env
 __pycache__/

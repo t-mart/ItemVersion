@@ -10,4 +10,4 @@ Then, in GIMP, crop, change background to transparent, save as png.
 
 ## `icon.png`
 
-See `ItemVersion/Images/README.md`. This is just a png of that.
+See `src/ItemVersion/Images/README.md`. This is just a png of that.

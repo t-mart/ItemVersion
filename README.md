@@ -65,7 +65,7 @@ If you know another language, you can help, and you don't need to know how to
 program.
 
 The translations live in
-[`ItemVersion/Locales/`](https://github.com/t-mart/ItemVersion/tree/master/ItemVersion/Locales),
+[`ItemVersion/Locales/`](https://github.com/t-mart/ItemVersion/tree/master/src/ItemVersion/Locales),
 one file per language. Open the one for yours, and you'll see lines like this:
 
 ```lua

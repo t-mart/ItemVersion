@@ -20,6 +20,6 @@ message = "Release {new_version}"
 calver_format = "{YYYY}.{0W}"
 
 [[tool.bumpversion.files]]
-filename = "ItemVersion/ItemVersion.toc"
+filename = "src/ItemVersion/ItemVersion.toc"
 search = "## Version: {current_version}"
 replace = "## Version: {new_version}"

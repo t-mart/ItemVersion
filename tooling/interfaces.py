@@ -6,7 +6,8 @@ import sys
 import urllib.request
 from typing import Iterable
 
-from common import TOC_PATH, Die, relative
+from common import Die, relative
+from config import load_config
 from toc import set_toc_field, toc_field
 
 # Despite the us. hostname, one response covers every region.
@@ -71,6 +72,18 @@ def interface_version(versions_name: str) -> str:
         raise Die(f"cannot read a version out of {versions_name!r}") from error
 
 
+def version_from_interface(interface: str) -> str:
+    """`120007` -> `12.0.7`: the CurseForge game-version name for a TOC interface."""
+    try:
+        number = int(interface)
+    except ValueError as error:
+        raise Die(f"not an interface number: {interface!r}") from error
+
+    major, rest = divmod(number, 10000)
+    minor, patch = divmod(rest, 100)
+    return f"{major}.{minor}.{patch}"
+
+
 def interface_for(product: str, region: str = REGION) -> str:
     rows = parse_versions(fetch_text(VERSIONS_URL.format(product=product)))
 
@@ -97,21 +110,22 @@ def current_interfaces(
 def cmd_interfaces(dry_run: bool = False) -> int:
     interfaces = current_interfaces()
 
-    text = TOC_PATH.read_text(encoding="utf-8")
+    toc_path = load_config().toc_path
+    text = toc_path.read_text(encoding="utf-8")
     listed = toc_field(text, "Interface")
     updated = set_toc_field(text, "Interface", interfaces)
 
     if updated == text:
-        print(f"{relative(TOC_PATH)} already lists {interfaces}", file=sys.stderr)
+        print(f"{relative(toc_path)} already lists {interfaces}", file=sys.stderr)
     elif dry_run:
         print(
-            f"would update {relative(TOC_PATH)}: {listed} -> {interfaces}",
+            f"would update {relative(toc_path)}: {listed} -> {interfaces}",
             file=sys.stderr,
         )
     else:
-        TOC_PATH.write_text(updated, encoding="utf-8")
+        toc_path.write_text(updated, encoding="utf-8")
         print(
-            f"updated {relative(TOC_PATH)}: {listed} -> {interfaces}", file=sys.stderr
+            f"updated {relative(toc_path)}: {listed} -> {interfaces}", file=sys.stderr
         )
 
     # Notes above go to stderr so that stdout is just the value, which the release

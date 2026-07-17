@@ -1,4 +1,8 @@
-"""Paths and plumbing shared by the ./dev commands."""
+"""Generic plumbing shared by the ./dev commands.
+
+The project layout (the addon name and where its source lives) is not here: it
+derives from wowaddon.yml, so it lives on the Config object in config.py.
+"""
 
 from __future__ import annotations
 
@@ -8,15 +12,6 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SOURCE_DIR = "ItemVersion"
-
-# Link to the source dir rather than the build output. It is a stable path, so it
-# cannot rot the way a version-stamped dist/ path does, and an edit is live on the
-# next /reload with no build step. The tradeoff is that packager keywords stay
-# unexpanded.
-LINK_SRC = REPO_ROOT / SOURCE_DIR
-LIBS_DIR = LINK_SRC / "Libs"
-TOC_PATH = LINK_SRC / f"{SOURCE_DIR}.toc"
 
 
 class Die(Exception):

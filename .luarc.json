@@ -12,7 +12,7 @@
   },
   "workspace": {
     "library": [
-      "ItemVersion/Libs"
+      "src/ItemVersion/Libs"
     ],
     "ignoreDir": [
       ".vscode",

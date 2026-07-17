@@ -12,7 +12,15 @@ import pytest  # type: ignore[ty:unresolved-import]
 from dotenv import dotenv_values  # type: ignore[ty:unresolved-import]
 
 import common
+import config
 import install
+from config import Config
+
+NAME = "ItemVersion"
+
+
+def make_config(name: str = NAME) -> Config:
+    return Config(name=name, curseforge_project_id=1, ignore=(), libs=(("AceAddon-3.0", "svn://x"),))
 
 
 def make_wow_root(tmp_path: Path, flavors: tuple[str, ...] = install.FLAVORS) -> Path:
@@ -25,14 +33,14 @@ def make_wow_root(tmp_path: Path, flavors: tuple[str, ...] = install.FLAVORS) ->
 @pytest.fixture
 def installed(tmp_path, monkeypatch):
     """A fake WoW root and a fake source dir, wired up so install can run."""
-    source = tmp_path / "src" / common.SOURCE_DIR
-    (source / "Libs").mkdir(parents=True)
-    (source / f"{common.SOURCE_DIR}.toc").write_text("## Version: 2026.28.0\n", encoding="utf-8")
+    monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
+    cfg = make_config()
+    (cfg.libs_dir).mkdir(parents=True)
+    (cfg.toc_path).write_text("## Version: 2026.28.0\n", encoding="utf-8")
 
     root = make_wow_root(tmp_path)
 
-    monkeypatch.setattr(install, "LINK_SRC", source)
-    monkeypatch.setattr(install, "LIBS_DIR", source / "Libs")
+    monkeypatch.setattr(install, "load_config", lambda: cfg)
     # Never let a real .env leak into a test run.
     monkeypatch.setattr(install, "ENV_FILE", tmp_path / "nonexistent")
     monkeypatch.setenv("WOW_ROOT", str(root))
@@ -166,10 +174,10 @@ class TestInstall:
         assert install.cmd_install() == 0
 
         for flavor in install.FLAVORS:
-            assert install.target_for(installed, flavor).is_symlink()
+            assert install.target_for(installed, flavor, NAME).is_symlink()
 
     def test_refuses_to_clobber_a_real_directory(self, installed, capsys):
-        target = install.target_for(installed, "_retail_")
+        target = install.target_for(installed, "_retail_", NAME)
         target.mkdir()
         (target / "keepme.lua").write_text("-- someone else's install", encoding="utf-8")
 
@@ -193,25 +201,27 @@ class TestInstall:
         install.cmd_install()
         install.cmd_install()
 
-        target = install.target_for(installed, "_retail_")
+        target = install.target_for(installed, "_retail_", NAME)
         assert target.is_symlink()
-        assert target.resolve() == install.LINK_SRC.resolve()
+        assert target.resolve() == install.load_config().source_dir.resolve()
 
-    def test_missing_libs_dies_before_linking(self, installed, monkeypatch):
-        monkeypatch.setattr(install, "LIBS_DIR", installed / "nope")
+    def test_missing_libs_dies_before_linking(self, installed):
+        import shutil
+
+        shutil.rmtree(install.load_config().libs_dir)
 
         with pytest.raises(common.Die, match="dev libs"):
             install.cmd_install()
 
-        assert not install.target_for(installed, "_retail_").exists()
+        assert not install.target_for(installed, "_retail_", NAME).exists()
 
     def test_flavor_installs_only_the_named_ones(self, installed):
         install.cmd_install(flavors=["retail", "classic"])
 
-        assert install.target_for(installed, "_retail_").is_symlink()
-        assert install.target_for(installed, "_classic_").is_symlink()
-        assert not install.target_for(installed, "_classic_era_").exists()
-        assert not install.target_for(installed, "_anniversary_").exists()
+        assert install.target_for(installed, "_retail_", NAME).is_symlink()
+        assert install.target_for(installed, "_classic_", NAME).is_symlink()
+        assert not install.target_for(installed, "_classic_era_", NAME).exists()
+        assert not install.target_for(installed, "_anniversary_", NAME).exists()
 
 
 class TestSelectedFlavors:
@@ -235,10 +245,10 @@ class TestUninstall:
         assert install.cmd_uninstall() == 0
 
         for flavor in install.FLAVORS:
-            assert not install.target_for(installed, flavor).exists()
+            assert not install.target_for(installed, flavor, NAME).exists()
 
     def test_leaves_a_real_directory_alone(self, installed, capsys):
-        target = install.target_for(installed, "_retail_")
+        target = install.target_for(installed, "_retail_", NAME)
         target.mkdir()
         (target / "keepme.lua").write_text("-- someone else's install", encoding="utf-8")
 
@@ -248,7 +258,7 @@ class TestUninstall:
         assert "left alone" in capsys.readouterr().out
 
     def test_removes_a_broken_link(self, installed):
-        target = install.target_for(installed, "_retail_")
+        target = install.target_for(installed, "_retail_", NAME)
         target.symlink_to(installed / "gone", target_is_directory=True)
 
         install.cmd_uninstall()
@@ -259,17 +269,17 @@ class TestUninstall:
         install.cmd_install()
         install.cmd_uninstall()
 
-        assert install.LINK_SRC.is_dir()
-        assert (install.LINK_SRC / "Libs").is_dir()
+        assert install.load_config().source_dir.is_dir()
+        assert (install.load_config().source_dir / "Libs").is_dir()
 
 
 class TestStatus:
     def test_reports_each_state(self, installed, capsys):
-        install.link(install.LINK_SRC, install.target_for(installed, "_retail_"))
-        install.target_for(installed, "_classic_").symlink_to(installed / "gone")
-        real = install.target_for(installed, "_classic_era_")
+        install.link(install.load_config().source_dir, install.target_for(installed, "_retail_", NAME))
+        install.target_for(installed, "_classic_", NAME).symlink_to(installed / "gone")
+        real = install.target_for(installed, "_classic_era_", NAME)
         real.mkdir()
-        (real / f"{common.SOURCE_DIR}.toc").write_text("## Version: 1.2.3\n", encoding="utf-8")
+        (real / f"{NAME}.toc").write_text("## Version: 1.2.3\n", encoding="utf-8")
 
         assert install.cmd_install_status() == 0
 

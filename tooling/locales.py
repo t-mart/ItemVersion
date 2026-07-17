@@ -22,8 +22,9 @@ from typing import Iterable, Iterator
 
 from luaparser import ast, astnodes  # type: ignore[ty:unresolved-import]
 
+from config import load_config
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
-ADDON_DIRNAME = "ItemVersion"
 
 # Ace3 ships locale tables of its own and indexes them with expressions rather
 # than literals, which is both noise and a parse hazard. Data.lua holds no
@@ -562,7 +563,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     root: Path = args.root.resolve()
-    addon_dir = root / ADDON_DIRNAME
+    addon_dir = root / "src" / load_config().name
 
     analysis = analyse(addon_dir)
 

@@ -12,7 +12,8 @@ from typing import Literal
 
 from dotenv import load_dotenv  # type: ignore[ty:unresolved-import]
 
-from common import LIBS_DIR, LINK_SRC, REPO_ROOT, SOURCE_DIR, Die, report
+from common import REPO_ROOT, Die, report
+from config import Config, load_config
 from toc import version_from_toc
 
 ENV_FILE = REPO_ROOT / ".env"
@@ -72,11 +73,11 @@ def wow_root() -> Path:
     return resolve_wow_root(os.environ.get("WOW_ROOT"))
 
 
-def require_libs() -> None:
-    if not LIBS_DIR.is_dir():
+def require_libs(config: Config) -> None:
+    if not config.libs_dir.is_dir():
         raise Die(
-            f"{SOURCE_DIR}/Libs is missing, so the addon would fail to load.\n"
-            "Fetch the Ace3 externals first:\n"
+            f"{config.name}'s Libs are missing, so the addon would fail to load.\n"
+            "Fetch the embedded libraries first:\n"
             "  ./dev libs"
         )
 
@@ -85,8 +86,8 @@ def addons_dir_for(root: Path, flavor: str) -> Path:
     return root / flavor / "Interface" / "AddOns"
 
 
-def target_for(root: Path, flavor: str) -> Path:
-    return addons_dir_for(root, flavor) / SOURCE_DIR
+def target_for(root: Path, flavor: str, name: str) -> Path:
+    return addons_dir_for(root, flavor) / name
 
 
 def classify(target: Path) -> State:
@@ -101,8 +102,8 @@ def classify(target: Path) -> State:
     return "absent"
 
 
-def installed_version_at(target: Path) -> str | None:
-    toc = target / f"{SOURCE_DIR}.toc"
+def installed_version_at(target: Path, name: str) -> str | None:
+    toc = target / f"{name}.toc"
     try:
         return version_from_toc(toc.read_text(encoding="utf-8"))
     except OSError:
@@ -117,14 +118,15 @@ def link(src: Path, dst: Path) -> None:
 
 
 def cmd_install(flavors: list[str] | None = None) -> int:
+    config = load_config()
     root = wow_root()
-    require_libs()
+    require_libs(config)
 
     linked = 0
 
     for flavor in selected_flavors(flavors):
         addons = addons_dir_for(root, flavor)
-        target = target_for(root, flavor)
+        target = target_for(root, flavor, config.name)
 
         if not addons.is_dir():
             report(flavor, "skip, no AddOns dir")
@@ -137,7 +139,7 @@ def cmd_install(flavors: list[str] | None = None) -> int:
             continue
 
         try:
-            link(LINK_SRC, target)
+            link(config.source_dir, target)
         except OSError as error:
             # Windows only grants symlink rights to admins, or to anyone with
             # Developer Mode on. Nothing here can fix that for the user, so say so
@@ -154,17 +156,18 @@ def cmd_install(flavors: list[str] | None = None) -> int:
         linked += 1
 
     print(
-        f"Installed symlinks into {linked} flavor(s) to {SOURCE_DIR}/. "
+        f"Installed symlinks into {linked} flavor(s) to {config.name}/. "
         "Use /reload in game to pick up edits."
     )
     return 0
 
 
 def cmd_uninstall() -> int:
+    config = load_config()
     root = wow_root()
 
     for flavor in FLAVORS:
-        target = target_for(root, flavor)
+        target = target_for(root, flavor, config.name)
         state = classify(target)
 
         if state in ("link-ok", "link-broken"):
@@ -177,11 +180,12 @@ def cmd_uninstall() -> int:
 
 
 def cmd_install_status() -> int:
+    config = load_config()
     root = wow_root()
     print(f"WOW_ROOT: {root}")
 
     for flavor in FLAVORS:
-        target = target_for(root, flavor)
+        target = target_for(root, flavor, config.name)
         state = classify(target)
 
         if state == "link-ok":
@@ -189,7 +193,8 @@ def cmd_install_status() -> int:
         elif state == "link-broken":
             report(flavor, f"BROKEN symlink -> {os.readlink(target)}")
         elif state == "real-dir":
-            report(flavor, f"real directory, version {installed_version_at(target)}")
+            version = installed_version_at(target, config.name)
+            report(flavor, f"real directory, version {version}")
         else:
             report(flavor, "not installed")
 

@@ -425,7 +425,7 @@ class TestEndToEnd:
 
     @pytest.fixture
     def tree(self, tmp_path):
-        addon = tmp_path / "ItemVersion"
+        addon = tmp_path / "src/ItemVersion"
         (addon / "Locales").mkdir(parents=True)
         (addon / "Locales" / "enUS.lua").write_text(
             'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
@@ -449,20 +449,20 @@ class TestEndToEnd:
         assert "1/2 translated" in capsys.readouterr().out
 
     def test_check_mode_writes_nothing(self, tree):
-        before = (tree / "ItemVersion/Locales/deDE.lua").read_text(encoding="utf-8")
+        before = (tree / "src/ItemVersion/Locales/deDE.lua").read_text(encoding="utf-8")
         self.run(tree, "--check")
-        assert (tree / "ItemVersion/Locales/deDE.lua").read_text(
+        assert (tree / "src/ItemVersion/Locales/deDE.lua").read_text(
             encoding="utf-8"
         ) == before
 
     def test_fix_mode_writes_stubs(self, tree):
         assert self.run(tree) == 0
-        text = (tree / "ItemVersion/Locales/deDE.lua").read_text(encoding="utf-8")
+        text = (tree / "src/ItemVersion/Locales/deDE.lua").read_text(encoding="utf-8")
         assert '-- L["Beta"] = ""' in text
 
     def test_fix_mode_reports_the_state_it_leaves_behind(self, tree, capsys):
         """A run that fixes everything must not still print what it fixed."""
-        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+        (tree / "src/ItemVersion/Locales/deDE.lua").write_text(
             DEUTSCH_HEADER + 'L["Beta"] = "B"\nL["Alpha"] = "A"\n', encoding="utf-8"
         )
         assert self.run(tree) == 0
@@ -470,7 +470,7 @@ class TestEndToEnd:
 
     def test_check_mode_still_reports_what_it_found(self, tree, capsys):
         """The mirror of the above: --check fixes nothing, so it must complain."""
-        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+        (tree / "src/ItemVersion/Locales/deDE.lua").write_text(
             DEUTSCH_HEADER + 'L["Beta"] = "B"\nL["Alpha"] = "A"\n', encoding="utf-8"
         )
         assert self.run(tree, "--check") == 0
@@ -478,7 +478,7 @@ class TestEndToEnd:
 
     def test_fix_mode_never_rewrites_enUS(self, tree):
         """enUS is hand-written and carries comments explaining its keys."""
-        path = tree / "ItemVersion/Locales/enUS.lua"
+        path = tree / "src/ItemVersion/Locales/enUS.lua"
         annotated = (
             'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
             "-- a comment a maintainer wrote and expects to keep\n"
@@ -492,26 +492,26 @@ class TestEndToEnd:
 
     def test_missing_enUS_is_a_hard_failure(self, tree):
         """With no default there is nothing to check against, so do not guess."""
-        (tree / "ItemVersion/Locales/enUS.lua").unlink()
+        (tree / "src/ItemVersion/Locales/enUS.lua").unlink()
         assert self.run(tree) == 1
 
     def test_used_but_undefined_fails(self, tree, capsys):
-        (tree / "ItemVersion/Thing.lua").write_text(
+        (tree / "src/ItemVersion/Thing.lua").write_text(
             'print(L["Ghost"])\n', encoding="utf-8"
         )
         assert self.run(tree, "--check") == 1
         assert "enUS does not define it" in capsys.readouterr().out
 
     def test_bad_placeholder_fails(self, tree, capsys):
-        (tree / "ItemVersion/Locales/enUS.lua").write_text(
+        (tree / "src/ItemVersion/Locales/enUS.lua").write_text(
             'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
             'L["Hit %d times"] = true\n',
             encoding="utf-8",
         )
-        (tree / "ItemVersion/Thing.lua").write_text(
+        (tree / "src/ItemVersion/Thing.lua").write_text(
             'print(L["Hit %d times"])\n', encoding="utf-8"
         )
-        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+        (tree / "src/ItemVersion/Locales/deDE.lua").write_text(
             DEUTSCH_HEADER + 'L["Hit %d times"] = "%s mal getroffen"\n',
             encoding="utf-8",
         )
@@ -520,10 +520,10 @@ class TestEndToEnd:
 
     def test_check_mode_fails_without_fixing(self, tree):
         """CI must not paper over a problem by rewriting the file."""
-        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+        (tree / "src/ItemVersion/Locales/deDE.lua").write_text(
             DEUTSCH_HEADER + 'L["Nonsense"] = "X"\n', encoding="utf-8"
         )
         assert self.run(tree, "--check") == 1
-        assert "Nonsense" in (tree / "ItemVersion/Locales/deDE.lua").read_text(
+        assert "Nonsense" in (tree / "src/ItemVersion/Locales/deDE.lua").read_text(
             encoding="utf-8"
         )

@@ -17,11 +17,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - uses: BigWigsMods/packager@v2
-        with:
-          args: -d
-        env:
-          CF_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install subversion
+        # ./dev build fetches the embedded Ace3 libraries over SVN.
+        run: sudo apt-get install -y subversion
+
+      - name: Build
+        run: ./dev build
 
       - name: Upload build
         uses: actions/upload-artifact@v6
@@ -29,5 +33,5 @@ jobs:
           name: ItemVersion
           include-hidden-files: true
           path: |
-            .release/
-            !.release/*.zip
+            dist/
+            !dist/*.zip

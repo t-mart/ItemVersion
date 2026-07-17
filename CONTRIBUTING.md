@@ -44,17 +44,18 @@ something it needs is missing:
 
 - `check` and `format` want [selene](https://kampfkarren.github.io/selene/) and
   [stylua](https://github.com/JohnnyMorganz/StyLua).
-- `libs` and `build` want the [BigWigs packager](#bigwigs-packager), which is a
-  bash script.
+- `libs` and `build` want [Subversion](https://subversion.apache.org/), used to
+  fetch the embedded Ace3 libraries from CurseForge.
+- `publish` wants the [GitHub CLI](https://cli.github.com/) to create a release,
+  and a `CURSEFORGE_TOKEN` (see `.env.template`) to upload to CurseForge.
 
 ### Testing Your Changes In-Game
 
 After you've made changes, you'll want to see how they behave in-game. The
 recommended way to achieve this is as follows:
 
-1. Download the addon dependencies in to `ItemVersion/Libs`. After putting the
-   [BigWigs packager in your `PATH`](#bigwigs-packager), you can do this with
-   the following command:
+1. Download the addon dependencies in to `src/ItemVersion/Libs`. With Subversion
+   installed, you can do this with the following command:
 
    ```bash
    ./dev libs
@@ -75,7 +76,7 @@ recommended way to achieve this is as follows:
    ./dev install
    ```
 
-   This symlinks `ItemVersion/` into each flavor's `Interface/AddOns`, so your
+   This symlinks `src/ItemVersion/` into each flavor's `Interface/AddOns`, so your
    edits are live with no build step. It refuses to touch a real directory, so
    it will not eat a copy of ItemVersion you installed normally. Pass
    `--flavor` (repeatable, e.g. `./dev install --flavor retail`) to install into
@@ -107,7 +108,7 @@ print(L["Hello world"])
 ```
 
 Then add the string to
-[`ItemVersion/Locales/enUS.lua`](https://github.com/t-mart/ItemVersion/blob/master/ItemVersion/Locales/enUS.lua),
+[`src/ItemVersion/Locales/enUS.lua`](https://github.com/t-mart/ItemVersion/blob/master/src/ItemVersion/Locales/enUS.lua),
 in alphabetical order:
 
 ```lua
@@ -150,7 +151,7 @@ but it's easier to just remember.
 
 See
 [Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/README.md#translators-needed)
-in the README. Editing one file under `ItemVersion/Locales/` is the whole
+in the README. Editing one file under `src/ItemVersion/Locales/` is the whole
 process, and no Lua knowledge is needed beyond the quotes.
 
 The `locales` command maintains those files: it sorts them, stubs out anything
@@ -158,27 +159,31 @@ untranslated, and drops keys that no longer exist. It rewrites every locale
 except `enUS.lua`, which is written by hand. `check` runs the same checks
 without writing anything, which is what CI does.
 
-## BigWigs Packager
-
-This project uses the
-[BigWigs packager](https://github.com/BigWigsMods/packager) for building
-releases.
-
-To install it locally, place
-[`release.sh`](https://github.com/BigWigsMods/packager/blob/master/release.sh)
-somewhere in your `PATH`. Ask an LLM for help if you don't know how to do this.
-
 ## Building a Release
 
-To create a packaged release build:
+To create a packaged addon zip in `dist/`:
 
 ```bash
 ./dev build
 ```
 
-This requires the [BigWigs packager to be installed locally](#bigwigs-packager).
+This copies `src/ItemVersion/` into `dist/`, stamps the build date into the TOC, and
+zips it up. Files listed under `ignore` in `wowaddon.yml` (such as the
+development-only `Bindings.xml`) are left out. Missing libraries are fetched
+first, so Subversion needs to be installed.
 
-Note that any replacements for `debug` will be omitted from the build.
+To ship a build, `./dev publish` uploads it to CurseForge and, for a full
+release, creates a GitHub release. Run it with `--dry-run` first to see exactly
+what would go where without uploading anything:
+
+```bash
+./dev build
+./dev publish --dry-run
+```
+
+Alpha and beta builds go to CurseForge only: `./dev publish --type alpha`. The
+release workflow does all of this on the release branch; you rarely need to
+publish by hand.
 
 ## Versioning
 

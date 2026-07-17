@@ -1,10 +1,13 @@
 name: Release
 
-# On release branch, this action:
-# - updates the interface versions in the .toc file, commits if needed
-# - bumps the version (with commit and tag)
-# - runs big wigs release.sh script (which creates the GitHub release and uploads to CurseForge)
-# - merges the release branch back into master
+# On the release branch, this action:
+# - updates the interface versions in the .toc file
+# - builds the addon zip with ./dev build
+# - publishes it with ./dev publish (CurseForge, and GitHub for a full release)
+#
+# A full release bumps the version, tags it, and merges back into master. Alpha
+# and beta builds go to CurseForge only and make no git changes at all: no bump,
+# no tag, no merge. They exist purely as test uploads.
 #
 # This workflow doesn't run on its own -- its called by other workflows that
 # have put something releaseable on release branch (refresh-data.yml or
@@ -46,6 +49,8 @@ jobs:
         run: |
           # bump-my-version bumps our versions
           uv tool install bump-my-version
+          # ./dev build fetches the embedded Ace3 libraries over SVN
+          sudo apt-get install -y subversion
 
       - name: Configure Git
         run: |
@@ -53,63 +58,40 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       # ./dev interfaces reads Blizzard's version endpoints itself, validates what
-      # comes back, and rewrites the TOC. It fails loudly on anything unexpected.
-      - name: Update Interface versions
-        run: |
-          NEW_INTERFACES=$(./dev interfaces)
+      # comes back, and rewrites the working TOC. It fails loudly on anything
+      # unexpected. The change is only committed for a full release, below.
+      - name: Update interface versions
+        run: ./dev interfaces
 
-          if [[ -n $(git status --porcelain ItemVersion/ItemVersion.toc) ]]; then
-            echo "Updated interface versions to ${NEW_INTERFACES}, committing changes."
-            git add ItemVersion/ItemVersion.toc
-            git commit -m "Updated interfaces to ${NEW_INTERFACES}"
-          else
-            echo "Interface versions are up to date. No commit needed."
-          fi
-
-      - name: (Release) Bump (with commit and tag) and push
+      - name: Full release
         if: ${{ inputs.release-type == 'release' }}
-        run: |
-          bump-my-version bump patch
-          VERSION=$(bump-my-version show current_version)
-
-          PACKAGER_ARGS="-n ItemVersion-${VERSION}"
-          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
-
-      - # big wigs packager only allows an alpha or beta release to CF if the tag
-        # contains the word "alpha" or "beta". because we use calver and because
-        # bump-my-version doesn't work well for this kind of optional tag,
-        # we create a completely out-of-band tag that has nothing to do
-        # with any particular version.
-        name: (Alpha/Beta) Tag
-        if:
-          ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
-        run: |
-          RELEASE_TYPE="${{ inputs.release-type }}"
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          TIMESTAMP=$(date +%s)
-          TAG_NAME="${RELEASE_TYPE}-${SHORT_SHA}-${TIMESTAMP}"
-
-          echo "Creating tag: ${TAG_NAME}"
-          git tag -a "${TAG_NAME}" -m "${RELEASE_TYPE} release"
-
-          PACKAGER_ARGS="-n ItemVersion-${TAG_NAME}"
-          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
-
-      - name: (No release) Skip bumping version and pushing
-        if: ${{ inputs.release-type == 'none' }}
-        run: |
-          PACKAGER_ARGS="-d"
-          echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV
-
-      - name: Git Push
-        run: git push --follow-tags
-
-      - uses: BigWigsMods/packager@v2
-        with:
-          args: ${{ env.PACKAGER_ARGS }}
         env:
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-          CF_API_KEY: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ -n $(git status --porcelain src/ItemVersion/ItemVersion.toc) ]]; then
+            git add src/ItemVersion/ItemVersion.toc
+            git commit -m "Update interface versions"
+          fi
+          bump-my-version bump patch
+          git push --follow-tags
+          ./dev build
+          ./dev publish --type release --yes
+          git checkout master
+          git merge release
+          git push origin master
+
+      - name: Pre-release
+        if: ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: |
+          ./dev build
+          ./dev publish --type ${{ inputs.release-type }} --yes
+
+      - name: Build only
+        if: ${{ inputs.release-type == 'none' }}
+        run: ./dev build
 
       - name: Upload build
         uses: actions/upload-artifact@v6
@@ -117,11 +99,5 @@ jobs:
           name: ItemVersion
           include-hidden-files: true
           path: |
-            .release/
-            !.release/*.zip
-
-      - name: Merge back into master
-        run: |
-          git checkout master
-          git merge release
-          git push origin master
+            dist/
+            !dist/*.zip

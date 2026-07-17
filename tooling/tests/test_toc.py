@@ -6,6 +6,7 @@ from __future__ import annotations
 import pytest  # type: ignore[ty:unresolved-import]
 
 import common
+import config
 import toc
 
 
@@ -32,7 +33,7 @@ class TestSetTocField:
             toc.set_toc_field(self.TOC, "Nonsense", "x")
 
     def test_the_real_toc_has_an_interface_line(self):
-        text = common.TOC_PATH.read_text(encoding="utf-8")
+        text = config.load_config().toc_path.read_text(encoding="utf-8")
         value = toc.toc_field(text, "Interface")
         assert value, "the shipped TOC must list interface versions"
         assert all(part.strip().isdigit() for part in value.split(","))

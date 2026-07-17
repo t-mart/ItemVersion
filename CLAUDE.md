@@ -39,9 +39,9 @@ widgets.
 
 ## Key Directories
 
-- `ItemVersion/`: Main addon code.
-- `ItemVersion/Locales/`: Localization files for different languages.
-- `ItemVersion/Libs/`: Library files, primarily for Ace3 framework. Look here to
+- `src/ItemVersion/`: Main addon code.
+- `src/ItemVersion/Locales/`: Localization files for different languages.
+- `src/ItemVersion/Libs/`: Library files, primarily for Ace3 framework. Look here to
   see how Ace3 works under the hood. It's sometimes more helpful than the Ace3
   docs.
 
@@ -61,13 +61,13 @@ widgets.
 - `TODO.md`: List of tasks and features to implement.
 - `README.md`: Overview and documentation for the addon.
 - `docs/API.md`: Documentation for the addon's API.
-- `ItemVersion/API.lua`: Implementation of the addon's API.
-- `ItemVersion/Options.lua`: Implementation of the addon's options and settings.
-- `ItemVersion/Tooltip.lua`: Implementation of tooltip modifications. This is a
+- `src/ItemVersion/API.lua`: Implementation of the addon's API.
+- `src/ItemVersion/Options.lua`: Implementation of the addon's options and settings.
+- `src/ItemVersion/Tooltip.lua`: Implementation of tooltip modifications. This is a
   work in progress, still needs overhaul.
-- `ItemVersion/Data.lua`: This is a massive file containing the item version
+- `src/ItemVersion/Data.lua`: This is a massive file containing the item version
   database. It should not be extensively read through... It's just tables with
   item IDs and version info. See the API.lua for the interface that's more
   relevant.
-- `ItemVersion/Expansion.lua`: Source code data representing expansions and
+- `src/ItemVersion/Expansion.lua`: Source code data representing expansions and
   version corrections.

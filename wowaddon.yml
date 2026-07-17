@@ -1,0 +1,28 @@
+# Project configuration for the ./dev tooling.
+#
+# name                 the addon folder and the base of the packaged zip name
+# curseforge-project-id the project this uploads to on CurseForge
+# ignore               files under the addon dir to keep out of a build
+# libs                 embedded libraries, fetched by `./dev libs`. Each maps a
+#                      folder under ItemVersion/Libs to the SVN url it comes from.
+#                      Ace3 and friends are published over SVN on CurseForge, so
+#                      these stay svn even though the rest of the world is git.
+
+name: ItemVersion
+
+curseforge-project-id: 433258
+
+ignore:
+  - Bindings.xml
+
+libs:
+  AceAddon-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceAddon-3.0
+  AceConfig-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceConfig-3.0
+  AceConsole-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceConsole-3.0
+  AceDB-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceDB-3.0
+  AceDBOptions-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceDBOptions-3.0
+  AceGUI-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceGUI-3.0
+  AceLocale-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0
+  CallbackHandler-1.0: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+  LibSharedMedia-3.0: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk
+  LibStub: https://repos.curseforge.com/wow/libstub/trunk

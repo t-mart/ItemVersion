@@ -4,6 +4,7 @@
 #   "luaparser>=3.2.1",
 #   "pytest>=8",
 #   "python-dotenv>=1.0",
+#   "pyyaml>=6.0",
 #   "watchfiles>=1.0",
 # ]
 # ///

@@ -12,10 +12,11 @@ import sys
 from dataclasses import dataclass
 from typing import Callable
 
-from common import SOURCE_DIR, Die
+from common import Die
 from install import ALL_FLAVORS, FLAVOR_DIRS, cmd_install, cmd_install_status, cmd_uninstall
 from interfaces import cmd_interfaces
 from packaging import cmd_build, cmd_clean, cmd_libs
+from publish import RELEASE, RELEASE_TYPES, TARGETS, cmd_publish
 from quality import cmd_check, cmd_format, cmd_locales, cmd_test, cmd_watch
 
 
@@ -41,6 +42,36 @@ def interfaces_options(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def publish_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--type",
+        choices=RELEASE_TYPES,
+        default=RELEASE,
+        help="the CurseForge release type (default: release)",
+    )
+    parser.add_argument(
+        "--to",
+        action="append",
+        choices=TARGETS,
+        metavar="TARGET",
+        help=(
+            "publish to this target; may be repeated. "
+            f"one of {', '.join(TARGETS)}. Defaults by type: "
+            "release goes everywhere, alpha and beta to curseforge only."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the plan and stop, uploading nothing",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="skip the confirmation prompt (for CI)",
+    )
+
+
 def install_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--flavor",
@@ -61,16 +92,21 @@ COMMANDS = {
         "Update the TOC's Interface line from Blizzard.",
         interfaces_options,
     ),
-    "libs": Command(cmd_libs, f"Fetch the Ace3 externals into {SOURCE_DIR}/Libs."),
-    "build": Command(cmd_build, "Package a release build into .release/."),
-    "clean": Command(cmd_clean, "Remove .release/ and the fetched Libs."),
+    "libs": Command(cmd_libs, "Fetch the embedded libraries into the addon's Libs dir."),
+    "build": Command(cmd_build, "Package the addon zip into dist/."),
+    "clean": Command(cmd_clean, "Remove dist/ and the fetched Libs."),
     "install": Command(
         cmd_install,
-        f"Symlink {SOURCE_DIR}/ into each WoW flavor's AddOns dir.",
+        "Symlink the addon into each WoW flavor's AddOns dir.",
         install_options,
     ),
     "uninstall": Command(
         cmd_uninstall, "Remove our symlinks."
+    ),
+    "publish": Command(
+        cmd_publish,
+        "Upload a built zip to CurseForge and GitHub.",
+        publish_options,
     ),
     "install-status": Command(
         cmd_install_status, "Show what is installed for each flavor."

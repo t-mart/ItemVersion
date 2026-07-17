@@ -1,10 +1,6 @@
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["luaparser>=3.2.1", "pytest>=8"]
-# ///
 """Tests for the locale checker.
 
-  uv run scripts/test_locales.py
+  ./dev test
 
 A checker that reports nothing is indistinguishable from a checker that is
 broken, so most of these feed it a known-bad file and assert it complains.
@@ -12,14 +8,11 @@ broken, so most of these feed it a known-bad file and assert it complains.
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import pytest  # type: ignore[ty:unresolved-import]
 
-sys.path.insert(0, str(Path(__file__).parent))
-
-import locales  # noqa: E402
+import locales
 
 
 def locale_from(tmp_path: Path, name: str, text: str) -> locales.LocaleFile:
@@ -449,13 +442,7 @@ class TestEndToEnd:
         return tmp_path
 
     def run(self, tree, *extra):
-        argv = ["locales.py", "--root", str(tree), *extra]
-        old = sys.argv
-        sys.argv = argv
-        try:
-            return locales.main()
-        finally:
-            sys.argv = old
+        return locales.main(["--root", str(tree), *extra])
 
     def test_clean_tree_passes(self, tree, capsys):
         assert self.run(tree, "--check") == 0
@@ -540,7 +527,3 @@ class TestEndToEnd:
         assert "Nonsense" in (tree / "ItemVersion/Locales/deDE.lua").read_text(
             encoding="utf-8"
         )
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-q"]))

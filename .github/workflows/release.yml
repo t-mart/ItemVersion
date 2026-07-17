@@ -44,21 +44,22 @@ jobs:
 
       - name: Install support tooling
         run: |
-          # nextver bumps our versions
+          # bump-my-version bumps our versions
           uv tool install bump-my-version
-
-          # wownow gets the current wow versions
-          uv tool install git+https://github.com/t-mart/wownowpy
 
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      # ./dev interfaces reads Blizzard's version endpoints itself, validates what
+      # comes back, and rewrites the TOC. It fails loudly on anything unexpected,
+      # which the pipeline it replaced could not: jq exits 0 on empty input and
+      # this step has no pipefail, so a bad response silently blanked the
+      # Interface line and released a TOC the client will not load.
       - name: Update Interface versions
         run: |
-          NEW_INTERFACES=$(wownow | jq -r '[.products[] | .versions[] | select(.region == "us") | .interface] | join(", ")')
-          sed -i "s/^## Interface:.*/## Interface: ${NEW_INTERFACES}/" ItemVersion/ItemVersion.toc
+          NEW_INTERFACES=$(./dev interfaces)
 
           if [[ -n $(git status --porcelain ItemVersion/ItemVersion.toc) ]]; then
             echo "Updated interface versions to ${NEW_INTERFACES}, committing changes."
@@ -72,7 +73,7 @@ jobs:
         if: ${{ inputs.release-type == 'release' }}
         run: |
           bump-my-version bump patch
-          VERSION=$(bump-my-version show --format json | jq -r ".current_version")
+          VERSION=$(bump-my-version show current_version)
 
           PACKAGER_ARGS="-n ItemVersion-${VERSION}"
           echo "PACKAGER_ARGS=$PACKAGER_ARGS" >> $GITHUB_ENV

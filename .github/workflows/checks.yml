@@ -2,7 +2,7 @@ name: Checks
 
 # Lint, formatting and locale checks, on pull requests and on master.
 #
-# This runs `scripts/dev.py check`, which is the same command you run locally, so
+# This runs `./dev check`, which is the same command you run locally, so
 # a green run here means the same thing as a green run on your machine.
 
 on:
@@ -51,4 +51,4 @@ jobs:
           echo "$BIN" >> "$GITHUB_PATH"
 
       - name: Check
-        run: uv run scripts/dev.py check
+        run: ./dev check

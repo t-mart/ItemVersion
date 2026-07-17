@@ -1,0 +1,29 @@
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "luaparser>=3.2.1",
+#   "python-dotenv>=1.0",
+#   "watchfiles>=1.0",
+# ]
+# ///
+"""ItemVersion development helper.
+
+  ./dev help
+
+The commands live in tooling/, which this adds to the import path. This file owns
+the dependency list for all of them, so uv fetches them on the way in and the
+modules under tooling/ stay plain imports.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tooling"))
+
+# Resolved by the line above, which a type checker cannot follow.
+from cli import main  # type: ignore[ty:unresolved-import] # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main())

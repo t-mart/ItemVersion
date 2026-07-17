@@ -27,16 +27,17 @@ Once cloned, create a new branch off of `master` for your changes.
 
 ### Tools
 
-Everything is driven by one script, `scripts/dev.py`, run through
-[uv](https://docs.astral.sh/uv/getting-started/installation/):
+Everything is driven by one executable in the repo root:
 
 ```bash
-uv run scripts/dev.py help
+./dev help
 ```
 
-uv is the only thing you need to install for it. It fetches the right Python and
-the script's dependencies on first run, so there is no virtualenv to create or
-activate.
+It needs [uv](https://docs.astral.sh/uv/getting-started/installation/), and
+nothing else. A shebang hands the script to uv, which fetches the right Python
+and the dependencies on first run, so there is no virtualenv to create or
+activate. On Windows, where a shebang means nothing, run `uv run --script dev`
+instead.
 
 Some individual commands want a tool on your `PATH`, and each one tells you if
 something it needs is missing:
@@ -56,7 +57,7 @@ recommended way to achieve this is as follows:
    the following command:
 
    ```bash
-   uv run scripts/dev.py libs
+   ./dev libs
    ```
 
 2. Tell the tooling where WoW lives, by copying the template and editing it:
@@ -71,7 +72,7 @@ recommended way to achieve this is as follows:
 3. Link the addon into every flavor you have installed:
 
    ```bash
-   uv run scripts/dev.py install
+   ./dev install
    ```
 
    This symlinks `ItemVersion/` into each flavor's `Interface/AddOns`, so your
@@ -86,7 +87,8 @@ recommended way to achieve this is as follows:
    you must reload the UI in-game for it to take effect. You can do this by
    typing `/reload` in the chat.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
+>
 > Please test your changes before submitting a pull request and document thusly
 > in your PR.
 
@@ -114,7 +116,7 @@ L["Hello world"] = true
 is already English". You don't need to do anything for the other languages:
 
 ```bash
-uv run scripts/dev.py locales
+./dev locales
 ```
 
 will add a commented stub for your new string to every locale file, ready for a
@@ -137,14 +139,15 @@ L["Legion|short"] = "Legion"
 Both are "Legion" in English, but one is the expansion's full name and the other
 has to fit in a tooltip, and a language may want those to differ.
 
-Note that such a key needs its English spelled out, as above, and **not** `true`.
-`true` makes the value the key, so a language without a translation for it would
-show the player `Legion|canon`, marker and all. `check` enforces this, but
-it's easier to just remember.
+Note that such a key needs its English spelled out, as above, and **not**
+`true`. `true` makes the value the key, so a language without a translation for
+it would show the player `Legion|canon`, marker and all. `check` enforces this,
+but it's easier to just remember.
 
 ### Translations
 
-See [Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/README.md#translators-needed)
+See
+[Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/README.md#translators-needed)
 in the README. Editing one file under `ItemVersion/Locales/` is the whole
 process, and no Lua knowledge is needed beyond the quotes.
 
@@ -168,7 +171,7 @@ somewhere in your `PATH`. Ask an LLM for help if you don't know how to do this.
 To create a packaged release build:
 
 ```bash
-uv run scripts/dev.py build
+./dev build
 ```
 
 This requires the [BigWigs packager to be installed locally](#bigwigs-packager).

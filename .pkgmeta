@@ -22,15 +22,17 @@ plain-copy:
 
 # Files and directories to ignore when packaging
 ignore:
+  - .env.template
   - AUTHORS.md
   - CHANGELOG.md
   - CLAUDE.md
   - CONTRIBUTING.md
+  - dev
   - docs
   - README.md
-  - scripts
   - selene.toml
   - stylua.toml
+  - tooling
   - wow-stdlib.yml
 
 move-folders:

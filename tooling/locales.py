@@ -1,15 +1,10 @@
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["luaparser>=3.2.1"]
-# ///
 """Keep the locale files honest.
 
-Usage:
-  uv run scripts/locales.py            fix what can be fixed safely, then report
-  uv run scripts/locales.py --check    report only, never write, exit 1 on error
+  ./dev locales    fix what can be fixed safely, then report
+  ./dev check      report only, and lint the Lua while we are here
 
---check is what CI runs. It makes no edits, so a pull request fails rather than
-arrives with a surprise commit.
+check calls this with --check, which makes no edits, so CI fails a pull request
+rather than pushing a surprise commit to it.
 
 Strings are found by parsing Lua, not by matching text. A regex over `L["..."]`
 misses `L['single']` and `L[ "spaced" ]`, mangles escaped quotes, and matches
@@ -548,9 +543,10 @@ def fix(analysis: Analysis) -> list[Path]:
     return written
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Check, and optionally fix, the addon's locale files."
+        prog="dev locales",
+        description="Check, and optionally fix, the addon's locale files.",
     )
     parser.add_argument(
         "--check",
@@ -563,7 +559,7 @@ def main() -> int:
         default=REPO_ROOT,
         help="repo root to work on, for testing against a scratch tree",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     root: Path = args.root.resolve()
     addon_dir = root / ADDON_DIRNAME
@@ -603,7 +599,3 @@ def main() -> int:
     print(f"{analysis.errors} error(s), {analysis.warnings} warning(s)")
 
     return 1 if analysis.errors else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

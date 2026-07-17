@@ -1,4 +1,10 @@
-L = L or {}
+local AddonName = ...
+
+local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "zhCN")
+if not L then
+  return
+end
+
 L["Added in {expacIcon} ({versionTriple})"] = "添加于 {expacIcon} ({versionTriple})"
 L["Addon Version"] = "插件版本"
 L["Apply version corrections"] = "应用版本修正"
@@ -7,6 +13,8 @@ L["Battle for Azeroth"] = "争霸艾泽拉斯"
 L["Build number only"] = "仅构建号"
 -- L["Cata"] = ""
 L["Cataclysm"] = "大地的裂变"
+L["Classic|canon"] = "经典旧世"
+L["Classic|short"] = "经典旧世"
 L["Color of the line of text in the tooltip"] = "鼠标提示信息的文本颜色"
 L["Correct the version for some items whose release version is different than their usable version."] = "修正部分物品的版本信息（实装版本与可用版本不一致）。"
 L["Customize the format of the item version information shown in tooltips."] = "自定义鼠标提示信息中物品版本信息的显示格式"
@@ -22,7 +30,8 @@ L["Full version"] = "完整版本"
 L["Invalid item ID or link provided"] = "提供的物品ID或链接无效"
 -- L["ItemVersion does not support profile version %d, so your settings have been reset."] = ""
 L["Key Modifiers Needed to Show Info"] = "显示信息所需的修饰键"
-L["Legion"] = "军团再临"
+L["Legion|canon"] = "军团再临"
+L["Legion|short"] = "军团再临"
 L["Line Color"] = "文本颜色"
 L["Lookup item ID or Link and print tooltip line"] = "查询物品ID或链接并输出提示信息行"
 L["Major, minor, and patch version"] = "主版本号、次版本号和补丁版本号"
@@ -50,11 +59,9 @@ L["The War Within"] = "地心之战"
 L["Token"] = "标记"
 L["Tooltip format"] = "鼠标提示信息格式"
 L["Usage: /itemversion <command>"] = "用法：/itemversion <命令>"
-L["Vanilla"] = "经典旧世"
 L["Version Information"] = "版本信息"
 L["Warlords of Draenor"] = "德拉诺之王"
 -- L["WoD"] = ""
-L["World of Warcraft"] = "魔兽世界"
 L["WotLK"] = "WLK"
 L["WoW Build"] = "构建号"
 L["WoW Build Date"] = "构建日期"

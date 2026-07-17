@@ -1,4 +1,10 @@
-L = L or {}
+local AddonName = ...
+
+local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "esMX")
+if not L then
+  return
+end
+
 L["Added in {expacIcon} ({versionTriple})"] = "Añadido en {expacIcon} ({versionTriple})"
 L["Addon Version"] = "Versión del addon"
 L["Apply version corrections"] = "Aplicar correcciones de versión"
@@ -7,6 +13,8 @@ L["Apply version corrections"] = "Aplicar correcciones de versión"
 L["Build number only"] = "Solo número de compilación"
 -- L["Cata"] = ""
 -- L["Cataclysm"] = ""
+L["Classic|canon"] = "World of Warcraft: Clásico"
+L["Classic|short"] = "World of Warcraft: Clásico"
 L["Color of the line of text in the tooltip"] = "Color de la línea de texto en la descripción emergente"
 L["Correct the version for some items whose release version is different than their usable version."] = "Corrige la versión de algunos objetos cuya versión de lanzamiento es diferente de la versión en la que pueden usarse."
 L["Customize the format of the item version information shown in tooltips."] = "Personaliza el formato de la información de versión de los objetos mostrada en las descripciones emergentes."
@@ -22,7 +30,8 @@ L["Full version"] = "Versión completa"
 L["Invalid item ID or link provided"] = "Se proporcionó un ID o enlace de objeto no válido"
 -- L["ItemVersion does not support profile version %d, so your settings have been reset."] = ""
 L["Key Modifiers Needed to Show Info"] = "Teclas modificadoras necesarias para mostrar la información"
--- L["Legion"] = ""
+-- L["Legion|canon"] = ""
+-- L["Legion|short"] = ""
 L["Line Color"] = "Color de la línea"
 L["Lookup item ID or Link and print tooltip line"] = "Buscar un ID o enlace de objeto y mostrar la línea de la descripción emergente"
 L["Major, minor, and patch version"] = "Versión mayor, menor y de parche"
@@ -50,11 +59,9 @@ L["Show version info"] = "Mostrar información de versión"
 -- L["Token"] = ""
 L["Tooltip format"] = "Formato de la descripción emergente"
 L["Usage: /itemversion <command>"] = "Uso: /itemversion <comando>"
--- L["Vanilla"] = ""
 L["Version Information"] = "Información de versión"
 -- L["Warlords of Draenor"] = ""
 -- L["WoD"] = ""
--- L["World of Warcraft"] = ""
 -- L["WotLK"] = ""
 L["WoW Build"] = "Compilación de WoW"
 L["WoW Build Date"] = "Fecha de compilación de WoW"

@@ -12,6 +12,10 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 ---@field corrections number[]|nil Optional list of item IDs that need version correction
 ---@field IsPresent fun(self: Expansion): boolean Check if this expansion is available
 
+-- Expansion names are ours, not the client's. Blizzard's EXPANSION_NAME<N>
+-- globals look like a free translation, but they are only translated in koKR,
+-- zhCN and zhTW, and Classic Era and Anniversary define no name for Midnight at
+-- all. Taking them would also overwrite better translations than Blizzard's own.
 Private.Expansion = {}
 
 ---Returns the texture path for an expansion icon
@@ -24,8 +28,8 @@ end
 Private.Expansion.All = {
   {
     major = 1,
-    canonName = L["World of Warcraft"],
-    shortName = L["Vanilla"],
+    canonName = L["Classic|canon"],
+    shortName = L["Classic|short"],
     previewItemId = 13468, -- Black Lotus
     texture = getExpansionTexturePath("wow.png"),
     expansionLevel = 0,
@@ -72,8 +76,8 @@ Private.Expansion.All = {
   },
   {
     major = 7,
-    canonName = L["Legion"],
-    shortName = L["Legion"],
+    canonName = L["Legion|canon"],
+    shortName = L["Legion|short"],
     previewItemId = 124103, -- Foxflower
     texture = getExpansionTexturePath("legion.png"),
     expansionLevel = 6,

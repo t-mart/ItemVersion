@@ -105,10 +105,10 @@ class TestParsing:
         assert loc.locale == "zhCN"
         assert not loc.is_default
 
-    def test_header_stops_at_first_entry(self, tmp_path):
+    def test_header_is_not_kept_from_the_file(self, tmp_path):
+        """Nothing above the entries is read back; render rebuilds it."""
         loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["BfA"] = true\n')
-        assert loc.header == DEUTSCH_HEADER
-        assert "BfA" not in loc.header
+        assert not hasattr(loc, "header")
 
 
 class TestNoop:
@@ -215,6 +215,55 @@ class TestStructure:
         assert sorted(keys) != keys
 
 
+class TestContextKeys:
+    def test_true_on_a_context_key_is_an_error(self, tmp_path):
+        """`= true` would put the marker itself in front of a player."""
+        text = (
+            'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
+            'L["Legion|canon"] = true\n'
+        )
+        loc = locale_from(tmp_path, "enUS.lua", text)
+        problems = locales.check_context_keys(loc)
+        assert [p.severity for p in problems] == [locales.ERROR]
+        assert "would display the marker" in problems[0].message
+
+    def test_explicit_english_on_a_context_key_passes(self, tmp_path):
+        text = (
+            'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
+            'L["Legion|canon"] = "Legion"\n'
+        )
+        loc = locale_from(tmp_path, "enUS.lua", text)
+        assert locales.check_context_keys(loc) == []
+
+    def test_true_on_an_ordinary_key_is_fine(self, tmp_path):
+        text = (
+            'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
+            'L["Profiles"] = true\n'
+        )
+        loc = locale_from(tmp_path, "enUS.lua", text)
+        assert locales.check_context_keys(loc) == []
+
+    def test_render_keeps_an_explicit_enUS_value(self, tmp_path):
+        """Rendering enUS must not flatten a context key back to `= true`."""
+        text = (
+            'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
+            'L["Legion|canon"] = "Legion"\n'
+            'L["Profiles"] = true\n'
+        )
+        loc = locale_from(tmp_path, "enUS.lua", text)
+        out = locales.render(loc, {"Legion|canon", "Profiles"})
+        assert 'L["Legion|canon"] = "Legion"' in out
+        assert 'L["Profiles"] = true' in out
+        assert 'L["Legion|canon"] = true' not in out
+
+    def test_two_contexts_of_one_word_can_differ(self, tmp_path):
+        """The whole point: one English word, two independent translations."""
+        text = DEUTSCH_HEADER + 'L["Legion|canon"] = "Legion"\nL["Legion|short"] = "Leg"\n'
+        loc = locale_from(tmp_path, "deDE.lua", text)
+        assert loc.by_key["Legion|canon"].value == "Legion"
+        assert loc.by_key["Legion|short"].value == "Leg"
+
+
 class TestUsages:
     def test_finds_key_and_location(self, tmp_path):
         path = tmp_path / "Thing.lua"
@@ -269,10 +318,25 @@ class TestRender:
         out = locales.render(loc, {"Alpha"})
         assert '-- L["Alpha"] = ""' in out
 
-    def test_header_is_preserved(self, tmp_path):
+    def test_header_is_generated_from_the_locale(self, tmp_path):
         loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["Alpha"] = "A"\n')
         out = locales.render(loc, {"Alpha"})
-        assert out.startswith(DEUTSCH_HEADER)
+        assert out.startswith(locales.header_for("deDE", False))
+        assert 'NewLocale(AddonName, "deDE")' in out
+        assert "if not L then" in out
+
+    def test_export_format_header_is_replaced(self, tmp_path):
+        """A CurseForge export leaks a global L. Rendering it fixes that."""
+        loc = locale_from(tmp_path, "zhCN.lua", 'L = L or {}\nL["Alpha"] = "A"\n')
+        out = locales.render(loc, {"Alpha"})
+        assert "L = L or {}" not in out
+        assert 'local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "zhCN")' in out
+
+    def test_default_locale_header_passes_isDefault(self, tmp_path):
+        text = 'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\nL["Alpha"] = true\n'
+        loc = locale_from(tmp_path, "enUS.lua", text)
+        out = locales.render(loc, {"Alpha"})
+        assert 'NewLocale(AddonName, "enUS", true)' in out
 
     def test_output_is_sorted(self, tmp_path):
         text = DEUTSCH_HEADER + 'L["Zulu"] = "Z"\nL["Alpha"] = "A"\n'
@@ -289,6 +353,35 @@ class TestRender:
         again = locales.render(locale_from(tmp_path, "deDE.lua", once), reference)
 
         assert once == again
+
+    def test_idempotent_when_the_first_key_is_a_stub(self, tmp_path):
+        """The stub sorts above every real entry here.
+
+        A header rule based on the first *entry* swallows that stub, then
+        re-emits it below, and the file grows by one line every run.
+        """
+        loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["Zulu"] = "Z"\n')
+        reference = {"Alpha", "Zulu"}
+
+        once = locales.render(loc, reference)
+        again = locales.render(locale_from(tmp_path, "deDE.lua", once), reference)
+
+        assert once == again
+        assert once.count('-- L["Alpha"] = ""') == 1
+        assert once.startswith(locales.header_for("deDE", False))
+
+    def test_stubs_do_not_accumulate_over_many_runs(self, tmp_path):
+        """The real-world shape: a locale with only a handful translated."""
+        reference = {"Alpha", "Beta", "Gamma", "Zulu"}
+        text = DEUTSCH_HEADER + 'L["Zulu"] = "Z"\n'
+
+        for _ in range(4):
+            text = locales.render(locale_from(tmp_path, "deDE.lua", text), reference)
+
+        assert text.count('-- L["Alpha"] = ""') == 1
+        assert text.count('L["Zulu"] = "Z"') == 1
+        entry_lines = [ln for ln in text.splitlines() if "L[" in ln]
+        assert len(entry_lines) == len(reference)
 
     def test_default_locale_renders_true(self, tmp_path):
         text = 'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\nL["Alpha"] = true\n'
@@ -355,6 +448,22 @@ class TestEndToEnd:
         assert self.run(tree) == 0
         text = (tree / "ItemVersion/Locales/deDE.lua").read_text(encoding="utf-8")
         assert '-- L["Beta"] = ""' in text
+
+    def test_fix_mode_reports_the_state_it_leaves_behind(self, tree, capsys):
+        """A run that fixes everything must not still print what it fixed."""
+        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+            DEUTSCH_HEADER + 'L["Beta"] = "B"\nL["Alpha"] = "A"\n', encoding="utf-8"
+        )
+        assert self.run(tree) == 0
+        assert "0 error(s), 0 warning(s)" in capsys.readouterr().out
+
+    def test_check_mode_still_reports_what_it_found(self, tree, capsys):
+        """The mirror of the above: --check fixes nothing, so it must complain."""
+        (tree / "ItemVersion/Locales/deDE.lua").write_text(
+            DEUTSCH_HEADER + 'L["Beta"] = "B"\nL["Alpha"] = "A"\n', encoding="utf-8"
+        )
+        assert self.run(tree, "--check") == 0
+        assert "not sorted" in capsys.readouterr().out
 
     def test_used_but_undefined_fails(self, tree, capsys):
         (tree / "ItemVersion/Thing.lua").write_text(

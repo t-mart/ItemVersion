@@ -24,6 +24,10 @@ L["BfA"] = true
 L["Build number only"] = true
 L["Cata"] = true
 L["Cataclysm"] = true
+-- In English, we use "Classic" for both the canon and short names, but they have different
+-- semantic meaning. To allow for other languages to distinguish them, we use a context marker.
+L["Classic|canon"] = "Classic"
+L["Classic|short"] = "Classic"
 L["Color of the line of text in the tooltip"] = true
 L["Correct the version for some items whose release version is different than their usable version."] = true
 L["Customize the format of the item version information shown in tooltips."] = true
@@ -39,7 +43,9 @@ L["Full version"] = true
 L["Invalid item ID or link provided"] = true
 L["ItemVersion does not support profile version %d, so your settings have been reset."] = true
 L["Key Modifiers Needed to Show Info"] = true
-L["Legion"] = true
+-- same as "Classic" above
+L["Legion|canon"] = "Legion"
+L["Legion|short"] = "Legion"
 L["Line Color"] = true
 L["Lookup item ID or Link and print tooltip line"] = true
 L["Major, minor, and patch version"] = true
@@ -67,11 +73,9 @@ L["The War Within"] = true
 L["Token"] = true
 L["Tooltip format"] = true
 L["Usage: /itemversion <command>"] = true
-L["Vanilla"] = true
 L["Version Information"] = true
 L["Warlords of Draenor"] = true
 L["WoD"] = true
-L["World of Warcraft"] = true
 L["WotLK"] = true
 L["WoW Build"] = true
 L["WoW Build Date"] = true

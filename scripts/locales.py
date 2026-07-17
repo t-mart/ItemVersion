@@ -40,6 +40,11 @@ EXCLUDED_FILES = frozenset({"Data.lua"})
 SPECIFIER = re.compile(r"%%|%[-+ #0]*\d*(?:\.\d+)?[diouxXeEfgGcsq]")
 TOKEN = re.compile(r"\{(\w+)\}")
 
+# Separates a key from the role it plays, as in `Legion|canon` and
+# `Legion|short`. Lets one English word carry two meanings that other languages
+# may want to tell apart. Never shown to a player.
+CONTEXT_MARKER = "|"
+
 ERROR, WARNING, INFO = "error", "warning", "info"
 
 
@@ -82,7 +87,6 @@ class LocaleFile:
     locale: str
     is_default: bool
     entries: tuple[Entry, ...]
-    header: str
 
     @property
     def by_key(self) -> dict[str, Entry]:
@@ -191,28 +195,41 @@ def read_entries(tree: astnodes.Chunk) -> Iterator[Entry]:
             )
 
 
+def header_for(locale: str, is_default: bool) -> str:
+    """The boilerplate at the top of a locale file.
+
+    Generated rather than preserved, so there is no boundary to find between
+    the header and the entries. Everything below is regenerated too, which
+    makes the whole file the tool's to own.
+
+    The `if not L then return end` guard is only correct because each locale is
+    its own file: NewLocale returns nil for every locale but the player's, and a
+    return at file scope ends the file. In a combined file it would swallow
+    every locale after the first.
+    """
+    default_arg = ", true" if is_default else ""
+    return (
+        "local AddonName = ...\n"
+        "\n"
+        f'local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "{locale}"{default_arg})\n'
+        "if not L then\n"
+        "  return\n"
+        "end\n"
+    )
+
+
 def read_locale(path: Path) -> LocaleFile | Problem:
     try:
         tree = parse(path)
     except Exception as exc:
         return Problem(ERROR, path, None, f"could not parse: {exc}")
 
-    entries = tuple(read_entries(tree))
-
-    # Everything above the first assignment is the file's own business: the
-    # NewLocale call, the `if not L then return end` guard, comments. Fix mode
-    # regenerates the entry list below it and leaves this alone.
-    text = path.read_text(encoding="utf-8")
-    first_line = min((e.line for e in entries), default=0)
-    header = "".join(text.splitlines(keepends=True)[: max(first_line - 1, 0)])
-
     declared, is_default = declared_locale(tree)
     return LocaleFile(
         path=path,
         locale=declared or path.stem,
         is_default=is_default,
-        entries=entries,
-        header=header,
+        entries=tuple(read_entries(tree)),
     )
 
 
@@ -295,6 +312,28 @@ def check_placeholders(locale: LocaleFile, reference: set[str]) -> list[Problem]
     return problems
 
 
+def check_context_keys(default: LocaleFile) -> list[Problem]:
+    """A `Name|context` key must spell its English out in enUS.
+
+    The marker exists so one English word can mean two things: `Legion|canon`
+    and `Legion|short` are the same word in English but need not be in every
+    language. The cost is that such a key is not its own English, so `= true`
+    would put the marker itself on screen. Only enUS can be checked this way,
+    since it is the fallback everyone else lands on.
+    """
+    return [
+        Problem(
+            ERROR,
+            default.path,
+            entry.line,
+            f"{entry.key!r} is marked with a context, so it needs an explicit "
+            f"English value; `= true` would display the marker to players",
+        )
+        for entry in default.entries
+        if CONTEXT_MARKER in entry.key and entry.value is None
+    ]
+
+
 def check_duplicates(locale: LocaleFile) -> list[Problem]:
     seen: dict[str, int] = {}
     problems = []
@@ -345,12 +384,15 @@ def check_sorted(locale: LocaleFile) -> list[Problem]:
 
 
 def render(locale: LocaleFile, reference: Iterable[str]) -> str:
-    """Canonical text for a locale file: header verbatim, entries regenerated.
+    """The whole text of a locale file, header and all.
+
+    Only the translated values survive a round trip; everything else is
+    reconstructed from the locale name and the enUS key list. That is what
+    keeps this idempotent, and it means a translator never has to get any Lua
+    right beyond the quotes around their own string.
 
     Untranslated keys become commented stubs so a translator opening the file
-    sees exactly what is left. A stub does not parse as an assignment, so the
-    next run treats it as missing again and reproduces it. That makes this
-    idempotent.
+    sees exactly what is left to do.
     """
     translated = {e.key: e for e in locale.entries if not e.is_noop}
     lines = []
@@ -359,9 +401,14 @@ def render(locale: LocaleFile, reference: Iterable[str]) -> str:
         entry = translated.get(key)
 
         if locale.is_default:
-            # enUS is the reference. The convention is `= true`, meaning the
-            # value is the key.
-            lines.append(f"L[{lua_quote(key)}] = true")
+            # enUS is the reference, so `= true` (value equals key) says it all
+            # for an ordinary key. A key that is not its own English keeps the
+            # value it was given.
+            existing = locale.by_key.get(key)
+            if existing is not None and existing.value is not None:
+                lines.append(f"L[{lua_quote(key)}] = {lua_quote(existing.value)}")
+            else:
+                lines.append(f"L[{lua_quote(key)}] = true")
             continue
 
         if entry is None:
@@ -370,7 +417,7 @@ def render(locale: LocaleFile, reference: Iterable[str]) -> str:
 
         lines.append(f"L[{lua_quote(key)}] = {lua_quote(entry.value or key)}")
 
-    return locale.header.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+    return header_for(locale.locale, locale.is_default) + "\n" + "\n".join(lines) + "\n"
 
 
 def lua_quote(text: str) -> str:
@@ -383,40 +430,42 @@ def coverage(locale: LocaleFile, reference: set[str]) -> tuple[int, int]:
     return len(translated), len(reference)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Check, and optionally fix, the addon's locale files."
-    )
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="report only, write nothing, exit non-zero on error (for CI)",
-    )
-    parser.add_argument(
-        "--root",
-        type=Path,
-        default=REPO_ROOT,
-        help="repo root to work on, for testing against a scratch tree",
-    )
-    args = parser.parse_args()
+@dataclass(frozen=True)
+class Analysis:
+    problems: tuple[Problem, ...]
+    locales: tuple[LocaleFile, ...]
+    default: LocaleFile | None
+    used: dict[str, list[str]]
 
-    root: Path = args.root.resolve()
-    addon_dir = root / ADDON_DIRNAME
+    @property
+    def reference_keys(self) -> set[str]:
+        return set(self.default.by_key) if self.default else set()
 
+    @property
+    def errors(self) -> int:
+        return sum(1 for p in self.problems if p.severity == ERROR)
+
+    @property
+    def warnings(self) -> int:
+        return sum(1 for p in self.problems if p.severity == WARNING)
+
+
+def analyse(addon_dir: Path) -> Analysis:
+    """Read everything and run every check. Writes nothing."""
     problems: list[Problem] = []
 
     used, usage_problems = find_usages(source_files(addon_dir))
     problems += usage_problems
 
-    locales: list[LocaleFile] = []
+    found: list[LocaleFile] = []
     for path in locale_files(addon_dir):
         result = read_locale(path)
         if isinstance(result, Problem):
             problems.append(result)
             continue
-        locales.append(result)
+        found.append(result)
 
-    default = next((loc for loc in locales if loc.is_default), None)
+    default = next((loc for loc in found if loc.is_default), None)
     if default is None:
         # Transitional: enUS still lives in the single Locales.lua alongside the
         # @localization@ blocks. Once that file is split up, the isDefault call
@@ -427,8 +476,7 @@ def main() -> int:
             default = result
 
     if default is None:
-        print("error: found no default (enUS) locale to check against", file=sys.stderr)
-        return 1
+        return Analysis(tuple(problems), tuple(found), None, used)
 
     reference = default.by_key
     reference_keys = set(reference)
@@ -455,29 +503,70 @@ def main() -> int:
             )
         )
 
-    for locale in locales:
+    problems += check_context_keys(default)
+
+    for locale in found:
         problems += check_duplicates(locale)
         problems += check_unknown_keys(locale, reference_keys)
         problems += check_placeholders(locale, reference_keys)
         problems += check_sorted(locale)
 
-    written = []
-    if not args.check:
-        for locale in locales:
-            text = render(locale, reference_keys)
-            if text != locale.path.read_text(encoding="utf-8"):
-                locale.path.write_text(text, encoding="utf-8")
-                written.append(locale.path)
+    return Analysis(tuple(problems), tuple(found), default, used)
 
-    for problem in sorted(problems, key=lambda p: (str(p.path), p.line or 0)):
+
+def fix(analysis: Analysis) -> list[Path]:
+    written = []
+    for locale in analysis.locales:
+        text = render(locale, analysis.reference_keys)
+        if text != locale.path.read_text(encoding="utf-8"):
+            locale.path.write_text(text, encoding="utf-8")
+            written.append(locale.path)
+    return written
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Check, and optionally fix, the addon's locale files."
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="report only, write nothing, exit non-zero on error (for CI)",
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=REPO_ROOT,
+        help="repo root to work on, for testing against a scratch tree",
+    )
+    args = parser.parse_args()
+
+    root: Path = args.root.resolve()
+    addon_dir = root / ADDON_DIRNAME
+
+    analysis = analyse(addon_dir)
+
+    if analysis.default is None:
+        print("error: found no default (enUS) locale to check against", file=sys.stderr)
+        return 1
+
+    written: list[Path] = []
+    if not args.check:
+        written = fix(analysis)
+        if written:
+            # Report the state we are leaving behind, not the one we found.
+            # Otherwise a run that fixes every problem still prints them all.
+            analysis = analyse(addon_dir)
+
+    for problem in sorted(analysis.problems, key=lambda p: (str(p.path), p.line or 0)):
         print(problem.render(root))
 
     print()
-    print(f"enUS: {len(reference_keys)} keys, {len(used)} used in source")
-    for locale in sorted(locales, key=lambda loc: loc.locale):
+    print(f"enUS: {len(analysis.reference_keys)} keys, {len(analysis.used)} used in source")
+    for locale in sorted(analysis.locales, key=lambda loc: loc.locale):
         if locale.is_default:
             continue
-        done, total = coverage(locale, reference_keys)
+        done, total = coverage(locale, analysis.reference_keys)
         pct = (100 * done // total) if total else 0
         print(f"  {locale.locale}: {done}/{total} translated ({pct}%)")
 
@@ -486,12 +575,10 @@ def main() -> int:
         for path in written:
             print(f"rewrote {relative_to(path, root)}")
 
-    errors = sum(1 for p in problems if p.severity == ERROR)
-    warnings = sum(1 for p in problems if p.severity == WARNING)
     print()
-    print(f"{errors} error(s), {warnings} warning(s)")
+    print(f"{analysis.errors} error(s), {analysis.warnings} warning(s)")
 
-    return 1 if errors else 0
+    return 1 if analysis.errors else 0
 
 
 if __name__ == "__main__":

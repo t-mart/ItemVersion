@@ -5,6 +5,9 @@
 
 ## Unreleased
 
+- The original game is now called "Classic", both in full and abbreviated,
+  instead of "World of Warcraft" and "Vanilla". This is what Blizzard internally
+  calls it.
 - Fix translations never loading. Only German could ever apply. Every other
   language silently fell back to English, including the Chinese and Brazilian
   Portuguese translations that were already finished and waiting. Thanks to
@@ -25,9 +28,9 @@
   setting you have not since changed, and anything you did change is left as you
   set it. Long-obsolete settings are also cleared out of your saved variables
   ([#108](https://github.com/t-mart/ItemVersion/issues/108)).
-- Fix an "Invalid font asset" error thrown when opening the options panel. Thanks
-  to [@HectorZaGa](https://github.com/HectorZaGa) for the report and the fix
-  ([#105](https://github.com/t-mart/ItemVersion/pull/105)).
+- Fix an "Invalid font asset" error thrown when opening the options panel.
+  Thanks to [@HectorZaGa](https://github.com/HectorZaGa) for the report and the
+  fix ([#105](https://github.com/t-mart/ItemVersion/pull/105)).
 - Fix the "Apply version corrections" option, which did nothing. It always
   appeared unchecked no matter what you set it to, and corrections were always
   applied. It now shows the real setting and turning it off takes effect

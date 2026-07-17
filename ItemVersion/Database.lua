@@ -1,6 +1,7 @@
 local AddonName, Private = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
+local AceConsole = LibStub("AceConsole-3.0")
 
 ---@class DatabaseProfile
 ---@field enableTooltip boolean Whether to show version info in tooltips
@@ -200,12 +201,23 @@ local function migrate(database)
   --   -- future migrations would go here
   -- end
 
+  -- Whatever is left is a version with no migration into the current schema,
+  -- which in practice means a newer ItemVersion wrote the profile and the user
+  -- has since downgraded. Their settings are lost either way: the keys of a
+  -- schema we do not know cannot be carried anywhere. Resetting at least leaves
+  -- a working addon, where raising here aborted OnInitialize and left every
+  -- later step, including the tooltip hook, unrun.
   if version ~= CURRENT_VERSION_NUMBER then
-    error(
-      ("Profile version %d is not supported by this version of ItemVersion. Please update your profile or reset to defaults."):format(
-        version
-      )
+    AceConsole:Print(
+      format(L["ItemVersion does not support profile version %d, so your settings have been reset."], version)
     )
+
+    -- Suppress callbacks, since OnProfileReset is wired to migrate. The nested
+    -- pass would terminate, a reset profile reading as v1, but only by luck.
+    -- ResetProfile empties the profile table rather than replacing it, so the
+    -- local above still points at the live one.
+    database:ResetProfile(nil, true)
+    version = CURRENT_VERSION_NUMBER
   end
 
   -- Stamped last: the migrations above strip unknown keys, and version is not

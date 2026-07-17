@@ -24,6 +24,7 @@ L["Format Tokens"] = true
 L["Full name of the expansion"] = true
 L["Full version"] = true
 L["Invalid item ID or link provided"] = true
+L["ItemVersion does not support profile version %d, so your settings have been reset."] = true
 L["Key Modifiers Needed to Show Info"] = true
 L["Legion"] = true
 L["Line Color"] = true

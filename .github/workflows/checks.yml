@@ -1,0 +1,54 @@
+name: Checks
+
+# Lint, formatting and locale checks, on pull requests and on master.
+#
+# This runs `scripts/dev.py check`, which is the same command you run locally, so
+# a green run here means the same thing as a green run on your machine.
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      # Straight from each project's releases, because both ship a prebuilt
+      # binary. cargo binstall was building selene from source, which dominated an
+      # otherwise ~4ms lint: selene publishes no [package.metadata.binstall], so
+      # binstall cannot match its release asset to a target triple and falls back
+      # to compiling. Downloading takes about a second.
+      #
+      # Pinned so a new upstream release cannot fail an unrelated pull request.
+      # Bump them when the version you lint with locally moves on.
+      - name: Install selene and stylua
+        env:
+          SELENE_VERSION: "0.31.0"
+          STYLUA_VERSION: "2.5.2"
+        run: |
+          BIN="$HOME/.local/bin"
+          mkdir -p "$BIN"
+          cd "$(mktemp -d)"
+
+          curl -sSfL -O "https://github.com/Kampfkarren/selene/releases/download/${SELENE_VERSION}/selene-${SELENE_VERSION}-linux.zip"
+          curl -sSfL -O "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip"
+
+          unzip -qo "selene-${SELENE_VERSION}-linux.zip"
+          unzip -qo stylua-linux-x86_64.zip
+
+          chmod +x selene stylua
+          mv selene stylua "$BIN/"
+          echo "$BIN" >> "$GITHUB_PATH"
+
+      - name: Check
+        run: uv run scripts/dev.py check

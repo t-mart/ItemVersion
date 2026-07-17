@@ -410,7 +410,7 @@ class TestEndToEnd:
     def tree(self, tmp_path):
         addon = tmp_path / "ItemVersion"
         (addon / "Locales").mkdir(parents=True)
-        (addon / "Locales.lua").write_text(
+        (addon / "Locales" / "enUS.lua").write_text(
             'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
             'L["Alpha"] = true\n'
             'L["Beta"] = true\n',
@@ -465,6 +465,25 @@ class TestEndToEnd:
         assert self.run(tree, "--check") == 0
         assert "not sorted" in capsys.readouterr().out
 
+    def test_fix_mode_never_rewrites_enUS(self, tree):
+        """enUS is hand-written and carries comments explaining its keys."""
+        path = tree / "ItemVersion/Locales/enUS.lua"
+        annotated = (
+            'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
+            "-- a comment a maintainer wrote and expects to keep\n"
+            'L["Alpha"] = true\n'
+            'L["Beta"] = true\n'
+        )
+        path.write_text(annotated, encoding="utf-8")
+
+        assert self.run(tree) == 0
+        assert path.read_text(encoding="utf-8") == annotated
+
+    def test_missing_enUS_is_a_hard_failure(self, tree):
+        """With no default there is nothing to check against, so do not guess."""
+        (tree / "ItemVersion/Locales/enUS.lua").unlink()
+        assert self.run(tree) == 1
+
     def test_used_but_undefined_fails(self, tree, capsys):
         (tree / "ItemVersion/Thing.lua").write_text(
             'print(L["Ghost"])\n', encoding="utf-8"
@@ -473,7 +492,7 @@ class TestEndToEnd:
         assert "enUS does not define it" in capsys.readouterr().out
 
     def test_bad_placeholder_fails(self, tree, capsys):
-        (tree / "ItemVersion/Locales.lua").write_text(
+        (tree / "ItemVersion/Locales/enUS.lua").write_text(
             'local L = LibStub("AceLocale-3.0"):NewLocale(A, "enUS", true)\n'
             'L["Hit %d times"] = true\n',
             encoding="utf-8",

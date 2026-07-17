@@ -118,7 +118,11 @@ def parse(path: Path) -> astnodes.Chunk:
 
 
 def source_files(addon_dir: Path) -> list[Path]:
-    """Every addon Lua file that might reference a string, locale files aside."""
+    """Every addon Lua file that might reference a string, locale files aside.
+
+    The locale files are where strings are defined rather than used, so counting
+    them as usage would make every key look used and defeat the stale-key check.
+    """
     locale_dir = addon_dir / "Locales"
     return sorted(
         p
@@ -126,7 +130,6 @@ def source_files(addon_dir: Path) -> list[Path]:
         if not EXCLUDED_DIRS & set(p.relative_to(addon_dir).parts)
         and p.name not in EXCLUDED_FILES
         and locale_dir not in p.parents
-        and p.name != "Locales.lua"
     )
 
 
@@ -467,15 +470,6 @@ def analyse(addon_dir: Path) -> Analysis:
 
     default = next((loc for loc in found if loc.is_default), None)
     if default is None:
-        # Transitional: enUS still lives in the single Locales.lua alongside the
-        # @localization@ blocks. Once that file is split up, the isDefault call
-        # above finds enUS.lua and this goes away.
-        legacy = addon_dir / "Locales.lua"
-        result = read_locale(legacy) if legacy.exists() else None
-        if isinstance(result, LocaleFile) and result.entries:
-            default = result
-
-    if default is None:
         return Analysis(tuple(problems), tuple(found), None, used)
 
     reference = default.by_key
@@ -515,8 +509,16 @@ def analyse(addon_dir: Path) -> Analysis:
 
 
 def fix(analysis: Analysis) -> list[Path]:
+    """Rewrite the translations. enUS is left alone.
+
+    enUS is the source of truth, written by hand and carrying comments that
+    explain the keys. Regenerating it would only reformat it, and would throw
+    those comments away. It is still checked, just not rewritten.
+    """
     written = []
     for locale in analysis.locales:
+        if locale.is_default:
+            continue
         text = render(locale, analysis.reference_keys)
         if text != locale.path.read_text(encoding="utf-8"):
             locale.path.write_text(text, encoding="utf-8")

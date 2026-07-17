@@ -1,5 +1,3 @@
-local _, Private = ...
-
 local AceGUI = LibStub("AceGUI-3.0")
 
 local Type = "ItemVersion-PreviewIcon"
@@ -10,16 +8,13 @@ local methods = {
 
   ["OnRelease"] = function() end,
 
-  ["SetText"] = function(self, text)
-    -- use the hack: this is the way to get a stringified expansion major version
-    -- we use this to look up the expansion and render its icon
-    local expansionMajor = tonumber(text)
-    local expansion = Private.Expansion:GetExpansionFromMajor(expansionMajor)
-    local itemId = expansion.previewItemId
+  -- AceConfigDialog forwards the option's `arg` here, which is how a
+  -- dialogControl receives data of its own.
+  ["SetCustomData"] = function(self, itemId)
     self.icon:SetTexture(C_Item.GetItemIconByID(itemId))
 
-    self.frame:SetScript("OnEnter", function(s)
-      GameTooltip:SetOwner(s, "ANCHOR_RIGHT")
+    self.frame:SetScript("OnEnter", function(frame)
+      GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
       GameTooltip:SetItemByID(itemId)
       GameTooltip:Show()
     end)
@@ -28,6 +23,10 @@ local methods = {
       GameTooltip:Hide()
     end)
   end,
+
+  -- AceConfigDialog drives a "description" option as if it were a Label. The
+  -- icon comes from SetCustomData, so there is nothing for these to do.
+  ["SetText"] = function() end,
 
   ["SetFontObject"] = function() end,
 }
@@ -39,7 +38,6 @@ local function Constructor()
   frame:SetSize(32, 40)
   local icon = frame:CreateTexture(nil, "ARTWORK")
   icon:SetAllPoints(frame)
-  icon:SetTexture(C_Item.GetItemIconByID(124103))
 
   -- Create widget
   local widget = {

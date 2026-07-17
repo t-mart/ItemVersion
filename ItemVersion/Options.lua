@@ -36,7 +36,8 @@ for _, expansion in ipairs(Private.Expansion.All) do
       order = expansion.major,
       type = "description",
       width = 0.25,
-      name = tostring(expansion.major), -- HACK: a way to provide data to the widget
+      name = "", -- Ignored by our widget, but required by AceConfig
+      arg = expansion.previewItemId,
       dialogControl = "ItemVersion-PreviewIcon",
     }
   end

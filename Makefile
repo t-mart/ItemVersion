@@ -1,4 +1,4 @@
-.PHONY: libs clean build install uninstall status check format watch
+.PHONY: libs clean build install uninstall status check format locales test watch
 
 SOURCE_DIR := ItemVersion
 BUILD_ROOT := .release
@@ -28,5 +28,5 @@ build: $(BUILD_DIR)
 
 # Make passes command-line and inherited env vars through to recipes, so
 # `make install WOW_ROOT=...` reaches the script without any plumbing here.
-install uninstall status check format watch:
+install uninstall status check format locales test watch:
 	@scripts/dev.sh $@

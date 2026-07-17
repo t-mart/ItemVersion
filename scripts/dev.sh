@@ -2,7 +2,7 @@
 #
 # Development helpers for working on ItemVersion against a local WoW install.
 #
-# Usage: scripts/dev.sh <install|uninstall|status|check|format|watch|help>
+# Usage: scripts/dev.sh <install|uninstall|status|check|format|locales|test|watch|help>
 #
 # The WoW root is the directory containing _retail_, _classic_ and friends. Set
 # it once in .wowroot (gitignored), or override it with the WOW_ROOT env var.
@@ -195,12 +195,13 @@ require_tool() {
   command -v "$1" >/dev/null || die "$1 is not installed."
 }
 
-# Both tools resolve their config (selene.toml, stylua.toml, .styluaignore)
-# relative to the cwd, so run from the repo root. Neither short-circuits the
-# other: one run should report everything that is wrong.
+# selene and stylua resolve their config (selene.toml, stylua.toml,
+# .styluaignore) relative to the cwd, so run from the repo root. Nothing here
+# short-circuits: one run should report everything that is wrong.
 cmd_check() {
   require_tool selene
   require_tool stylua
+  require_tool uv
   cd "$REPO_ROOT"
 
   local failed=0
@@ -214,7 +215,25 @@ cmd_check() {
     failed=1
   fi
 
+  # --check so this never edits from a check run. `make locales` is the mode
+  # that writes.
+  uv run scripts/locales.py --check || failed=1
+
   return "$failed"
+}
+
+# Prunes stale keys, sorts, and stubs out anything untranslated. uv fetches the
+# script's dependencies itself, so there is no venv to set up.
+cmd_locales() {
+  require_tool uv
+  cd "$REPO_ROOT"
+  uv run scripts/locales.py
+}
+
+cmd_test() {
+  require_tool uv
+  cd "$REPO_ROOT"
+  uv run scripts/test_locales.py
 }
 
 cmd_format() {
@@ -248,8 +267,11 @@ Commands:
               Refuses to clobber a real directory.
   uninstall   Remove our symlinks. Never touches a real directory.
   status      Show what is installed for each flavor.
-  check       Lint with selene and check formatting with stylua.
+  check       Lint with selene, check formatting with stylua, and check the
+              locale files. Writes nothing.
   format      Reformat the addon with stylua.
+  locales     Prune, sort and stub the locale files. This one writes.
+  test        Run the tests for the locale tooling.
   watch       Re-run check on every save. Reload in game to see changes.
   help        Show this message.
 
@@ -267,6 +289,8 @@ main() {
     status) cmd_status ;;
     check) cmd_check ;;
     format) cmd_format ;;
+    locales) cmd_locales ;;
+    test) cmd_test ;;
     watch) cmd_watch ;;
     help | -h | --help) cmd_help ;;
     *)

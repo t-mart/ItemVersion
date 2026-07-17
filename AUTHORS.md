@@ -1,7 +1,11 @@
 # ItemVersion Authors
 
-ItemVersion is written and maintained by Tim Martin.
+The following people have contributed to ItemVersion in some way.
 
-Additional contributors, listed alphabetically, are:
+If you have helped out but are missing in this list, please open a pull request
+to add yourself!
 
-- Hollicsh (Russian localization)
+- HectorZaGa
+- Hollicsh
+- reysonk
+- t-mart

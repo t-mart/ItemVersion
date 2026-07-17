@@ -50,5 +50,5 @@ class TestCli:
         monkeypatch.delenv("WOW_ROOT", raising=False)
         monkeypatch.setattr(install, "ENV_FILE", Path("/nonexistent"))
 
-        assert cli.main(["status"]) == 1
+        assert cli.main(["install-status"]) == 1
         assert "error:" in capsys.readouterr().err

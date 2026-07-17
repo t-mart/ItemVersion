@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from common import SOURCE_DIR, Die
-from install import cmd_install, cmd_status, cmd_uninstall
+from install import ALL_FLAVORS, FLAVOR_DIRS, cmd_install, cmd_install_status, cmd_uninstall
 from interfaces import cmd_interfaces
 from packaging import cmd_build, cmd_clean, cmd_libs
 from quality import cmd_check, cmd_format, cmd_locales, cmd_test, cmd_watch
@@ -41,6 +41,20 @@ def interfaces_options(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def install_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--flavor",
+        dest="flavors",
+        action="append",
+        choices=(*FLAVOR_DIRS, ALL_FLAVORS),
+        metavar="FLAVOR",
+        help=(
+            "install into this flavor only; may be repeated. one of "
+            f"{', '.join(FLAVOR_DIRS)}, or {ALL_FLAVORS} (the default)."
+        ),
+    )
+
+
 COMMANDS = {
     "interfaces": Command(
         cmd_interfaces,
@@ -51,12 +65,16 @@ COMMANDS = {
     "build": Command(cmd_build, "Package a release build into .release/."),
     "clean": Command(cmd_clean, "Remove .release/ and the fetched Libs."),
     "install": Command(
-        cmd_install, f"Symlink {SOURCE_DIR}/ into each WoW flavor's AddOns dir."
+        cmd_install,
+        f"Symlink {SOURCE_DIR}/ into each WoW flavor's AddOns dir.",
+        install_options,
     ),
     "uninstall": Command(
-        cmd_uninstall, "Remove our symlinks. Never touches a real directory."
+        cmd_uninstall, "Remove our symlinks."
     ),
-    "status": Command(cmd_status, "Show what is installed for each flavor."),
+    "install-status": Command(
+        cmd_install_status, "Show what is installed for each flavor."
+    ),
     "check": Command(
         cmd_check, "Lint, check formatting, and check the locale files. Writes nothing."
     ),

@@ -17,9 +17,34 @@ from toc import version_from_toc
 
 ENV_FILE = REPO_ROOT / ".env"
 
-FLAVORS = ("_retail_", "_classic_era_", "_classic_", "_anniversary_")
+# The names a user types map to the directory WoW actually uses.
+FLAVOR_DIRS = {
+    "retail": "_retail_",
+    "classic-era": "_classic_era_",
+    "classic": "_classic_",
+    "anniversary": "_anniversary_",
+}
+
+# Directory names, in a stable order, for the commands that touch every flavor.
+FLAVORS = tuple(FLAVOR_DIRS.values())
+
+ALL_FLAVORS = "all"
 
 State = Literal["absent", "link-ok", "link-broken", "real-dir"]
+
+
+def selected_flavors(flavors: list[str] | None) -> tuple[str, ...]:
+    """Directory names to install into, from the --flavor selection.
+
+    No selection means all of them, as does an explicit "all". Naming "all"
+    alongside a specific flavor is contradictory, so refuse it.
+    """
+    chosen = flavors or [ALL_FLAVORS]
+    if ALL_FLAVORS in chosen:
+        if set(chosen) != {ALL_FLAVORS}:
+            raise Die("--flavor all installs everywhere; do not name others with it")
+        return FLAVORS
+    return tuple(FLAVOR_DIRS[name] for name in chosen)
 
 
 def resolve_wow_root(value: str | None) -> Path:
@@ -91,13 +116,13 @@ def link(src: Path, dst: Path) -> None:
     os.symlink(src, dst, target_is_directory=True)
 
 
-def cmd_install() -> int:
+def cmd_install(flavors: list[str] | None = None) -> int:
     root = wow_root()
     require_libs()
 
     linked = 0
 
-    for flavor in FLAVORS:
+    for flavor in selected_flavors(flavors):
         addons = addons_dir_for(root, flavor)
         target = target_for(root, flavor)
 
@@ -128,7 +153,10 @@ def cmd_install() -> int:
         report(flavor, "linked")
         linked += 1
 
-    print(f"Linked {linked} flavor(s) to {SOURCE_DIR}/. Use /reload in game to pick up edits.")
+    print(
+        f"Installed symlinks into {linked} flavor(s) to {SOURCE_DIR}/. "
+        "Use /reload in game to pick up edits."
+    )
     return 0
 
 
@@ -148,7 +176,7 @@ def cmd_uninstall() -> int:
     return 0
 
 
-def cmd_status() -> int:
+def cmd_install_status() -> int:
     root = wow_root()
     print(f"WOW_ROOT: {root}")
 

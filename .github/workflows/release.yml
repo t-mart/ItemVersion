@@ -53,10 +53,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       # ./dev interfaces reads Blizzard's version endpoints itself, validates what
-      # comes back, and rewrites the TOC. It fails loudly on anything unexpected,
-      # which the pipeline it replaced could not: jq exits 0 on empty input and
-      # this step has no pipefail, so a bad response silently blanked the
-      # Interface line and released a TOC the client will not load.
+      # comes back, and rewrites the TOC. It fails loudly on anything unexpected.
       - name: Update Interface versions
         run: |
           NEW_INTERFACES=$(./dev interfaces)

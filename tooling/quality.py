@@ -77,12 +77,6 @@ def is_watched(path: str) -> bool:
     return candidate.suffix in WATCH_SUFFIXES
 
 
-def clear_screen() -> None:
-    # Cheaper than shelling out to clear/cls, and Windows terminals have handled
-    # these since Windows 10.
-    print("\033[2J\033[H", end="")
-
-
 def describe(changes: Iterable[tuple[Change, str]]) -> list[str]:
     return sorted(f"{change.name} {relative(Path(path))}" for change, path in changes)
 
@@ -91,7 +85,7 @@ def describe(changes: Iterable[tuple[Change, str]]) -> list[str]:
 # already live in game. All this does is lint, so a mistake surfaces before you
 # alt-tab and reload.
 def cmd_watch() -> int:
-    clear_screen()
+    print(f"watching {relative(LINK_SRC)} for changes...")
     cmd_check()
 
     # debounce is milliseconds. A save often lands as several events, and one lint
@@ -99,7 +93,6 @@ def cmd_watch() -> int:
     for changes in watch(
         LINK_SRC, watch_filter=lambda _, path: is_watched(path), debounce=200
     ):
-        clear_screen()
         for line in describe(changes):
             print(line)
         print()

@@ -77,8 +77,10 @@ recommended way to achieve this is as follows:
 
    This symlinks `ItemVersion/` into each flavor's `Interface/AddOns`, so your
    edits are live with no build step. It refuses to touch a real directory, so
-   it will not eat a copy of ItemVersion you installed normally. The `status`
-   command shows what is linked, and `uninstall` removes the links again.
+   it will not eat a copy of ItemVersion you installed normally. Pass
+   `--flavor` (repeatable, e.g. `./dev install --flavor retail`) to install into
+   only some flavors instead of all of them. The `install-status` command shows
+   what is linked, and `uninstall` removes the links again.
 
    On Windows, creating a symlink needs either Developer Mode turned on
    (Settings > System > For developers) or an Administrator terminal.

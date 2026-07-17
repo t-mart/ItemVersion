@@ -90,14 +90,7 @@ def interface_for(product: str, region: str = REGION) -> str:
 def current_interfaces(
     products: Iterable[str] = WOW_PRODUCTS, region: str = REGION
 ) -> str:
-    """What the TOC's Interface line should say, straight from Blizzard.
-
-    Every surprise below is fatal on purpose. The shell pipeline this replaced
-    turned an empty or unexpected response into a blank `## Interface:` line and
-    then committed and released it, because jq exits 0 on empty input and the
-    step had no pipefail. A TOC with no interface versions is an addon the client
-    will not load.
-    """
+    """What the TOC's Interface line should say, straight from Blizzard."""
     return ", ".join(interface_for(product, region) for product in products)
 
 

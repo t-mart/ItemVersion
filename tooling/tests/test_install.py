@@ -205,6 +205,29 @@ class TestInstall:
 
         assert not install.target_for(installed, "_retail_").exists()
 
+    def test_flavor_installs_only_the_named_ones(self, installed):
+        install.cmd_install(flavors=["retail", "classic"])
+
+        assert install.target_for(installed, "_retail_").is_symlink()
+        assert install.target_for(installed, "_classic_").is_symlink()
+        assert not install.target_for(installed, "_classic_era_").exists()
+        assert not install.target_for(installed, "_anniversary_").exists()
+
+
+class TestSelectedFlavors:
+    def test_no_selection_means_every_flavor(self):
+        assert install.selected_flavors(None) == install.FLAVORS
+
+    def test_all_means_every_flavor(self):
+        assert install.selected_flavors(["all"]) == install.FLAVORS
+
+    def test_names_map_to_directories_in_order(self):
+        assert install.selected_flavors(["classic", "retail"]) == ("_classic_", "_retail_")
+
+    def test_all_with_a_named_flavor_is_refused(self):
+        with pytest.raises(common.Die, match="all"):
+            install.selected_flavors(["all", "retail"])
+
 
 class TestUninstall:
     def test_removes_our_links(self, installed):
@@ -248,7 +271,7 @@ class TestStatus:
         real.mkdir()
         (real / f"{common.SOURCE_DIR}.toc").write_text("## Version: 1.2.3\n", encoding="utf-8")
 
-        assert install.cmd_status() == 0
+        assert install.cmd_install_status() == 0
 
         out = capsys.readouterr().out
         assert "symlink ->" in out

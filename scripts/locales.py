@@ -337,6 +337,27 @@ def check_context_keys(default: LocaleFile) -> list[Problem]:
     ]
 
 
+def check_empty_values(locale: LocaleFile) -> list[Problem]:
+    """An empty string is worse than no entry at all.
+
+    Stubs are written as `-- L["key"] = ""`, so the obvious way to translate one
+    is to uncomment it and type between the quotes. Stopping half way leaves an
+    entry that overrides the English fallback with nothing, and the player sees
+    a blank where a word should be.
+    """
+    return [
+        Problem(
+            ERROR,
+            locale.path,
+            entry.line,
+            f"{entry.key!r} is an empty string, which would show the player "
+            f"nothing at all; comment the line out again to fall back to English",
+        )
+        for entry in locale.entries
+        if entry.value == ""
+    ]
+
+
 def check_duplicates(locale: LocaleFile) -> list[Problem]:
     seen: dict[str, int] = {}
     problems = []
@@ -501,6 +522,7 @@ def analyse(addon_dir: Path) -> Analysis:
 
     for locale in found:
         problems += check_duplicates(locale)
+        problems += check_empty_values(locale)
         problems += check_unknown_keys(locale, reference_keys)
         problems += check_placeholders(locale, reference_keys)
         problems += check_sorted(locale)

@@ -71,10 +71,56 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 print(L["Hello world"])
 ```
 
-Further, please add your strings to the English table in [`ItemVersion/Locales.lua`](https://github.com/t-mart/ItemVersion/blob/master/ItemVersion/Locales.lua). Then, list any new strings in your pull request. This is so I can add
-them to
-[the localization system](https://legacy.curseforge.com/wow/addons/itemversion/localization)
-for later translation.
+Then add the string to
+[`ItemVersion/Locales/enUS.lua`](https://github.com/t-mart/ItemVersion/blob/master/ItemVersion/Locales/enUS.lua),
+in alphabetical order:
+
+```lua
+L["Hello world"] = true
+```
+
+`true` means "the value is the key", which is how AceLocale spells "this string
+is already English". You don't need to do anything for the other languages:
+
+```bash
+make locales
+```
+
+will add a commented stub for your new string to every locale file, ready for a
+translator to fill in, and `make check` will tell you if you forgot.
+
+There's nothing else to do. Translations live in this repo, so there is no
+separate system to notify.
+
+#### When one English word means two things
+
+If the same English string is used in two places that a translator might want to
+word differently, give each one a context, with `|` between the string and the
+context:
+
+```lua
+L["Legion|canon"] = "Legion"
+L["Legion|short"] = "Legion"
+```
+
+Both are "Legion" in English, but one is the expansion's full name and the other
+has to fit in a tooltip, and a language may want those to differ.
+
+Note that such a key needs its English spelled out, as above, and **not** `true`.
+`true` makes the value the key, so a language without a translation for it would
+show the player `Legion|canon`, marker and all. `make check` enforces this, but
+it's easier to just remember.
+
+### Translations
+
+See [Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/README.md#translators-needed)
+in the README. Editing one file under `ItemVersion/Locales/` is the whole
+process, and no Lua knowledge is needed beyond the quotes.
+
+`make locales` maintains those files: it sorts them, stubs out anything
+untranslated, and drops keys that no longer exist. It rewrites every locale
+except `enUS.lua`, which is written by hand. `make check` runs the same checks
+without writing anything, which is what CI does.
 
 ## BigWigs Packager
 

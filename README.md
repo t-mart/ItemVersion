@@ -61,13 +61,41 @@ for more information.
 
 ## Translators Needed
 
-If you know another language and want to help translate ItemVersion, please use
-[the localization page on CurseForge](https://legacy.curseforge.com/wow/addons/itemversion/localization).
-Translations submitted there are pulled in automatically when the addon is
-built, so there's no need to open a pull request.
+If you know another language, you can help, and you don't need to know how to
+program.
 
-Translations are living things. If you see an improvement to make, don't
-hesitate to bring it up.
+The translations live in
+[`ItemVersion/Locales/`](https://github.com/t-mart/ItemVersion/tree/master/ItemVersion/Locales),
+one file per language. Open the one for yours, and you'll see lines like this:
+
+```lua
+L["Addon Version"] = "Versão do Addon"
+-- L["Apply version corrections"] = ""
+```
+
+The first is translated. The second is commented out, which means nobody has
+translated it yet: the English in the brackets is what a player sees today.
+To translate it, delete the leading `-- ` and type your translation between the
+empty quotes.
+
+That's the whole job. You can do it in GitHub's web editor, using the pencil
+icon on the file, and "Propose changes" will open a pull request for you.
+
+Three things worth knowing:
+
+- **Leave `enUS.lua` alone.** That one is the English source that everything
+  else falls back to.
+- **Keep anything in `%` or `{}` exactly as it is.** `%s`, `%d` and
+  `{expacIcon}` get replaced with real values when the addon runs, so
+  `"Added in {expacIcon}"` can become `"Added in Legion"`. You can move them
+  around to suit your language, but don't rename or drop them.
+- **Don't leave a line half done.** An empty `""` shows the player nothing at
+  all, which is worse than English. If you want to skip one, comment it back
+  out.
+
+A missing language is fine too: just ask in an issue and one will be added.
+Translations are living things, so if you spot one that reads badly, please say
+so.
 
 ## Support
 

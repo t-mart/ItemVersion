@@ -215,6 +215,30 @@ class TestStructure:
         assert sorted(keys) != keys
 
 
+class TestEmptyValues:
+    def test_half_finished_stub_is_an_error(self, tmp_path):
+        """Uncommenting a stub without filling it in blanks the string."""
+        loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["Profiles"] = ""\n')
+        problems = locales.check_empty_values(loc)
+        assert [p.severity for p in problems] == [locales.ERROR]
+        assert "nothing at all" in problems[0].message
+
+    def test_a_real_translation_passes(self, tmp_path):
+        loc = locale_from(
+            tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["Profiles"] = "Profile"\n'
+        )
+        assert locales.check_empty_values(loc) == []
+
+    def test_a_commented_stub_is_not_an_entry(self, tmp_path):
+        """The stub as written by the tool must not trip this check."""
+        loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + '-- L["Profiles"] = ""\n')
+        assert locales.check_empty_values(loc) == []
+
+    def test_true_is_not_empty(self, tmp_path):
+        loc = locale_from(tmp_path, "deDE.lua", DEUTSCH_HEADER + 'L["Profiles"] = true\n')
+        assert locales.check_empty_values(loc) == []
+
+
 class TestContextKeys:
     def test_true_on_a_context_key_is_an_error(self, tmp_path):
         """`= true` would put the marker itself in front of a player."""

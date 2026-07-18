@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from common import Die
+from data import cmd_get_data
 from install import (
     ALL_FLAVORS,
     FLAVOR_DIRS,
@@ -100,6 +101,10 @@ COMMANDS = {
     ),
     "prepare": Command(
         cmd_prepare, "Fetch the embedded libraries and generate the locale files."
+    ),
+    "get-data": Command(
+        cmd_get_data,
+        "Download the latest Data.lua from item-version-scrape",
     ),
     "build": Command(cmd_build, "Package the addon zip into dist/."),
     "clean": Command(cmd_clean, "Remove dist/ and the generated Libs and Locales."),

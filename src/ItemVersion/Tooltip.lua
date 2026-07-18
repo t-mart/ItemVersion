@@ -48,7 +48,7 @@ local function getItemId(tooltip, data)
   -- classic way
   local name, link = tooltip:GetItem()
   if name and link then
-    return tonumber(string.match(link, "item:(%d*)"))
+    return tonumber(string.match(link, "item:(%d+)"))
   end
 end
 

@@ -5,6 +5,8 @@ This file documents the user-facing changes made to ItemVersion over time.
 If a release is not documented here, it was likely generated automatically
 to update the item database.
 
+## Unreleased
+
 ## 2026.28.1
 
 - The item database now loads in a compact run-length-encoded form, cutting

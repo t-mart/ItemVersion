@@ -1,9 +1,9 @@
 # ItemVersion Changelog
 
-> [!NOTE]
->
-> If a release is not documented here, it was likely an automated item
-> database refresh.
+This file documents the user-facing changes made to ItemVersion over time.
+
+If a release is not documented here, it was likely generated automatically
+to update the item database.
 
 ## 2026.28.1
 

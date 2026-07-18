@@ -33,7 +33,6 @@ from packaging import BUILD_ROOT
 from toc import require_version, toc_field
 
 ENV_FILE = REPO_ROOT / ".env"
-CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 
 CF_HOST = "https://wow.curseforge.com"
 CF_TOKEN_ENV = "CURSEFORGE_TOKEN"
@@ -68,25 +67,16 @@ def interface_list(text: str) -> tuple[str, ...]:
     return tuple(part.strip() for part in listed.split(",") if part.strip())
 
 
-def release_notes(changelog: str) -> str:
-    """The body of the top section of the changelog, heading dropped.
+def release_notes(changelog_url: str | None) -> str:
+    """A link to the changelog, which both targets render as markdown.
 
-    That section is the pending "Unreleased" notes, which is what this release
-    contains. An empty section (a bare data refresh) falls back to a default.
+    Pointing at the file beats scraping it: no fragile markdown parsing, and the
+    notes stay correct however the changelog is written. Without a configured url
+    there is nothing to link, so fall back to a default.
     """
-    lines = changelog.splitlines()
-    start = next((i for i, line in enumerate(lines) if line.startswith("## ")), None)
-    if start is None:
+    if not changelog_url:
         return DEFAULT_NOTES
-
-    body = []
-    for line in lines[start + 1 :]:
-        if line.startswith("## "):
-            break
-        body.append(line)
-
-    notes = "\n".join(body).strip()
-    return notes or DEFAULT_NOTES
+    return f"[changelog]({changelog_url})"
 
 
 def build_plan(
@@ -273,7 +263,7 @@ def cmd_publish(
         require_version(toc),
         interface_list(toc),
         type,
-        release_notes(CHANGELOG.read_text(encoding="utf-8")),
+        release_notes(config.changelog_url),
         datetime.now(timezone.utc),
     )
 

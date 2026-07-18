@@ -16,6 +16,12 @@
       "type": "integer",
       "description": "The numeric CurseForge project id that publish uploads to."
     },
+    "changelog-url": {
+      "type": "string",
+      "minLength": 1,
+      "format": "uri",
+      "description": "Optional link to the changelog. Publish uses it as the release notes rather than inlining anything."
+    },
     "ignore": {
       "type": "array",
       "description": "Paths, relative to the source dir, to leave out of a build (glob patterns allowed).",

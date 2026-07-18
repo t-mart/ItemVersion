@@ -15,10 +15,12 @@ from config import Config
 WHEN = datetime(2026, 7, 17, 21, 37, 26, tzinfo=timezone.utc)
 
 CONFIG = Config(
-    name="ItemVersion", curseforge_project_id=433258, ignore=(), libs=(("A", "svn://x"),)
+    name="ItemVersion",
+    curseforge_project_id=433258,
+    ignore=(),
+    libs=(("A", "svn://x"),),
+    changelog_url="https://example/CHANGELOG.md",
 )
-
-CHANGELOG = "# Changelog\n\n## Unreleased\n\n- did a thing\n\n## 1.0.0\n\n- old thing\n"
 
 
 class TestPureHelpers:
@@ -33,14 +35,14 @@ class TestPureHelpers:
         toc = "## Interface: 120007, 50504, 11508\n"
         assert publish.interface_list(toc) == ("120007", "50504", "11508")
 
-    def test_release_notes_takes_the_top_section_body(self):
-        assert publish.release_notes(CHANGELOG) == "- did a thing"
+    def test_release_notes_link_to_the_changelog(self):
+        notes = publish.release_notes("https://example/CHANGELOG.md")
+        assert "https://example/CHANGELOG.md" in notes
+        assert "changelog" in notes.lower()
 
-    def test_release_notes_falls_back_when_empty(self):
-        assert publish.release_notes("## Unreleased\n\n## 1.0.0\n- x\n") == publish.DEFAULT_NOTES
-
-    def test_release_notes_falls_back_with_no_sections(self):
-        assert publish.release_notes("no headings here\n") == publish.DEFAULT_NOTES
+    def test_release_notes_falls_back_without_a_url(self):
+        assert publish.release_notes(None) == publish.DEFAULT_NOTES
+        assert publish.release_notes("") == publish.DEFAULT_NOTES
 
 
 class TestBuildPlan:
@@ -102,11 +104,8 @@ def published(tmp_path, monkeypatch):
     build_root.mkdir()
     (build_root / "ItemVersion-1.2.3.zip").write_bytes(b"zipdata")
 
-    (tmp_path / "CHANGELOG.md").write_text(CHANGELOG, encoding="utf-8")
-
     monkeypatch.setattr(publish, "load_config", lambda: CONFIG)
     monkeypatch.setattr(publish, "BUILD_ROOT", build_root)
-    monkeypatch.setattr(publish, "CHANGELOG", tmp_path / "CHANGELOG.md")
     monkeypatch.setattr(common, "REPO_ROOT", tmp_path)
 
     return SimpleNamespace(build_root=build_root)
@@ -125,7 +124,7 @@ class TestPublish:
         out = capsys.readouterr().out
         assert "Release type: release" in out
         assert "12.0.7" in out and "1.15.8" in out
-        assert "did a thing" in out
+        assert "https://example/CHANGELOG.md" in out
 
     def test_missing_archive_dies(self, published):
         (published.build_root / "ItemVersion-1.2.3.zip").unlink()

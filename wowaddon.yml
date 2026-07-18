@@ -4,6 +4,7 @@
 #
 # name                 the addon folder and the base of the packaged zip name
 # curseforge-project-id the project this uploads to on CurseForge
+# changelog-url        optional link used as the release notes on publish
 # ignore               files under the addon dir to keep out of a build
 # libs                 embedded libraries, fetched by `./dev prepare`. Each maps a
 #                      folder under ItemVersion/Libs to the SVN url it comes from.
@@ -13,6 +14,8 @@
 name: ItemVersion
 
 curseforge-project-id: 433258
+
+changelog-url: https://github.com/t-mart/ItemVersion/blob/master/CHANGELOG.md
 
 ignore:
   - Bindings.xml

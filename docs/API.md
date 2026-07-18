@@ -17,6 +17,7 @@ Where `ItemVersionLookup` is a table with the following fields and methods:
   - `major`: The major version number (expansion number)
   - `canonName`: The full expansion name (e.g., "Shadowlands")
   - `shortName`: The abbreviated expansion name (e.g., "SL")
+  - `texture`: Path to the expansion's icon texture
 - **`minor`**: The minor version number
 - **`patch`**: The patch version number
 - **`build`**: The build number
@@ -52,7 +53,12 @@ Shadowlands. With corrections disabled, it will show its canonical BfA version.
 local version = ItemVersion.API.GetItemVersion(168589, false)
 -- Returns:
 -- {
---   expansion = { major = 8, canonName = "Battle for Azeroth", shortName = "BfA" },
+--   expansion = {
+--     major = 8,
+--     canonName = "Battle for Azeroth",
+--     shortName = "BfA",
+--     texture = "Interface\\AddOns\\ItemVersion\\Media\\Images\\Expansions\\bfa.png",
+--   },
 --   minor = 2,
 --   patch = 0,
 --   build = 30918,
@@ -66,7 +72,12 @@ print(format("%d.%d.%d", version.expansion.major, version.minor, version.patch))
 local version = ItemVersion.API.GetItemVersion(168589, true)
 -- Returns:
 -- {
---   expansion = { major = 9, canonName = "Shadowlands", shortName = "SL" },
+--   expansion = {
+--     major = 9,
+--     canonName = "Shadowlands",
+--     shortName = "SL",
+--     texture = "Interface\\AddOns\\ItemVersion\\Media\\Images\\Expansions\\sl.png",
+--   },
 --   minor = 0,
 --   patch = 0,
 --   build = 0,

@@ -18,6 +18,7 @@ local function toLookupExpansion(expansion)
     major = expansion.major,
     canonName = expansion.canonName,
     shortName = expansion.shortName,
+    texture = expansion.texture,
   }
 end
 
@@ -127,7 +128,7 @@ function ItemLookupMixin:Format(formatString)
 end
 
 ---@class ItemVersionLookup
----@field expansion {major: number, canonName: string, shortName: string}
+---@field expansion {major: number, canonName: string, shortName: string, texture: string}
 ---@field minor number
 ---@field patch number
 ---@field build number

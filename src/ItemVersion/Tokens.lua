@@ -31,8 +31,7 @@ Private.Tokens = {
     string = "{expacIcon}",
     description = L["Expansion icon"],
     resolve = function(lookup)
-      local expansion = Private.Expansion:GetExpansionFromMajor(lookup.expansion.major)
-      return format("|T%s:16:32|t", expansion.texture)
+      return format("|T%s:16:32|t", lookup.expansion.texture)
     end,
   },
   {

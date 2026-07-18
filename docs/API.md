@@ -108,7 +108,7 @@ This is a method available on `ItemVersionLookup` objects returned by `GetItemVe
 
 **Parameters:**
 
-- **`formatString`**: A string containing tokens like `{expacLong}`, `{versionTriple}`, etc. that will be replaced with actual values from this lookup
+- **`formatString`**: A string containing tokens like `{expacFull}`, `{versionTriple}`, etc. that will be replaced with actual values from this lookup
 
 **Returns:**
 
@@ -119,7 +119,7 @@ A formatted string with all tokens replaced by their corresponding values from t
 ```lua
 local version = ItemVersion.API.GetItemVersion(168589, true)
 if version then
-  local formatted = version:Format("Added in {expacLong} ({versionTriple})")
+  local formatted = version:Format("Added in {expacFull} ({versionTriple})")
   print(formatted)  -- "Added in Shadowlands (9.0.0)"
 end
 ```

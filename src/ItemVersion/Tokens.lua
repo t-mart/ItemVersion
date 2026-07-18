@@ -7,7 +7,7 @@ local format = format
 local tostring = tostring
 
 ---@class TokenInfo
----@field string string The token string (e.g., "{expacLong}")
+---@field string string The token string (e.g., "{expacFull}")
 ---@field description string The human-readable description of the token
 ---@field resolve fun(lookup: ItemVersionLookup): string Function to resolve the token to its value
 

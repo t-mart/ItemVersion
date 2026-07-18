@@ -7,6 +7,11 @@ to update the item database.
 
 ## Unreleased
 
+- Fix the documentation and format token help referring to a `{expacLong}`
+  token that does not exist. The token for the full expansion name has always
+  been `{expacFull}`. A format string using `{expacLong}` rendered it literally
+  rather than the expansion name.
+
 ## 2026.28.1
 
 - The item database now loads in a compact run-length-encoded form, cutting

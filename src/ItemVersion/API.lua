@@ -117,7 +117,7 @@ local function replacePlain(subject, needle, replacement)
 end
 
 ---Format a string by replacing tokens with values from the lookup
----@param formatString string The format string containing tokens like {expacLong}, {versionTriple}, etc.
+---@param formatString string The format string containing tokens like {expacFull}, {versionTriple}, etc.
 ---@return string formatted The formatted string with tokens replaced
 function ItemLookupMixin:Format(formatString)
   for _, tokenInfo in ipairs(Private.Tokens) do

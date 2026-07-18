@@ -148,7 +148,7 @@ def resolve_version_ids(catalog: object, names: tuple[str, ...]) -> list[int]:
 
 
 def _multipart(fields: dict[str, str], filename: str, file_bytes: bytes) -> tuple[str, bytes]:
-    boundary = f"----ItemVersion{uuid.uuid4().hex}"
+    boundary = f"----FormBoundary{uuid.uuid4().hex}"
     parts = []
     for name, value in fields.items():
         parts.append(

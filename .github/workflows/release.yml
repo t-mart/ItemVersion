@@ -63,7 +63,8 @@ jobs:
       - name: Update interface versions
         run: ./dev interfaces
 
-      - name: Full release
+      - # Push to CurseForge and make a GH release
+        name: Full release
         if: ${{ inputs.release-type == 'release' }}
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
@@ -81,7 +82,8 @@ jobs:
           git merge release
           git push origin master
 
-      - name: Pre-release
+      - # Just push to CurseForge
+        name: Pre-release
         if: ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
@@ -89,7 +91,8 @@ jobs:
           ./dev build
           ./dev publish --type ${{ inputs.release-type }} --yes
 
-      - name: Build only
+      - # Just build
+        name: Build only
         if: ${{ inputs.release-type == 'none' }}
         run: ./dev build
 

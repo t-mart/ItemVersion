@@ -16,6 +16,11 @@
       "type": "integer",
       "description": "The numeric CurseForge project id that publish uploads to."
     },
+    "curseforge-project-slug": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional CurseForge project slug (the addon's url segment). Lets publish print the public file page for an upload."
+    },
     "changelog-url": {
       "type": "string",
       "minLength": 1,

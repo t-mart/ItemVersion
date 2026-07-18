@@ -26,7 +26,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv  # type: ignore[ty:unresolved-import]
 
-from common import REPO_ROOT, Die, relative, require_tool, run
+from common import REPO_ROOT, Die, capture, relative, require_tool
 from config import Config, load_config
 from interfaces import version_from_interface
 from packaging import BUILD_ROOT
@@ -35,6 +35,10 @@ from toc import require_version, toc_field
 ENV_FILE = REPO_ROOT / ".env"
 
 CF_HOST = "https://wow.curseforge.com"
+# Where an author watches a freshly uploaded file move through review.
+CF_AUTHORS = "https://authors.curseforge.com"
+# The public site, where the file lands once approved.
+CF_PUBLIC = "https://www.curseforge.com/wow/addons"
 CF_TOKEN_ENV = "CURSEFORGE_TOKEN"
 
 RELEASE, ALPHA, BETA = "release", "alpha", "beta"
@@ -77,6 +81,24 @@ def release_notes(changelog_url: str | None) -> str:
     if not changelog_url:
         return DEFAULT_NOTES
     return f"[changelog]({changelog_url})"
+
+
+def file_id_from(payload: object) -> int | None:
+    """The uploaded file's id from the upload-file response, which is {"id": <int>}."""
+    if not isinstance(payload, dict):
+        return None
+    file_id = payload.get("id")
+    return file_id if isinstance(file_id, int) else None
+
+
+def authors_file_url(project_id: int, file_id: int) -> str:
+    """The author dashboard page for a file, where its review status shows."""
+    return f"{CF_AUTHORS}/#/projects/{project_id}/files/{file_id}"
+
+
+def public_file_url(slug: str, file_id: int) -> str:
+    """The public download page for a file, live once the file is approved."""
+    return f"{CF_PUBLIC}/{slug}/files/{file_id}"
 
 
 def build_plan(
@@ -196,7 +218,7 @@ def upload_curseforge(config: Config, plan: Plan) -> None:
     )
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
-            response.read()
+            raw = response.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", "replace")
         raise Die(f"CurseForge upload failed ({error.code}): {detail}") from error
@@ -205,10 +227,24 @@ def upload_curseforge(config: Config, plan: Plan) -> None:
 
     print(f"  uploaded {plan.archive.name} to CurseForge as {plan.release_type}")
 
+    try:
+        file_id = file_id_from(json.loads(raw))
+    except json.JSONDecodeError:
+        file_id = None
+
+    if file_id is None:
+        print("  (no file id in the response; check the project's files page)")
+        return
+
+    print(f"  Author URL: {authors_file_url(config.curseforge_project_id, file_id)}")
+    if config.curseforge_project_slug:
+        print(f"  Public URL: {public_file_url(config.curseforge_project_slug, file_id)}")
+
 
 def upload_github(plan: Plan) -> None:
     require_tool("gh")
-    failed = run(
+    # gh writes the new release's url to stdout; capture it so we can echo it plainly.
+    failed, out = capture(
         [
             "gh",
             "release",
@@ -223,7 +259,11 @@ def upload_github(plan: Plan) -> None:
     )
     if failed:
         raise Die("gh release create failed")
+
     print(f"  created GitHub release {plan.tag}")
+    url = out.strip()
+    if url:
+        print(f"  {url}")
 
 
 def print_plan(plan: Plan, targets: tuple[str, ...], config: Config) -> None:

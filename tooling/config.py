@@ -29,6 +29,7 @@ class Config:
     ignore: tuple[str, ...]
     libs: tuple[tuple[str, str], ...]  # (folder under Libs, svn url), in file order
     changelog_url: str | None = None
+    curseforge_project_slug: str | None = None
 
     # The name is the single source of truth for the layout: the source directory
     # is src/<name>, and WoW requires the TOC basename to match the folder name.
@@ -66,6 +67,7 @@ def parse_config(text: str) -> Config:
         ignore=tuple(data.get("ignore") or []),
         libs=tuple(data["libs"].items()),
         changelog_url=data.get("changelog-url"),
+        curseforge_project_slug=data.get("curseforge-project-slug"),
     )
 
 

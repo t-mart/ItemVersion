@@ -39,3 +39,14 @@ def run(command: list[str]) -> int:
     # meant to introduce. Flushing first keeps the two interleaved as written.
     sys.stdout.flush()
     return subprocess.run(command, cwd=REPO_ROOT).returncode
+
+
+def capture(command: list[str]) -> tuple[int, str]:
+    """Like run, but return the child's stdout too. Its stderr still passes through.
+
+    For a command whose useful output is a single value (gh prints the new release's
+    url), so we can echo it in our own words rather than let it scroll past.
+    """
+    sys.stdout.flush()
+    result = subprocess.run(command, cwd=REPO_ROOT, stdout=subprocess.PIPE, text=True)
+    return result.returncode, result.stdout

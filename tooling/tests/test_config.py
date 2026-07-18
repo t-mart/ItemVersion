@@ -10,6 +10,7 @@ import config
 VALID = """
 name: ItemVersion
 curseforge-project-id: 433258
+curseforge-project-slug: itemversion
 changelog-url: https://example/CHANGELOG.md
 ignore:
   - Bindings.xml
@@ -25,6 +26,7 @@ class TestParseConfig:
 
         assert result.name == "ItemVersion"
         assert result.curseforge_project_id == 433258
+        assert result.curseforge_project_slug == "itemversion"
         assert result.changelog_url == "https://example/CHANGELOG.md"
         assert result.ignore == ("Bindings.xml",)
         assert result.libs == (
@@ -47,6 +49,10 @@ class TestParseConfig:
     def test_changelog_url_is_optional(self):
         text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"
         assert config.parse_config(text).changelog_url is None
+
+    def test_project_slug_is_optional(self):
+        text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"
+        assert config.parse_config(text).curseforge_project_slug is None
 
     def test_missing_required_key_dies(self):
         text = "name: X\nlibs:\n  A: svn://x\n"

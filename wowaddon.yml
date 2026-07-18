@@ -2,18 +2,26 @@
 #
 # Project configuration for the ./dev tooling.
 #
-# name                 the addon folder and the base of the packaged zip name
-# curseforge-project-id the project this uploads to on CurseForge
-# changelog-url        optional link used as the release notes on publish
-# ignore               files under the addon dir to keep out of a build
-# libs                 embedded libraries, fetched by `./dev prepare`. Each maps a
-#                      folder under ItemVersion/Libs to the SVN url it comes from.
-#                      Ace3 and friends are published over SVN on CurseForge, so
-#                      these stay svn even though the rest of the world is git.
+# name 
+#   the addon folder under src/ and the base of the packaged zip name
+# curseforge-project-id
+#   the project this uploads to on CurseForge
+# curseforge-project-slug
+#   the slug of the project on CurseForge, used for linking to the uploaded
+#   files on CurseForge. This value can be found in the Addon URL:
+#   https://www.curseforge.com/wow/addons/<slug>
+# changelog-url
+#   optional link used as the release notes on publish
+# ignore
+#   files under the addon dir to keep out of a build
+# libs
+#   embedded libraries, fetched by `./dev prepare`. Each maps a folder under
+#   ItemVersion/Libs to the SVN url it comes from
 
 name: ItemVersion
 
 curseforge-project-id: 433258
+curseforge-project-slug: itemversion
 
 changelog-url: https://github.com/t-mart/ItemVersion/blob/master/CHANGELOG.md
 

@@ -20,6 +20,7 @@ CONFIG = Config(
     ignore=(),
     libs=(("A", "svn://x"),),
     changelog_url="https://example/CHANGELOG.md",
+    curseforge_project_slug="itemversion",
 )
 
 
@@ -43,6 +44,25 @@ class TestPureHelpers:
     def test_release_notes_falls_back_without_a_url(self):
         assert publish.release_notes(None) == publish.DEFAULT_NOTES
         assert publish.release_notes("") == publish.DEFAULT_NOTES
+
+    def test_file_id_from_reads_the_id(self):
+        assert publish.file_id_from({"id": 20402}) == 20402
+
+    def test_file_id_from_tolerates_a_shapeless_response(self):
+        for payload in ({}, {"id": "nope"}, [1, 2], "text", None):
+            assert publish.file_id_from(payload) is None
+
+    def test_authors_file_url_points_at_the_dashboard(self):
+        assert (
+            publish.authors_file_url(433258, 20402)
+            == "https://authors.curseforge.com/#/projects/433258/files/20402"
+        )
+
+    def test_public_file_url_points_at_the_download_page(self):
+        assert (
+            publish.public_file_url("itemversion", 20402)
+            == "https://www.curseforge.com/wow/addons/itemversion/files/20402"
+        )
 
 
 class TestBuildPlan:

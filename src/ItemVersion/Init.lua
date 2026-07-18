@@ -13,7 +13,7 @@ LSM:Register(
 
 ---Initialize the addon
 function ItemVersion:OnInitialize()
-  Private.DatabaseManager.Initialize()
+  Private.Profile.Initialize()
 
   Private.Options.Register()
 

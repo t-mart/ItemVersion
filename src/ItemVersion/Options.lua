@@ -193,7 +193,7 @@ end
 
 ---Register the profile management options panel
 local function registerProfileOptions()
-  local profiles = Private.DatabaseManager:GetProfileOptionsTable()
+  local profiles = Private.Profile:GetProfileOptionsTable()
   AceConfig:RegisterOptionsTable(Options.PROFILE_OPTIONS_APP_NAME, profiles)
   AceConfigDialog:AddToBlizOptions(Options.PROFILE_OPTIONS_APP_NAME, L["Profiles"], AddonName)
 end

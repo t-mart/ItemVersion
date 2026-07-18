@@ -18,8 +18,8 @@ Classic and Classic Era as well.
 
 ## Implementation
 
-We provide a data table in Data.lua. That comes from an external process to this
-project.
+We provide a data table in ItemData.lua. That comes from an external process to
+this project.
 
 In game, we hook into the item tooltip rendering process. When an item tooltip
 is shown, we look up the item ID in our database, format the version information
@@ -70,7 +70,7 @@ widgets.
 - `src/ItemVersion/Options.lua`: Implementation of the addon's options and settings.
 - `src/ItemVersion/Tooltip.lua`: Implementation of tooltip modifications. This is a
   work in progress, still needs overhaul.
-- `src/ItemVersion/Data.lua`: This is a massive file containing the item version
+- `src/ItemVersion/ItemData.lua`: This is a massive file containing the item version
   database. It should not be extensively read through... It's just tables with
   item IDs and version info. See the API.lua for the interface that's more
   relevant.

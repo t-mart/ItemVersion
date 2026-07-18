@@ -1,9 +1,9 @@
 """Fetching the generated item database from item-version-scrape.
 
-Data.lua is produced by a separate project, t-mart/item-version-scrape, and published
-as a release asset there. This pulls the latest one down into the addon source so a
-developer can refresh their local copy without running a scrape, using gh the same way
-the refresh-data workflow does.
+ItemData.lua is produced by a separate project, t-mart/item-version-scrape, and
+published as a release asset there. This pulls the latest one down into the addon
+source so a developer can refresh their local copy without running a scrape, using gh
+the same way the refresh-data workflow does.
 """
 
 from __future__ import annotations
@@ -15,10 +15,10 @@ from config import load_config
 DATA_REPO = "t-mart/item-version-scrape"
 DATA_ASSET = "ItemVersionData.lua"
 # The name the addon loads it under (see the TOC).
-OUTPUT_NAME = "Data.lua"
+OUTPUT_NAME = "ItemData.lua"
 
 
-def cmd_get_data() -> int:
+def cmd_get_item_data() -> int:
     require_tool("gh")
 
     destination = load_config().source_dir / OUTPUT_NAME

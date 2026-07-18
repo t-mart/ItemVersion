@@ -16,9 +16,9 @@ local function toLookupExpansion(expansion)
   }
 end
 
--- Absolute run starts, reconstructed once from the deltas in Data.lua. Item ids
+-- Absolute run starts, reconstructed once from the deltas in ItemData.lua. Item ids
 -- sorted ascending are covered by contiguous runs that each share one version;
--- an id no run covers was absent from the source. Data.lua loads before this
+-- an id no run covers was absent from the source. ItemData.lua loads before this
 -- file (see the TOC), so the run arrays are already present.
 local runStarts = {}
 do

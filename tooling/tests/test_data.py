@@ -23,7 +23,7 @@ class TestGetData:
         monkeypatch.setattr(data, "load_config", lambda: CONFIG)
         monkeypatch.setattr(data, "run", lambda command: calls.append(command) or 0)
 
-        assert data.cmd_get_data() == 0
+        assert data.cmd_get_item_data() == 0
 
         command = calls[0]
         assert command[:3] == ["gh", "release", "download"]
@@ -41,7 +41,7 @@ class TestGetData:
         monkeypatch.setattr(data, "run", lambda command: 1)
 
         with pytest.raises(common.Die, match="download failed"):
-            data.cmd_get_data()
+            data.cmd_get_item_data()
 
     def test_a_missing_gh_dies(self, monkeypatch):
         def missing(name):
@@ -50,4 +50,4 @@ class TestGetData:
         monkeypatch.setattr(data, "require_tool", missing)
 
         with pytest.raises(common.Die, match="not installed"):
-            data.cmd_get_data()
+            data.cmd_get_item_data()

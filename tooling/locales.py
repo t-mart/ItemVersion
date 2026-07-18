@@ -39,10 +39,10 @@ from translations import (
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Ace3 ships locale tables of its own and indexes them with expressions rather
-# than literals, which is both noise and a parse hazard. Data.lua holds no strings
+# than literals, which is both noise and a parse hazard. ItemData.lua holds no strings
 # at all and costs ~16s to parse against ~0.3s for everything else.
 EXCLUDED_DIRS = frozenset({"Libs"})
-EXCLUDED_FILES = frozenset({"Data.lua"})
+EXCLUDED_FILES = frozenset({"ItemData.lua"})
 
 # `%%` is an escaped percent and carries no argument, so it is not a specifier.
 SPECIFIER = re.compile(r"%%|%[-+ #0]*\d*(?:\.\d+)?[diouxXeEfgGcsq]")

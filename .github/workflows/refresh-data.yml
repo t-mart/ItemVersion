@@ -1,6 +1,6 @@
 name: Refresh Data and Release
 
-# 1. On release branch, download the new Data.lua from an item-version-scrape
+# 1. On release branch, download the new ItemData.lua from an item-version-scrape
 #    release, and commit and push it. (This is intentionally not done on master
 #    branch -- master branch has a different lifecycle than the weekly data
 #    refreshes. master branch is where we do development, and we don't want
@@ -32,7 +32,7 @@ on:
         required: true
         default: "release"
       data-release-tag:
-        description: "The item-version-scrape release tag to pull Data.lua from"
+        description: "The item-version-scrape release tag to pull ItemData.lua from"
         type: string
         required: true
 
@@ -57,14 +57,14 @@ jobs:
           gh release download "${{ inputs.data-release-tag }}" \
             --repo t-mart/item-version-scrape \
             --pattern ItemVersionData.lua \
-            --output src/ItemVersion/Data.lua
+            --output src/ItemVersion/ItemData.lua
 
       - name: Commit & Push
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/ItemVersion/Data.lua
+          git add src/ItemVersion/ItemData.lua
           git commit -m "Refresh item data"
           git push origin "${{ env.release_ref }}"
 

@@ -1,7 +1,7 @@
 std = "wow-stdlib"
 
-# Data.lua is generated and is ~1s of an otherwise ~4ms lint run, so skip it.
-exclude = ["src/ItemVersion/Libs/**", "src/ItemVersion/Data.lua"]
+# ItemData.lua is generated and is ~1s of an otherwise ~4ms lint run, so skip it.
+exclude = ["src/ItemVersion/Libs/**", "src/ItemVersion/ItemData.lua"]
 
 [config]
 unscoped_variables = { ignore_pattern = "ItemVersion" }

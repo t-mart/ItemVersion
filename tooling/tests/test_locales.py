@@ -95,7 +95,7 @@ class TestSourceFiles:
         (addon / "Libs" / "Ace").mkdir(parents=True)
         (addon / "Locales" / "enUS.lua").write_text("-- x", encoding="utf-8")
         (addon / "Libs" / "Ace" / "Ace.lua").write_text("-- x", encoding="utf-8")
-        (addon / "Data.lua").write_text("-- x", encoding="utf-8")
+        (addon / "ItemData.lua").write_text("-- x", encoding="utf-8")
         (addon / "Init.lua").write_text("-- x", encoding="utf-8")
 
         found = {p.name for p in locales.source_files(addon)}

@@ -3,7 +3,7 @@ local AddonName, Private = ...
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 local AceConsole = LibStub("AceConsole-3.0")
 
----@class DatabaseProfile
+---@class ProfileSchema
 ---@field enableTooltip boolean Whether to show version info in tooltips
 ---@field lineColor Color The color of the tooltip line
 ---@field showOnShift boolean Show tooltip when Shift is held
@@ -15,7 +15,7 @@ local AceConsole = LibStub("AceConsole-3.0")
 ---@field version number The profile version number, stamped by migrate rather
 ---than defaulted
 
-Private.DatabaseManager = {}
+Private.Profile = {}
 local Color = Private.Color
 
 local NAME = "ItemVersionDB"
@@ -227,7 +227,7 @@ end
 
 ---Initialize the database and apply migrations
 ---@return table database The initialized AceDB database
-function Private.DatabaseManager.Initialize()
+function Private.Profile.Initialize()
   if Private.Database then
     return Private.Database
   end
@@ -254,6 +254,6 @@ end
 
 ---Get the AceDBOptions table for profile management
 ---@return table options The profile options table
-function Private.DatabaseManager.GetProfileOptionsTable()
+function Private.Profile.GetProfileOptionsTable()
   return LibStub("AceDBOptions-3.0"):GetOptionsTable(Private.Database)
 end

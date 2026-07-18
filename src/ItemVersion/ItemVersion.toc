@@ -17,12 +17,12 @@ Locales\zhTW.lua
 Init.lua
 Table.lua
 Color.lua
-Database.lua
+Profile.lua
 Expansion.lua
 Tokens.lua
 Options.lua
-SlashCommand.lua
-Data.lua
+SlashCommands.lua
+ItemData.lua
 API.lua
 Tooltip.lua
 Widgets.xml

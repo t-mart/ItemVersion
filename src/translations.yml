@@ -16,6 +16,9 @@
 # symlink serves are generated, so run `./dev prepare` afterwards (or `./dev watch`,
 # which regenerates them for you on every save) and then /reload in game.
 
+- key: Add
+  description: Heading and button in the format token table that appends the token to the format field.
+
 - key: Added in {expacIcon} ({versionTriple})
   description: The default tooltip line. Keep the {tokens} as-is.
   translations:
@@ -292,6 +295,15 @@
     esMX: Proporcione una plantilla para dar formato a la línea de la descripción emergente
     ruRU: Укажите шаблон для форматирования строки подсказки
     zhCN: 提供模板以格式化鼠标提示信息行
+
+- key: Reset
+  description: Label of the button that resets the tooltip format to its default.
+
+- key: Reset the tooltip format to its default.
+  description: Tooltip for the reset button.
+
+- key: Reset the tooltip format to its default?
+  description: Confirmation prompt shown before resetting the tooltip format.
 
 - key: Shadowlands
   description: Expansion name; use Blizzard's official localized one.

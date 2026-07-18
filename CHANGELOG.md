@@ -2,22 +2,25 @@
 
 This file documents the user-facing changes made to ItemVersion over time.
 
-If a release is not documented here, it was likely generated automatically
-to update the item database.
+If a release is not documented here, it was likely generated automatically to
+update the item database.
 
 ## Unreleased
 
-- Fix the documentation and format token help referring to a `{expacLong}`
-  token that does not exist. The token for the full expansion name has always
-  been `{expacFull}`. A format string using `{expacLong}` rendered it literally
+- Fix the documentation and format token help referring to a `{expacLong}` token
+  that does not exist. The token for the full expansion name has always been
+  `{expacFull}`. A format string using `{expacLong}` rendered it literally
   rather than the expansion name.
+- Add a button in the Format Tokens help table to add the token to the format
+  string. Fixes [#121](https://github.com/t-mart/ItemVersion/issues/121)
+- Add a button to reset the format string to its default value.
 
 ## 2026.28.1
 
 - The item database now loads in a compact run-length-encoded form, cutting
   ItemVersion's memory use by roughly 6x (from about 10.5 MB to under 2 MB) and
-  shrinking the data file loaded at startup. The information shown in tooltips is
-  unchanged.
+  shrinking the data file loaded at startup. The information shown in tooltips
+  is unchanged.
 - Spanish (Mexico), Russian, Korean and Traditional Chinese are now translated,
   and every other supported language has a file waiting for a first translation.
   Thanks to [@reysonk](https://github.com/reysonk) for the Russian

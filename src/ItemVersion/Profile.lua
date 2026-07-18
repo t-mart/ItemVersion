@@ -257,3 +257,14 @@ end
 function Private.Profile.GetProfileOptionsTable()
   return LibStub("AceDBOptions-3.0"):GetOptionsTable(Private.Database)
 end
+
+---The default value of a profile key in the current schema
+---
+---AceDB only rawsets a named scalar default into the profile once, with no
+---metatable to restore it, so a reset must write the value back rather than
+---clearing the key.
+---@param key string
+---@return any
+function Private.Profile.Default(key)
+  return CURRENT_VERSION_DEFAULTS.profile[key]
+end

@@ -5,6 +5,10 @@
 
 ## Unreleased
 
+- The item database now loads in a compact run-length-encoded form, cutting
+  ItemVersion's memory use by roughly 6x (from about 10.5 MB to under 2 MB) and
+  shrinking the data file loaded at startup. The information shown in tooltips is
+  unchanged.
 - Spanish (Mexico), Russian, Korean and Traditional Chinese are now translated,
   and every other supported language has a file waiting for a first translation.
   Thanks to [@reysonk](https://github.com/reysonk) for the Russian

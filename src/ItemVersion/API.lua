@@ -16,6 +16,56 @@ local function toLookupExpansion(expansion)
   }
 end
 
+-- Absolute run starts, reconstructed once from the deltas in Data.lua. Item ids
+-- sorted ascending are covered by contiguous runs that each share one version;
+-- an id no run covers was absent from the source. Data.lua loads before this
+-- file (see the TOC), so the run arrays are already present.
+local runStarts = {}
+do
+  local pos = 0
+  for i = 1, #Private.runStartDeltas do
+    local start = pos + Private.runStartDeltas[i]
+    runStarts[i] = start
+    pos = start + Private.runLengths[i]
+  end
+end
+
+---Find the version that covers an item id, or nil if no run covers it
+---@param itemId number The item ID to look up
+---@return {major: number, minor: number, patch: number, build: number}|nil
+local function findVersion(itemId)
+  local count = #runStarts
+  if count == 0 then
+    return nil
+  end
+
+  -- Binary search for the greatest runStarts[i] <= itemId.
+  local lo, hi = 1, count
+  while lo < hi do
+    local mid = math.floor((lo + hi + 1) / 2)
+    if runStarts[mid] <= itemId then
+      lo = mid
+    else
+      hi = mid - 1
+    end
+  end
+
+  -- The item is present only if it falls within that run's covered ids.
+  local start = runStarts[lo]
+  if itemId < start or itemId > start + Private.runLengths[lo] - 1 then
+    return nil
+  end
+
+  -- runVersions is 0-based; versionIdToVersion is 1-indexed, so version id v
+  -- lives at index v + 1. Each row is {major, minor, patch, build}.
+  local row = Private.versionIdToVersion[Private.runVersions[lo] + 1]
+  if not row then
+    return nil
+  end
+
+  return { major = row[1], minor = row[2], patch = row[3], build = row[4] }
+end
+
 local ItemLookupMixin = {}
 
 -- Shared by every lookup rather than copied into each one. The mixin is fixed,
@@ -99,12 +149,7 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
   end
 
   -- then lookup in main database
-  local versionId = Private.itemIdToVersionId[itemId]
-  if not versionId then
-    return nil
-  end
-
-  local version = Private.versionIdToVersion[versionId]
+  local version = findVersion(itemId)
   if not version then
     return nil
   end

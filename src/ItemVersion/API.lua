@@ -1,5 +1,10 @@
 local _, Private = ...
 
+-- Upvalued for the lookup and format paths
+local floor = math.floor
+local insert = table.insert
+local concat = table.concat
+
 local Expansion = Private.Expansion
 
 Private.API = {}
@@ -42,7 +47,7 @@ local function findVersion(itemId)
   -- Binary search for the greatest runStarts[i] <= itemId.
   local lo, hi = 1, count
   while lo < hi do
-    local mid = math.floor((lo + hi + 1) / 2)
+    local mid = floor((lo + hi + 1) / 2)
     if runStarts[mid] <= itemId then
       lo = mid
     else
@@ -100,14 +105,14 @@ local function replacePlain(subject, needle, replacement)
       break
     end
 
-    table.insert(pieces, subject:sub(searchFrom, matchStart - 1))
-    table.insert(pieces, replacement)
+    insert(pieces, subject:sub(searchFrom, matchStart - 1))
+    insert(pieces, replacement)
     searchFrom = matchEnd + 1
   end
 
-  table.insert(pieces, subject:sub(searchFrom))
+  insert(pieces, subject:sub(searchFrom))
 
-  return table.concat(pieces)
+  return concat(pieces)
 end
 
 ---Format a string by replacing tokens with values from the lookup

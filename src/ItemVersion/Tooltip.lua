@@ -1,5 +1,13 @@
 local _, Private = ...
 
+-- Upvalued for the tooltip render and modifier keypress paths
+local IsShiftKeyDown = IsShiftKeyDown
+local IsControlKeyDown = IsControlKeyDown
+local IsAltKeyDown = IsAltKeyDown
+local IsMetaKeyDown = IsMetaKeyDown
+local tonumber = tonumber
+local match = string.match
+
 Private.Tooltip = {}
 
 -- MODIFIER_STATE_CHANGED reports each physical key, so both sides of a modifier
@@ -48,7 +56,7 @@ local function getItemId(tooltip, data)
   -- classic way
   local name, link = tooltip:GetItem()
   if name and link then
-    return tonumber(string.match(link, "item:(%d+)"))
+    return tonumber(match(link, "item:(%d+)"))
   end
 end
 

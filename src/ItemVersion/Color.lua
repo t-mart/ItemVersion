@@ -1,5 +1,9 @@
 local _, Private = ...
 
+-- Upvalued: WrapTextWithColor and ToHexString run once per tooltip line shown.
+local floor = math.floor
+local format = format
+
 ---@class Color
 ---@field r number Red component (0.0 to 1.0)
 ---@field g number Green component (0.0 to 1.0)
@@ -25,10 +29,10 @@ end
 ---@param color Color The color to convert
 ---@return string hex The hex string in format "AARRGGBB"
 function Color.ToHexString(color)
-  local r = math.floor(color.r * 255)
-  local g = math.floor(color.g * 255)
-  local b = math.floor(color.b * 255)
-  local a = math.floor((color.a or 1.0) * 255)
+  local r = floor(color.r * 255)
+  local g = floor(color.g * 255)
+  local b = floor(color.b * 255)
+  local a = floor((color.a or 1.0) * 255)
   return format("%02X%02X%02X%02X", a, r, g, b)
 end
 

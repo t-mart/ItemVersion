@@ -2,6 +2,10 @@ local AddonName, Private = ...
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 
+-- Upvalued: token resolvers run once per token on every tooltip line formatted.
+local format = format
+local tostring = tostring
+
 ---@class TokenInfo
 ---@field string string The token string (e.g., "{expacLong}")
 ---@field description string The human-readable description of the token

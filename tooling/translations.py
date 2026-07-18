@@ -20,6 +20,28 @@ import schema
 # type. dump re-emits it, since safe_dump would otherwise drop every comment.
 SCHEMA_COMMENT = "# yaml-language-server: $schema=../tooling/schemas/translations.schema.json"
 
+# The usage note dump writes above the entries. It has to live here, not in the
+# file, because dump rewrites the whole file and safe_dump keeps no comments.
+HEADER = f"""\
+{SCHEMA_COMMENT}
+#
+# Every player-facing string in the addon, with its translations. This is the
+# source of truth; the Lua locale files under src/ItemVersion/Locales are
+# GENERATED from it and must not be edited by hand.
+#
+# Each item is one string:
+#   key           the text looked up in code as L["the key"]. Also the English
+#                 shown to players when no enUS translation is given below.
+#   description   optional, a note for translators. Never shown to players.
+#   translations  optional, one line per WoW locale (deDE, esES, zhCN, ...). A
+#                 locale with no line falls back to enUS; enUS falls back to key.
+#
+# `./dev locales` sorts this file and keeps it in step with the code. Editing it
+# does NOT change the running game on its own: the locale files an `./dev install`
+# symlink serves are generated, so run `./dev prepare` afterwards (or `./dev watch`,
+# which regenerates them for you on every save) and then /reload in game.
+"""
+
 # The fallback locale. A key with no enUS translation shows its own text, which is
 # how AceLocale spells an already-English string.
 DEFAULT_LOCALE = "enUS"
@@ -78,28 +100,33 @@ def parse_messages(text: str) -> tuple[Message, ...]:
 
 
 def dump_messages(messages: Iterable[Message]) -> str:
-    """The canonical text of the file: schema comment, then entries sorted by key.
+    """The canonical text of the file: the header, then entries sorted by key.
 
-    width is left huge so a long translation stays on one line, which keeps diffs
-    readable when a single string changes.
+    Each entry is dumped on its own and the blocks are joined with a blank line, so
+    the items read as separated stanzas rather than one dense run. width is left
+    huge so a long translation stays on one line, which keeps diffs readable when a
+    single string changes.
     """
-    items: list[dict] = []
+    blocks = []
     for message in sorted(messages, key=lambda m: sort_key(m.key)):
         entry: dict = {"key": message.key}
         if message.description:
             entry["description"] = message.description
         if message.translations:
             entry["translations"] = dict(message.translations)
-        items.append(entry)
+        blocks.append(
+            yaml.safe_dump(
+                [entry],
+                sort_keys=False,
+                allow_unicode=True,
+                default_flow_style=False,
+                width=4096,
+            ).rstrip("\n")
+        )
 
-    body = yaml.safe_dump(
-        items,
-        sort_keys=False,
-        allow_unicode=True,
-        default_flow_style=False,
-        width=4096,
-    )
-    return f"{SCHEMA_COMMENT}\n{body}"
+    if not blocks:
+        return HEADER
+    return HEADER + "\n" + "\n\n".join(blocks) + "\n"
 
 
 def read_messages(path: Path) -> tuple[Message, ...]:

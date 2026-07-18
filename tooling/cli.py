@@ -13,7 +13,13 @@ from dataclasses import dataclass
 from typing import Callable
 
 from common import Die
-from install import ALL_FLAVORS, FLAVOR_DIRS, cmd_install, cmd_install_status, cmd_uninstall
+from install import (
+    ALL_FLAVORS,
+    FLAVOR_DIRS,
+    cmd_install,
+    cmd_install_status,
+    cmd_uninstall,
+)
 from interfaces import cmd_interfaces
 from packaging import cmd_build, cmd_clean, cmd_prepare
 from publish import RELEASE, RELEASE_TYPES, TARGETS, cmd_publish
@@ -102,9 +108,7 @@ COMMANDS = {
         "Symlink the addon into each WoW flavor's AddOns dir.",
         install_options,
     ),
-    "uninstall": Command(
-        cmd_uninstall, "Remove our symlinks."
-    ),
+    "uninstall": Command(cmd_uninstall, "Remove our symlinks."),
     "publish": Command(
         cmd_publish,
         "Upload a built zip to CurseForge and GitHub.",
@@ -127,10 +131,7 @@ COMMANDS = {
     "help": Command(cmd_help, "Show this message."),
 }
 
-EPILOG = (
-    "The WoW root comes from the WOW_ROOT environment variable, else from .env.\n"
-    "See .env.template."
-)
+EPILOG = "Some subcommands may use environment variables, and .env is supported.\nSee .env.template."
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -36,6 +36,8 @@ def installed(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
     cfg = make_config()
     (cfg.libs_dir).mkdir(parents=True)
+    (cfg.locales_dir).mkdir(parents=True)
+    (cfg.locales_dir / "enUS.lua").write_text("-- generated\n", encoding="utf-8")
     (cfg.toc_path).write_text("## Version: 2026.28.0\n", encoding="utf-8")
 
     root = make_wow_root(tmp_path)
@@ -205,12 +207,20 @@ class TestInstall:
         assert target.is_symlink()
         assert target.resolve() == install.load_config().source_dir.resolve()
 
-    def test_missing_libs_dies_before_linking(self, installed):
+    def test_unprepared_dies_before_linking(self, installed):
         import shutil
 
         shutil.rmtree(install.load_config().libs_dir)
 
-        with pytest.raises(common.Die, match="dev libs"):
+        with pytest.raises(common.Die, match="dev prepare"):
+            install.cmd_install()
+
+        assert not install.target_for(installed, "_retail_", NAME).exists()
+
+    def test_missing_locales_dies_before_linking(self, installed):
+        (install.load_config().locales_dir / "enUS.lua").unlink()
+
+        with pytest.raises(common.Die, match="locale files"):
             install.cmd_install()
 
         assert not install.target_for(installed, "_retail_", NAME).exists()

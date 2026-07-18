@@ -34,7 +34,8 @@ def packager(tmp_path, monkeypatch):
     (source / "Libs" / "AceAddon-3.0").mkdir(parents=True)
     (source / "Libs" / "AceAddon-3.0" / "AceAddon-3.0.lua").write_text("-- lib", encoding="utf-8")
     (cfg.toc_path).write_text(
-        "## Title: ItemVersion\n## Version: 1.2.3\n\nInit.lua\n", encoding="utf-8"
+        "## Title: ItemVersion\n## Version: 1.2.3\n\nLocales\\enUS.lua\nInit.lua\n",
+        encoding="utf-8",
     )
     (source / "Init.lua").write_text("-- code\n", encoding="utf-8")
     (source / "Bindings.xml").write_text("<Bindings/>\n", encoding="utf-8")
@@ -127,9 +128,9 @@ class TestBuild:
                 str(packager.source / "Libs" / "AceAddon-3.0")] in packager.calls
 
 
-class TestLibs:
+class TestPrepare:
     def test_present_libs_are_not_refetched(self, packager, capsys):
-        assert packaging.cmd_libs() == 0
+        assert packaging.cmd_prepare() == 0
 
         assert packager.calls == []
         assert "present" in capsys.readouterr().out
@@ -139,7 +140,7 @@ class TestLibs:
 
         shutil.rmtree(packager.source / "Libs" / "AceAddon-3.0")
 
-        assert packaging.cmd_libs() == 0
+        assert packaging.cmd_prepare() == 0
         assert any(command[:2] == ["svn", "export"] for command in packager.calls)
 
     def test_a_failed_export_dies(self, packager, monkeypatch):
@@ -149,17 +150,44 @@ class TestLibs:
         monkeypatch.setattr(packaging, "run", lambda command: 1)
 
         with pytest.raises(common.Die, match="could not export"):
-            packaging.cmd_libs()
+            packaging.cmd_prepare()
+
+    def test_generates_locale_files_and_syncs_the_toc(self, packager):
+        packager.config.translations_path.write_text(
+            "- key: Hello\n  translations:\n    deDE: Hallo\n", encoding="utf-8"
+        )
+
+        assert packaging.cmd_prepare() == 0
+
+        locales_dir = packager.source / "Locales"
+        assert (locales_dir / "enUS.lua").is_file()
+        assert (locales_dir / "deDE.lua").is_file()
+        toc = packager.config.toc_path.read_text(encoding="utf-8")
+        assert "Locales\\deDE.lua" in toc
+
+    def test_drops_a_locale_that_lost_its_translations(self, packager):
+        packager.config.translations_path.write_text(
+            "- key: Hello\n  translations: {}\n", encoding="utf-8"
+        )
+        stale = packager.source / "Locales" / "deDE.lua"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("-- left over", encoding="utf-8")
+
+        packaging.cmd_prepare()
+
+        assert not stale.exists()
 
 
 class TestClean:
-    def test_removes_both_trees(self, packager, capsys):
+    def test_removes_the_generated_trees(self, packager, capsys):
         (packager.build_root / "junk").mkdir(parents=True)
+        (packager.source / "Locales").mkdir(parents=True)
 
         assert packaging.cmd_clean() == 0
 
         assert not packager.build_root.exists()
         assert not (packager.source / "Libs").exists()
+        assert not (packager.source / "Locales").exists()
         assert "removed" in capsys.readouterr().out
 
     def test_is_fine_when_there_is_nothing_to_remove(self, packager):

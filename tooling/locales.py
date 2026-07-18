@@ -1,34 +1,46 @@
-"""Keep the locale files honest.
+"""Keep translations.yml honest and turn it into the Lua locale files.
 
-  ./dev locales    fix what can be fixed safely, then report
-  ./dev check      report only, and lint the Lua while we are here
+  ./dev locales          reconcile translations.yml with the code, then report
+  ./dev locales --check   report only, write nothing (for CI)
+  ./dev prepare           generate Locales/*.lua from translations.yml
 
-check calls this with --check, which makes no edits, so CI fails a pull request
-rather than pushing a surprise commit to it.
+The first two live here. Generation is a step of prepare (packaging.py), which
+calls generate() below.
 
-Strings are found by parsing Lua, not by matching text. A regex over `L["..."]`
-misses `L['single']` and `L[ "spaced" ]`, mangles escaped quotes, and matches
-inside comments and strings.
+Used keys are found by parsing the addon's Lua, not by matching text: a regex over
+`L["..."]` misses `L['single']` and `L[ "spaced" ]`, mangles escaped quotes, and
+matches inside comments and strings. The locale files themselves are generated
+output now, so nothing here ever parses them; translations.yml is the source.
 """
 
 from __future__ import annotations
 
 import argparse
 import re
-import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator
 
 from luaparser import ast, astnodes  # type: ignore[ty:unresolved-import]
 
-from config import load_config
+from common import Die
+from config import Config, load_config
+from toc import set_toc_locales, toc_locales
+from translations import (
+    DEFAULT_LOCALE,
+    Message,
+    dump_messages,
+    parse_messages,
+    read_messages,
+    reconcile,
+    sort_key,
+    write_messages,
+)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Ace3 ships locale tables of its own and indexes them with expressions rather
-# than literals, which is both noise and a parse hazard. Data.lua holds no
-# strings at all and costs ~16s to parse against ~0.3s for everything else.
+# than literals, which is both noise and a parse hazard. Data.lua holds no strings
+# at all and costs ~16s to parse against ~0.3s for everything else.
 EXCLUDED_DIRS = frozenset({"Libs"})
 EXCLUDED_FILES = frozenset({"Data.lua"})
 
@@ -36,12 +48,13 @@ EXCLUDED_FILES = frozenset({"Data.lua"})
 SPECIFIER = re.compile(r"%%|%[-+ #0]*\d*(?:\.\d+)?[diouxXeEfgGcsq]")
 TOKEN = re.compile(r"\{(\w+)\}")
 
-# Separates a key from the role it plays, as in `Legion|canon` and
-# `Legion|short`. Lets one English word carry two meanings that other languages
-# may want to tell apart. Never shown to a player.
-CONTEXT_MARKER = "|"
+# Generated files say so, and point at the source, so nobody edits the output.
+GENERATED_BANNER = (
+    "-- Generated from src/translations.yml by `./dev prepare`. Do not edit by hand;\n"
+    "-- edit that file instead.\n"
+)
 
-ERROR, WARNING, INFO = "error", "warning", "info"
+ERROR, WARNING = "error", "warning"
 
 
 @dataclass(frozen=True)
@@ -58,43 +71,15 @@ class Problem:
         return f"{self.severity}: {where}: {self.message}"
 
 
-@dataclass(frozen=True)
-class Entry:
-    """One `L["key"] = value` assignment."""
-
-    key: str
-    value: str | None  # None when the value is `true`, meaning "same as key"
-    line: int
-
-    @property
-    def is_noop(self) -> bool:
-        """True when this entry says nothing the enUS fallback would not say.
-
-        `= true` is rewritten by AceLocale to the key itself, and a value that
-        merely echoes the key is the same thing spelled out. In a non-default
-        locale both are identical to having no entry at all.
-        """
-        return self.value is None or self.value == self.key
-
-
-@dataclass(frozen=True)
-class LocaleFile:
-    path: Path
-    locale: str
-    is_default: bool
-    entries: tuple[Entry, ...]
-
-    @property
-    def by_key(self) -> dict[str, Entry]:
-        return {e.key: e for e in self.entries}
-
-
 def relative_to(path: Path, root: Path) -> Path:
     """Shorten a path for display, leaving it alone if it is not under root."""
     try:
         return path.relative_to(root)
     except ValueError:
         return path
+
+
+# --- Reading the strings the code actually uses -----------------------------
 
 
 def lua_str(node: astnodes.Node) -> str | None:
@@ -109,15 +94,12 @@ def line_of(node: astnodes.Node) -> int | None:
     return token.line if token else None
 
 
-def parse(path: Path) -> astnodes.Chunk:
-    return ast.parse(path.read_text(encoding="utf-8"))
-
-
 def source_files(addon_dir: Path) -> list[Path]:
     """Every addon Lua file that might reference a string, locale files aside.
 
-    The locale files are where strings are defined rather than used, so counting
-    them as usage would make every key look used and defeat the stale-key check.
+    The locale files are generated output where strings are defined rather than
+    used, so counting them as usage would make every key look used and defeat the
+    stale-key check.
     """
     locale_dir = addon_dir / "Locales"
     return sorted(
@@ -129,13 +111,6 @@ def source_files(addon_dir: Path) -> list[Path]:
     )
 
 
-def locale_files(addon_dir: Path) -> list[Path]:
-    locale_dir = addon_dir / "Locales"
-    if not locale_dir.is_dir():
-        return []
-    return sorted(locale_dir.glob("*.lua"))
-
-
 def find_usages(paths: list[Path]) -> tuple[dict[str, list[str]], list[Problem]]:
     """Every `L["key"]` read in the addon source, keyed to where it was seen."""
     used: dict[str, list[str]] = {}
@@ -143,7 +118,7 @@ def find_usages(paths: list[Path]) -> tuple[dict[str, list[str]], list[Problem]]
 
     for path in paths:
         try:
-            tree = parse(path)
+            tree = ast.parse(path.read_text(encoding="utf-8"))
         except Exception as exc:  # luaparser raises a grab-bag of types
             problems.append(Problem(ERROR, path, None, f"could not parse: {exc}"))
             continue
@@ -158,8 +133,8 @@ def find_usages(paths: list[Path]) -> tuple[dict[str, list[str]], list[Problem]]
             line = line_of(node.idx) or line_of(node)
 
             if key is None:
-                # p3lim's scanner crashes here. Report and carry on: a computed
-                # key is legal Lua, we just cannot verify it.
+                # A computed key is legal Lua, we just cannot verify it. Report and
+                # carry on rather than crash the way p3lim's scanner does.
                 problems.append(
                     Problem(
                         WARNING,
@@ -175,84 +150,7 @@ def find_usages(paths: list[Path]) -> tuple[dict[str, list[str]], list[Problem]]
     return used, problems
 
 
-def read_entries(tree: astnodes.Chunk) -> Iterator[Entry]:
-    for node in ast.walk(tree):
-        if not isinstance(node, astnodes.Assign):
-            continue
-        for target, value in zip(node.targets, node.values):
-            if not isinstance(target, astnodes.Index):
-                continue
-            key = lua_str(target.idx)
-            if key is None:
-                continue
-
-            is_true = isinstance(value, astnodes.TrueExpr)
-            yield Entry(
-                key=key,
-                value=None if is_true else lua_str(value),
-                line=line_of(target.idx) or 0,
-            )
-
-
-def header_for(locale: str, is_default: bool) -> str:
-    """The boilerplate at the top of a locale file.
-
-    Generated rather than preserved, so there is no boundary to find between
-    the header and the entries. Everything below is regenerated too, which
-    makes the whole file the tool's to own.
-
-    The `if not L then return end` guard is only correct because each locale is
-    its own file: NewLocale returns nil for every locale but the player's, and a
-    return at file scope ends the file. In a combined file it would swallow
-    every locale after the first.
-    """
-    default_arg = ", true" if is_default else ""
-    return (
-        "local AddonName = ...\n"
-        "\n"
-        f'local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "{locale}"{default_arg})\n'
-        "if not L then\n"
-        "  return\n"
-        "end\n"
-    )
-
-
-def read_locale(path: Path) -> LocaleFile | Problem:
-    try:
-        tree = parse(path)
-    except Exception as exc:
-        return Problem(ERROR, path, None, f"could not parse: {exc}")
-
-    declared, is_default = declared_locale(tree)
-    return LocaleFile(
-        path=path,
-        locale=declared or path.stem,
-        is_default=is_default,
-        entries=tuple(read_entries(tree)),
-    )
-
-
-def declared_locale(tree: astnodes.Chunk) -> tuple[str | None, bool]:
-    """Read the locale out of the file's NewLocale call, mirroring AceLocale.
-
-    Returns (locale, is_default). A file with no call at all, which is what a
-    raw CurseForge export looks like, yields (None, False) and falls back to
-    its filename.
-    """
-    for node in ast.walk(tree):
-        # `x:NewLocale(...)` is an Invoke; a plain `f(...)` would be a Call.
-        if not isinstance(node, astnodes.Invoke):
-            continue
-        if getattr(node.func, "id", None) != "NewLocale":
-            continue
-        args = node.args
-        if len(args) < 2:
-            continue
-        locale = lua_str(args[1])
-        is_default = len(args) >= 3 and isinstance(args[2], astnodes.TrueExpr)
-        if locale:
-            return locale, is_default
-    return None, False
+# --- Placeholders -----------------------------------------------------------
 
 
 def specifiers(text: str) -> list[str]:
@@ -264,31 +162,121 @@ def tokens(text: str) -> set[str]:
     return set(TOKEN.findall(text))
 
 
-def check_placeholders(locale: LocaleFile, reference: set[str]) -> list[Problem]:
-    """A translation must carry the same placeholders as the string it replaces.
+# --- Checks -----------------------------------------------------------------
 
-    Dropping a `%s` silently loses an argument. Turning `%s` into `%d` throws at
-    runtime. Misspelling `{expacIcon}` ships a broken default tooltip format to
-    everyone in that locale, which is invisible in English.
-    """
+
+def check_canonical(text: str, path: Path) -> list[Problem]:
+    """The file must already be sorted and formatted the way locales writes it."""
+    if text == dump_messages(parse_messages(text)):
+        return []
+    return [
+        Problem(
+            ERROR,
+            path,
+            None,
+            "not in canonical form (sorting or formatting); run ./dev locales",
+        )
+    ]
+
+
+def check_duplicates(messages: tuple[Message, ...], path: Path) -> list[Problem]:
+    seen: set[str] = set()
     problems = []
-    for entry in locale.entries:
-        if entry.value is None or entry.key not in reference:
+    for message in messages:
+        if message.key in seen:
+            problems.append(
+                Problem(ERROR, path, None, f"duplicate key {message.key!r}")
+            )
+        seen.add(message.key)
+    return problems
+
+
+def check_usage(
+    messages: tuple[Message, ...], used: dict[str, list[str]], path: Path
+) -> list[Problem]:
+    """Every used key must be defined, and every defined key must be used."""
+    defined = {message.key for message in messages}
+    problems = []
+
+    for key in sorted(set(used) - defined, key=sort_key):
+        problems.append(
+            Problem(
+                ERROR,
+                path,
+                None,
+                f"{key!r} is used at {', '.join(used[key])} but translations.yml "
+                "does not define it",
+            )
+        )
+
+    for key in sorted(defined - set(used), key=sort_key):
+        problems.append(
+            Problem(
+                ERROR,
+                path,
+                None,
+                f"{key!r} is defined but nothing uses it; ./dev locales will drop it",
+            )
+        )
+
+    return problems
+
+
+def check_empty(message: Message, path: Path) -> list[Problem]:
+    """An empty translation is worse than none: it overrides English with nothing."""
+    return [
+        Problem(
+            ERROR,
+            path,
+            None,
+            f"{message.key!r} has an empty {locale} translation; remove it to fall "
+            "back to English",
+        )
+        for locale, value in message.translations
+        if value == ""
+    ]
+
+
+def check_context(message: Message, path: Path) -> list[Problem]:
+    """A `Name|context` key must give its English out; `|context` is not a word."""
+    if message.has_context and DEFAULT_LOCALE not in message.by_locale:
+        return [
+            Problem(
+                ERROR,
+                path,
+                None,
+                f"{message.key!r} has a context marker, so it needs an explicit "
+                f"{DEFAULT_LOCALE} translation; without one players would see the marker",
+            )
+        ]
+    return []
+
+
+def check_placeholders(message: Message, path: Path) -> list[Problem]:
+    """A translation must carry the same placeholders as the English it replaces.
+
+    Dropping a `%s` loses an argument; turning `%s` into `%d` throws at runtime;
+    misspelling `{expacIcon}` ships a broken tooltip that English never shows.
+    """
+    reference = message.english
+    problems = []
+    for locale, value in message.translations:
+        if value == "":
             continue
 
-        want, got = specifiers(entry.key), specifiers(entry.value)
+        want, got = specifiers(reference), specifiers(value)
         if want != got:
             problems.append(
                 Problem(
                     ERROR,
-                    locale.path,
-                    entry.line,
-                    f"placeholder mismatch for {entry.key!r}: "
-                    f"enUS has {want or 'none'}, this has {got or 'none'}",
+                    path,
+                    None,
+                    f"placeholder mismatch for {message.key!r} in {locale}: "
+                    f"English has {want or 'none'}, this has {got or 'none'}",
                 )
             )
 
-        want_tokens, got_tokens = tokens(entry.key), tokens(entry.value)
+        want_tokens, got_tokens = tokens(reference), tokens(value)
         if want_tokens != got_tokens:
             missing = sorted(want_tokens - got_tokens)
             extra = sorted(got_tokens - want_tokens)
@@ -303,163 +291,44 @@ def check_placeholders(locale: LocaleFile, reference: set[str]) -> list[Problem]
             problems.append(
                 Problem(
                     ERROR,
-                    locale.path,
-                    entry.line,
-                    f"token mismatch for {entry.key!r}: {detail}",
+                    path,
+                    None,
+                    f"token mismatch for {message.key!r} in {locale}: {detail}",
                 )
             )
     return problems
 
 
-def check_context_keys(default: LocaleFile) -> list[Problem]:
-    """A `Name|context` key must spell its English out in enUS.
+def check_toc_locales(config: Config, messages: tuple[Message, ...]) -> list[Problem]:
+    """The TOC's generated file list must name exactly the locales in the source.
 
-    The marker exists so one English word can mean two things: `Legion|canon`
-    and `Legion|short` are the same word in English but need not be in every
-    language. The cost is that such a key is not its own English, so `= true`
-    would put the marker itself on screen. Only enUS can be checked this way,
-    since it is the fallback everyone else lands on.
+    They only diverge when a whole language is added or dropped and prepare has not
+    run since, which would leave the new locale's file unloaded (or a dead entry).
     """
-    return [
-        Problem(
-            ERROR,
-            default.path,
-            entry.line,
-            f"{entry.key!r} is marked with a context, so it needs an explicit "
-            f"English value; `= true` would display the marker to players",
-        )
-        for entry in default.entries
-        if CONTEXT_MARKER in entry.key and entry.value is None
-    ]
+    try:
+        toc_text = config.toc_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return []
 
-
-def check_empty_values(locale: LocaleFile) -> list[Problem]:
-    """An empty string is worse than no entry at all.
-
-    Stubs are written as `-- L["key"] = ""`, so the obvious way to translate one
-    is to uncomment it and type between the quotes. Stopping half way leaves an
-    entry that overrides the English fallback with nothing, and the player sees
-    a blank where a word should be.
-    """
-    return [
-        Problem(
-            ERROR,
-            locale.path,
-            entry.line,
-            f"{entry.key!r} is an empty string, which would show the player "
-            f"nothing at all; comment the line out again to fall back to English",
-        )
-        for entry in locale.entries
-        if entry.value == ""
-    ]
-
-
-def check_duplicates(locale: LocaleFile) -> list[Problem]:
-    seen: dict[str, int] = {}
-    problems = []
-    for entry in locale.entries:
-        if entry.key in seen:
-            problems.append(
-                Problem(
-                    ERROR,
-                    locale.path,
-                    entry.line,
-                    f"duplicate key {entry.key!r}, silently overwrites line {seen[entry.key]}",
-                )
-            )
-        seen[entry.key] = entry.line
-    return problems
-
-
-def check_unknown_keys(locale: LocaleFile, reference: set[str]) -> list[Problem]:
-    return [
-        Problem(
-            ERROR,
-            locale.path,
-            entry.line,
-            f"key {entry.key!r} is not in enUS, so it is dead weight",
-        )
-        for entry in locale.entries
-        if entry.key not in reference
-    ]
-
-
-def sort_key(key: str) -> tuple[str, str]:
-    """Case-insensitive, with the raw key breaking ties so it is total."""
-    return (key.lower(), key)
-
-
-def check_sorted(locale: LocaleFile) -> list[Problem]:
-    keys = [e.key for e in locale.entries]
-    if keys == sorted(keys, key=sort_key):
+    current, expected = toc_locales(toc_text), locales_in(messages)
+    if current == expected:
         return []
     return [
         Problem(
-            WARNING,
-            locale.path,
+            ERROR,
+            config.toc_path,
             None,
-            "keys are not sorted, which makes diffs and merges noisy",
+            f"the TOC loads locales {current}, but translations.yml implies "
+            f"{expected}; run ./dev prepare",
         )
     ]
-
-
-def render(locale: LocaleFile, reference: Iterable[str]) -> str:
-    """The whole text of a locale file, header and all.
-
-    Only the translated values survive a round trip; everything else is
-    reconstructed from the locale name and the enUS key list. That is what
-    keeps this idempotent, and it means a translator never has to get any Lua
-    right beyond the quotes around their own string.
-
-    Untranslated keys become commented stubs so a translator opening the file
-    sees exactly what is left to do.
-    """
-    translated = {e.key: e for e in locale.entries if not e.is_noop}
-    lines = []
-
-    for key in sorted(reference, key=sort_key):
-        entry = translated.get(key)
-
-        if locale.is_default:
-            # enUS is the reference, so `= true` (value equals key) says it all
-            # for an ordinary key. A key that is not its own English keeps the
-            # value it was given.
-            existing = locale.by_key.get(key)
-            if existing is not None and existing.value is not None:
-                lines.append(f"L[{lua_quote(key)}] = {lua_quote(existing.value)}")
-            else:
-                lines.append(f"L[{lua_quote(key)}] = true")
-            continue
-
-        if entry is None:
-            lines.append(f"-- L[{lua_quote(key)}] = {lua_quote('')}")
-            continue
-
-        lines.append(f"L[{lua_quote(key)}] = {lua_quote(entry.value or key)}")
-
-    return header_for(locale.locale, locale.is_default) + "\n" + "\n".join(lines) + "\n"
-
-
-def lua_quote(text: str) -> str:
-    escaped = text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
-    return f'"{escaped}"'
-
-
-def coverage(locale: LocaleFile, reference: set[str]) -> tuple[int, int]:
-    translated = {e.key for e in locale.entries if not e.is_noop and e.key in reference}
-    return len(translated), len(reference)
 
 
 @dataclass(frozen=True)
 class Analysis:
     problems: tuple[Problem, ...]
-    locales: tuple[LocaleFile, ...]
-    default: LocaleFile | None
+    messages: tuple[Message, ...]
     used: dict[str, list[str]]
-
-    @property
-    def reference_keys(self) -> set[str]:
-        return set(self.default.by_key) if self.default else set()
 
     @property
     def errors(self) -> int:
@@ -470,131 +339,195 @@ class Analysis:
         return sum(1 for p in self.problems if p.severity == WARNING)
 
 
-def analyse(addon_dir: Path) -> Analysis:
-    """Read everything and run every check. Writes nothing."""
+def analyse(config: Config) -> Analysis:
+    """Read the source and the translations, run every check. Writes nothing."""
     problems: list[Problem] = []
 
-    used, usage_problems = find_usages(source_files(addon_dir))
+    used, usage_problems = find_usages(source_files(config.source_dir))
     problems += usage_problems
 
-    found: list[LocaleFile] = []
-    for path in locale_files(addon_dir):
-        result = read_locale(path)
-        if isinstance(result, Problem):
-            problems.append(result)
-            continue
-        found.append(result)
+    path = config.translations_path
+    try:
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        text = ""
 
-    default = next((loc for loc in found if loc.is_default), None)
-    if default is None:
-        return Analysis(tuple(problems), tuple(found), None, used)
+    try:
+        messages = parse_messages(text)
+    except Die as error:
+        # A schema or YAML error: nothing further can be checked meaningfully.
+        problems.append(Problem(ERROR, path, None, str(error)))
+        return Analysis(tuple(problems), (), used)
 
-    reference = default.by_key
-    reference_keys = set(reference)
+    problems += check_canonical(text, path)
+    problems += check_duplicates(messages, path)
+    problems += check_usage(messages, used, path)
+    problems += check_toc_locales(config, messages)
+    for message in messages:
+        problems += check_empty(message, path)
+        problems += check_context(message, path)
+        problems += check_placeholders(message, path)
 
-    # The check that prevents a shipped bug: a missing enUS entry makes
-    # AceLocale call geterrorhandler(), which is an error popup for the player.
-    for key in sorted(set(used) - reference_keys, key=sort_key):
-        problems.append(
-            Problem(
-                ERROR,
-                default.path,
-                None,
-                f"{key!r} is used at {', '.join(used[key])} but enUS does not define it",
-            )
-        )
-
-    for key in sorted(reference_keys - set(used), key=sort_key):
-        problems.append(
-            Problem(
-                WARNING,
-                default.path,
-                reference[key].line,
-                f"{key!r} is defined but never used",
-            )
-        )
-
-    problems += check_context_keys(default)
-
-    for locale in found:
-        problems += check_duplicates(locale)
-        problems += check_empty_values(locale)
-        problems += check_unknown_keys(locale, reference_keys)
-        problems += check_placeholders(locale, reference_keys)
-        problems += check_sorted(locale)
-
-    return Analysis(tuple(problems), tuple(found), default, used)
+    return Analysis(tuple(problems), messages, used)
 
 
-def fix(analysis: Analysis) -> list[Path]:
-    """Rewrite the translations. enUS is left alone.
+def fix(config: Config) -> bool:
+    """Reconcile translations.yml with the code and rewrite it. Returns changed."""
+    used, _ = find_usages(source_files(config.source_dir))
+    messages = read_messages(config.translations_path)
+    reconciled = reconcile(messages, used.keys())
 
-    enUS is the source of truth, written by hand and carrying comments that
-    explain the keys. Regenerating it would only reformat it, and would throw
-    those comments away. It is still checked, just not rewritten.
+    text = dump_messages(reconciled)
+    try:
+        before = config.translations_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        before = ""
+
+    if text == before:
+        return False
+    write_messages(config.translations_path, reconciled)
+    return True
+
+
+# --- Generating the Lua locale files ----------------------------------------
+
+
+def lua_quote(text: str) -> str:
+    escaped = text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    return f'"{escaped}"'
+
+
+def header_for(locale: str, is_default: bool) -> str:
+    """The AceLocale boilerplate at the top of a locale file.
+
+    The `if not L then return end` guard is only correct because each locale is its
+    own file: NewLocale returns nil for every locale but the player's, and a return
+    at file scope ends the file. In a combined file it would swallow every locale
+    after the first.
     """
-    written = []
-    for locale in analysis.locales:
-        if locale.is_default:
+    default_arg = ", true" if is_default else ""
+    return (
+        "local AddonName = ...\n"
+        "\n"
+        f'local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "{locale}"{default_arg})\n'
+        "if not L then\n"
+        "  return\n"
+        "end\n"
+    )
+
+
+def locales_in(messages: tuple[Message, ...]) -> list[str]:
+    """enUS first, then every other locale that has at least one real translation."""
+    others = {
+        locale
+        for message in messages
+        for locale, value in message.translations
+        if value and locale != DEFAULT_LOCALE
+    }
+    return [DEFAULT_LOCALE, *sorted(others)]
+
+
+def render_locale(messages: tuple[Message, ...], locale: str) -> str:
+    is_default = locale == DEFAULT_LOCALE
+    lines = []
+
+    for message in sorted(messages, key=lambda m: sort_key(m.key)):
+        if is_default:
+            english = message.english
+            if english == message.key:
+                # `= true` is AceLocale's "the value is the key", the whole point
+                # of the default locale.
+                lines.append(f"L[{lua_quote(message.key)}] = true")
+            else:
+                lines.append(f"L[{lua_quote(message.key)}] = {lua_quote(english)}")
             continue
-        text = render(locale, analysis.reference_keys)
-        if text != locale.path.read_text(encoding="utf-8"):
-            locale.path.write_text(text, encoding="utf-8")
-            written.append(locale.path)
+
+        value = message.by_locale.get(locale)
+        if not value:
+            continue
+        lines.append(f"L[{lua_quote(message.key)}] = {lua_quote(value)}")
+
+    return GENERATED_BANNER + "\n" + header_for(locale, is_default) + "\n" + "\n".join(lines) + "\n"
+
+
+def generate(config: Config) -> list[Path]:
+    """Write Locales/*.lua from translations.yml and sync the TOC's file list.
+
+    The directory is treated as ours entirely: files for locales that no longer
+    have translations are removed, so it always mirrors the source.
+    """
+    messages = read_messages(config.translations_path)
+    ordered = locales_in(messages)
+
+    locales_dir = config.locales_dir
+    locales_dir.mkdir(parents=True, exist_ok=True)
+
+    wanted = {f"{locale}.lua" for locale in ordered}
+    for existing in locales_dir.glob("*.lua"):
+        if existing.name not in wanted:
+            existing.unlink()
+
+    written = []
+    for locale in ordered:
+        path = locales_dir / f"{locale}.lua"
+        path.write_text(render_locale(messages, locale), encoding="utf-8")
+        written.append(path)
+
+    toc_text = config.toc_path.read_text(encoding="utf-8")
+    synced = set_toc_locales(toc_text, ordered)
+    if synced != toc_text:
+        config.toc_path.write_text(synced, encoding="utf-8")
+
     return written
+
+
+# --- Command ----------------------------------------------------------------
+
+
+def coverage(messages: tuple[Message, ...]) -> dict[str, int]:
+    """How many keys each non-default locale translates, for the summary."""
+    counts: dict[str, int] = {}
+    for message in messages:
+        for locale, value in message.translations:
+            if value and locale != DEFAULT_LOCALE:
+                counts[locale] = counts.get(locale, 0) + 1
+    return counts
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="dev locales",
-        description="Check, and optionally fix, the addon's locale files.",
+        description="Reconcile translations.yml with the code, or just check it.",
     )
     parser.add_argument(
         "--check",
         action="store_true",
         help="report only, write nothing, exit non-zero on error (for CI)",
     )
-    parser.add_argument(
-        "--root",
-        type=Path,
-        default=REPO_ROOT,
-        help="repo root to work on, for testing against a scratch tree",
-    )
     args = parser.parse_args(argv)
 
-    root: Path = args.root.resolve()
-    addon_dir = root / "src" / load_config().name
+    config = load_config()
 
-    analysis = analyse(addon_dir)
-
-    if analysis.default is None:
-        print("error: found no default (enUS) locale to check against", file=sys.stderr)
-        return 1
-
-    written: list[Path] = []
+    changed = False
     if not args.check:
-        written = fix(analysis)
-        if written:
-            # Report the state we are leaving behind, not the one we found.
-            # Otherwise a run that fixes every problem still prints them all.
-            analysis = analyse(addon_dir)
+        changed = fix(config)
 
-    for problem in sorted(analysis.problems, key=lambda p: (str(p.path), p.line or 0)):
-        print(problem.render(root))
+    analysis = analyse(config)
 
+    for problem in sorted(analysis.problems, key=lambda p: (str(p.path), p.line or 0, p.message)):
+        print(problem.render())
+
+    total = len(analysis.messages)
+    counts = coverage(analysis.messages)
     print()
-    print(f"enUS: {len(analysis.reference_keys)} keys, {len(analysis.used)} used in source")
-    for locale in sorted(analysis.locales, key=lambda loc: loc.locale):
-        if locale.is_default:
-            continue
-        done, total = coverage(locale, analysis.reference_keys)
-        pct = (100 * done // total) if total else 0
-        print(f"  {locale.locale}: {done}/{total} translated ({pct}%)")
+    print(f"{total} keys, {len(analysis.used)} used in source")
+    for locale in sorted(counts):
+        pct = (100 * counts[locale] // total) if total else 0
+        print(f"  {locale}: {counts[locale]}/{total} translated ({pct}%)")
 
-    if written:
+    if changed:
         print()
-        for path in written:
-            print(f"rewrote {relative_to(path, root)}")
+        print("rewrote translations.yml")
 
     print()
     print(f"{analysis.errors} error(s), {analysis.warnings} warning(s)")

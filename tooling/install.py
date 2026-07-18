@@ -73,12 +73,23 @@ def wow_root() -> Path:
     return resolve_wow_root(os.environ.get("WOW_ROOT"))
 
 
-def require_libs(config: Config) -> None:
+def require_prepared(config: Config) -> None:
+    """The generated bits a symlinked install needs, or a pointer to prepare.
+
+    Libs and the locale files are gitignored output, so a fresh checkout has
+    neither, and the addon would fail to load without them.
+    """
+    missing = []
     if not config.libs_dir.is_dir():
+        missing.append("the embedded libraries")
+    if not (config.locales_dir / "enUS.lua").is_file():
+        missing.append("the locale files")
+
+    if missing:
         raise Die(
-            f"{config.name}'s Libs are missing, so the addon would fail to load.\n"
-            "Fetch the embedded libraries first:\n"
-            "  ./dev libs"
+            f"{config.name} is missing {' and '.join(missing)}, so it would fail to load.\n"
+            "Generate them first:\n"
+            "  ./dev prepare"
         )
 
 
@@ -120,7 +131,7 @@ def link(src: Path, dst: Path) -> None:
 def cmd_install(flavors: list[str] | None = None) -> int:
     config = load_config()
     root = wow_root()
-    require_libs(config)
+    require_prepared(config)
 
     linked = 0
 

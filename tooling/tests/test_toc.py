@@ -39,6 +39,52 @@ class TestSetTocField:
         assert all(part.strip().isdigit() for part in value.split(","))
 
 
+class TestLocaleBlock:
+    TOC = (
+        "## Title: X\n\n"
+        "Libs.xml\n"
+        "Locales\\enUS.lua\n"
+        "Locales\\deDE.lua\n"
+        "Init.lua\n"
+    )
+
+    def test_reads_the_locale_codes(self):
+        assert toc.toc_locales(self.TOC) == ["enUS", "deDE"]
+
+    def test_reads_forward_slashes_too(self):
+        assert toc.toc_locales("Locales/enUS.lua\nLocales/frFR.lua\n") == ["enUS", "frFR"]
+
+    def test_rewrites_the_block_in_place(self):
+        out = toc.set_toc_locales(self.TOC, ["enUS", "frFR", "koKR"])
+        assert toc.toc_locales(out) == ["enUS", "frFR", "koKR"]
+        # Everything around the block is left exactly as it was.
+        assert "Libs.xml\n" in out
+        assert out.endswith("Init.lua\n")
+
+    def test_shrinking_the_block_drops_lines(self):
+        out = toc.set_toc_locales(self.TOC, ["enUS"])
+        assert toc.toc_locales(out) == ["enUS"]
+        assert "deDE" not in out
+
+    def test_round_trips_with_the_reader(self):
+        for want in (["enUS"], ["enUS", "deDE", "zhCN"]):
+            assert toc.toc_locales(toc.set_toc_locales(self.TOC, want)) == want
+
+    def test_preserves_crlf(self):
+        crlf = self.TOC.replace("\n", "\r\n")
+        out = toc.set_toc_locales(crlf, ["enUS"])
+        assert "Locales\\enUS.lua\r\n" in out
+
+    def test_no_block_dies(self):
+        with pytest.raises(common.Die, match="no Locales"):
+            toc.set_toc_locales("## Title: X\n\nInit.lua\n", ["enUS"])
+
+    def test_non_contiguous_block_dies(self):
+        scattered = "Locales\\enUS.lua\nInit.lua\nLocales\\deDE.lua\n"
+        with pytest.raises(common.Die, match="contiguous"):
+            toc.set_toc_locales(scattered, ["enUS", "deDE"])
+
+
 class TestVersionFromToc:
     def test_reads_the_version(self):
         assert toc.version_from_toc("## Title: X\n## Version: 2026.28.0\n") == "2026.28.0"

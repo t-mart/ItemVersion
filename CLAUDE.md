@@ -40,7 +40,9 @@ widgets.
 ## Key Directories
 
 - `src/ItemVersion/`: Main addon code.
-- `src/ItemVersion/Locales/`: Localization files for different languages.
+- `src/ItemVersion/Locales/`: Localization files for different languages. These
+  are GENERATED from `src/translations.yml` by `./dev prepare` and are gitignored.
+  Do not edit them by hand; edit `src/translations.yml` instead.
 - `src/ItemVersion/Libs/`: Library files, primarily for Ace3 framework. Look here to
   see how Ace3 works under the hood. It's sometimes more helpful than the Ace3
   docs.
@@ -59,6 +61,9 @@ widgets.
 ## Key Files
 
 - `TODO.md`: List of tasks and features to implement.
+- `src/translations.yml`: The source of truth for every player-facing string and
+  its translations. `./dev locales` reconciles it with the code, and
+  `./dev prepare` generates the Lua locale files from it.
 - `README.md`: Overview and documentation for the addon.
 - `docs/API.md`: Documentation for the addon's API.
 - `src/ItemVersion/API.lua`: Implementation of the addon's API.

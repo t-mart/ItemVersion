@@ -15,7 +15,7 @@ from typing import Callable
 from common import Die
 from install import ALL_FLAVORS, FLAVOR_DIRS, cmd_install, cmd_install_status, cmd_uninstall
 from interfaces import cmd_interfaces
-from packaging import cmd_build, cmd_clean, cmd_libs
+from packaging import cmd_build, cmd_clean, cmd_prepare
 from publish import RELEASE, RELEASE_TYPES, TARGETS, cmd_publish
 from quality import cmd_check, cmd_format, cmd_locales, cmd_test, cmd_watch
 
@@ -92,9 +92,11 @@ COMMANDS = {
         "Update the TOC's Interface line from Blizzard.",
         interfaces_options,
     ),
-    "libs": Command(cmd_libs, "Fetch the embedded libraries into the addon's Libs dir."),
+    "prepare": Command(
+        cmd_prepare, "Fetch the embedded libraries and generate the locale files."
+    ),
     "build": Command(cmd_build, "Package the addon zip into dist/."),
-    "clean": Command(cmd_clean, "Remove dist/ and the fetched Libs."),
+    "clean": Command(cmd_clean, "Remove dist/ and the generated Libs and Locales."),
     "install": Command(
         cmd_install,
         "Symlink the addon into each WoW flavor's AddOns dir.",
@@ -116,7 +118,7 @@ COMMANDS = {
     ),
     "format": Command(cmd_format, "Reformat the addon with stylua."),
     "locales": Command(
-        cmd_locales, "Prune, sort and stub the locale files. This one writes."
+        cmd_locales, "Reconcile translations.yml with the code. This one writes."
     ),
     "test": Command(cmd_test, "Run the tests for the dev tooling."),
     "watch": Command(

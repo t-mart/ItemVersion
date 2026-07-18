@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/t-mart/ItemVersion/translations.schema.json",
+  "title": "translations.yml",
+  "description": "Every player-facing string, with its translations. Locale files are generated from this.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["key"],
+    "properties": {
+      "key": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The string looked up in code as L[\"key\"]. Also the English fallback when no enUS translation is given."
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Optional guidance for translators. Not shown to players."
+      },
+      "translations": {
+        "type": "object",
+        "description": "A translated string per locale. A missing locale falls back to enUS, and enUS falls back to the key.",
+        "propertyNames": {
+          "pattern": "^[a-z]{2}[A-Z]{2}$",
+          "description": "A WoW locale code such as enUS, deDE or zhCN."
+        },
+        "additionalProperties": { "type": "string" }
+      }
+    }
+  }
+}

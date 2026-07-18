@@ -1,5 +1,6 @@
 /src/ItemVersion/Bindings.xml
 /dist
 /src/ItemVersion/Libs
+/src/ItemVersion/Locales
 /.env
 __pycache__/

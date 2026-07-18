@@ -13,6 +13,7 @@ from pathlib import Path
 
 import yaml  # type: ignore[ty:unresolved-import]
 
+import schema
 from common import REPO_ROOT, Die
 
 CONFIG_FILE = REPO_ROOT / "wowaddon.yml"
@@ -42,44 +43,27 @@ class Config:
     def toc_path(self) -> Path:
         return self.source_dir / f"{self.name}.toc"
 
+    @property
+    def locales_dir(self) -> Path:
+        return self.source_dir / "Locales"
 
-def _require(mapping: dict, key: str) -> object:
-    if key not in mapping:
-        raise Die(f"{CONFIG_FILE.name} is missing '{key}'")
-    return mapping[key]
+    # The translation source sits beside the addon dir rather than inside it, so it
+    # is neither symlinked into a WoW install nor copied into a build.
+    @property
+    def translations_path(self) -> Path:
+        return SRC_ROOT / "translations.yml"
 
 
 def parse_config(text: str) -> Config:
     data = yaml.safe_load(text)
-    if not isinstance(data, dict):
-        raise Die(f"{CONFIG_FILE.name} must be a mapping")
+    schema.validate(data, "wowaddon", CONFIG_FILE.name)
 
-    name = _require(data, "name")
-    project_id = _require(data, "curseforge-project-id")
-    libs = _require(data, "libs")
-
-    if not isinstance(name, str):
-        raise Die(f"{CONFIG_FILE.name}: name must be a string")
-    if not isinstance(project_id, int):
-        raise Die(f"{CONFIG_FILE.name}: curseforge-project-id must be an integer")
-    if not isinstance(libs, dict) or not libs:
-        raise Die(f"{CONFIG_FILE.name}: libs must be a non-empty mapping")
-
-    ignore = data.get("ignore") or []
-    if not isinstance(ignore, list) or not all(isinstance(item, str) for item in ignore):
-        raise Die(f"{CONFIG_FILE.name}: ignore must be a list of strings")
-
-    lib_entries = []
-    for folder, url in libs.items():
-        if not isinstance(folder, str) or not isinstance(url, str):
-            raise Die(f"{CONFIG_FILE.name}: each lib must map a name to an svn url string")
-        lib_entries.append((folder, url))
-
+    # The schema has vouched for the shape, so these accesses are safe.
     return Config(
-        name=name,
-        curseforge_project_id=project_id,
-        ignore=tuple(ignore),
-        libs=tuple(lib_entries),
+        name=data["name"],
+        curseforge_project_id=data["curseforge-project-id"],
+        ignore=tuple(data.get("ignore") or []),
+        libs=tuple(data["libs"].items()),
     )
 
 

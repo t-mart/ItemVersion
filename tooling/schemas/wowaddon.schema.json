@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/t-mart/ItemVersion/wowaddon.schema.json",
+  "title": "wowaddon.yml",
+  "description": "Project configuration for a World of Warcraft addon repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "curseforge-project-id", "libs"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The addon name. The source lives at src/<name>, and the TOC and shipped folder share it."
+    },
+    "curseforge-project-id": {
+      "type": "integer",
+      "description": "The numeric CurseForge project id that publish uploads to."
+    },
+    "ignore": {
+      "type": "array",
+      "description": "Paths, relative to the source dir, to leave out of a build (glob patterns allowed).",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "libs": {
+      "type": "object",
+      "description": "Embedded libraries to fetch into the addon's Libs dir, mapping a folder name to an svn url.",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    }
+  }
+}

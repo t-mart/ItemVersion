@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
+import locales
 from common import REPO_ROOT, Die, relative, report, require_tool, run
 from config import Config, load_config
 from toc import require_version
@@ -47,16 +48,27 @@ def ensure_libs(config: Config) -> None:
         report(folder, "fetched")
 
 
-def cmd_libs() -> int:
+def cmd_prepare() -> int:
+    """Populate the addon's generated bits: the embedded libs and the locale files.
+
+    Both are gitignored output that build and install need but do not commit. Libs
+    are fetched only when missing; the locale files are regenerated every run, so
+    they always match translations.yml.
+    """
     config = load_config()
     require_tool("svn")
+
     for folder, url in config.libs:
         if (config.libs_dir / folder).is_dir():
             report(folder, "present")
             continue
         _fetch_lib(config.libs_dir, folder, url)
         report(folder, "fetched")
-    print(f"{config.name}'s Libs are ready. Run clean first to refetch.")
+
+    written = locales.generate(config)
+    report("locales", f"generated {len(written)} file(s) in {relative(config.locales_dir)}")
+
+    print(f"{config.name} is ready. Run build or install next.")
     return 0
 
 
@@ -92,6 +104,7 @@ def _zip_dir(source_dir: Path, archive: Path, arc_root: str) -> None:
 def cmd_build() -> int:
     config = load_config()
     ensure_libs(config)
+    locales.generate(config)
 
     version = require_version(config.toc_path.read_text(encoding="utf-8"))
     staged = BUILD_ROOT / config.name
@@ -116,7 +129,8 @@ def cmd_build() -> int:
 
 def cmd_clean() -> int:
     config = load_config()
-    for path in (BUILD_ROOT, config.libs_dir):
+    # Everything generated: the build output and both prepared trees.
+    for path in (BUILD_ROOT, config.libs_dir, config.locales_dir):
         if path.is_dir():
             shutil.rmtree(path)
             print(f"removed {relative(path)}")

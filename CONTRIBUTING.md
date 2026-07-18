@@ -44,8 +44,8 @@ something it needs is missing:
 
 - `check` and `format` want [selene](https://kampfkarren.github.io/selene/) and
   [stylua](https://github.com/JohnnyMorganz/StyLua).
-- `libs` and `build` want [Subversion](https://subversion.apache.org/), used to
-  fetch the embedded Ace3 libraries from CurseForge.
+- `prepare` and `build` want [Subversion](https://subversion.apache.org/), used
+  to fetch the embedded Ace3 libraries from CurseForge.
 - `publish` wants the [GitHub CLI](https://cli.github.com/) to create a release,
   and a `CURSEFORGE_TOKEN` (see `.env.template`) to upload to CurseForge.
 
@@ -54,11 +54,13 @@ something it needs is missing:
 After you've made changes, you'll want to see how they behave in-game. The
 recommended way to achieve this is as follows:
 
-1. Download the addon dependencies in to `src/ItemVersion/Libs`. With Subversion
-   installed, you can do this with the following command:
+1. Generate the addon's non-committed pieces: the embedded libraries (fetched
+   into `src/ItemVersion/Libs` with Subversion) and the locale files (generated
+   from `src/translations.yml` into `src/ItemVersion/Locales`). Both are
+   gitignored, and one command produces them:
 
    ```bash
-   ./dev libs
+   ./dev prepare
    ```
 
 2. Tell the tooling where WoW lives, by copying the template and editing it:
@@ -107,23 +109,33 @@ local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 print(L["Hello world"])
 ```
 
-Then add the string to
-[`src/ItemVersion/Locales/enUS.lua`](https://github.com/t-mart/ItemVersion/blob/master/src/ItemVersion/Locales/enUS.lua),
-in alphabetical order:
-
-```lua
-L["Hello world"] = true
-```
-
-`true` means "the value is the key", which is how AceLocale spells "this string
-is already English". You don't need to do anything for the other languages:
+The English text between the brackets is the key. That is all you have to write
+in code: you do not touch any locale file. Once the string is in place, run:
 
 ```bash
 ./dev locales
 ```
 
-will add a commented stub for your new string to every locale file, ready for a
-translator to fill in, and the `check` command will tell you if you forgot.
+This scans the code, adds an entry for your new key to
+[`src/translations.yml`](https://github.com/t-mart/ItemVersion/blob/master/src/translations.yml),
+and drops any entry no code uses anymore. The `check` command runs the same scan
+without writing, and fails if the file is out of sync, which is what CI does.
+
+`translations.yml` is the one place every string lives. Each entry is a key, an
+optional `description` to help translators, and a translation per language:
+
+```yaml
+- key: Hello world
+  description: Greeting shown on login.
+  translations:
+    deDE: Hallo Welt
+```
+
+A key with no `enUS` translation shows its own text to English players, which is
+how AceLocale spells "this string is already English", so you rarely write an
+`enUS` line at all. A language with no translation for a key falls back to that
+English. The locale files under `src/ItemVersion/Locales/` are generated from
+this file by `./dev prepare`; they are gitignored and never edited by hand.
 
 There's nothing else to do. Translations live in this repo, so there is no
 separate system to notify.
@@ -132,32 +144,36 @@ separate system to notify.
 
 If the same English string is used in two places that a translator might want to
 word differently, give each one a context, with `|` between the string and the
-context:
+context. In code you look them up as `L["Legion|canon"]` and `L["Legion|short"]`,
+and in `translations.yml` you spell out the English for each:
 
-```lua
-L["Legion|canon"] = "Legion"
-L["Legion|short"] = "Legion"
+```yaml
+- key: Legion|canon
+  description: The expansion's full name.
+  translations:
+    enUS: Legion
+- key: Legion|short
+  description: The short form, for tight tooltip space.
+  translations:
+    enUS: Legion
 ```
 
 Both are "Legion" in English, but one is the expansion's full name and the other
-has to fit in a tooltip, and a language may want those to differ.
-
-Note that such a key needs its English spelled out, as above, and **not**
-`true`. `true` makes the value the key, so a language without a translation for
-it would show the player `Legion|canon`, marker and all. `check` enforces this,
-but it's easier to just remember.
+has to fit in a tooltip, and a language may want those to differ. Such a key
+**needs** its `enUS` spelled out: without it, English players would see the
+`|canon` marker itself. `check` enforces this.
 
 ### Translations
 
 See
 [Translators Needed](https://github.com/t-mart/ItemVersion/blob/master/README.md#translators-needed)
-in the README. Editing one file under `src/ItemVersion/Locales/` is the whole
-process, and no Lua knowledge is needed beyond the quotes.
+in the README. Editing the single `src/translations.yml` file is the whole
+process, and no Lua knowledge is needed.
 
-The `locales` command maintains those files: it sorts them, stubs out anything
-untranslated, and drops keys that no longer exist. It rewrites every locale
-except `enUS.lua`, which is written by hand. `check` runs the same checks
-without writing anything, which is what CI does.
+The `locales` command keeps that file tidy: it sorts entries by key, adds keys
+the code has started using, and drops keys it has stopped using. `check` runs the
+same checks without writing anything, which is what CI does. `prepare` then turns
+the file into the Lua locale files the game loads.
 
 ## Building a Release
 
@@ -167,10 +183,11 @@ To create a packaged addon zip in `dist/`:
 ./dev build
 ```
 
-This copies `src/ItemVersion/` into `dist/`, stamps the build date into the TOC, and
-zips it up. Files listed under `ignore` in `wowaddon.yml` (such as the
-development-only `Bindings.xml`) are left out. Missing libraries are fetched
-first, so Subversion needs to be installed.
+This runs `prepare` (fetching libraries and generating the locale files), copies
+`src/ItemVersion/` into `dist/`, stamps the build date into the TOC, and zips it
+up. Files listed under `ignore` in `wowaddon.yml` (such as the development-only
+`Bindings.xml`) are left out. Subversion needs to be installed for the library
+fetch.
 
 To ship a build, `./dev publish` uploads it to CurseForge and, for a full
 release, creates a GitHub release. Run it with `--dry-run` first to see exactly

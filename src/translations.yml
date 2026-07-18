@@ -1,0 +1,299 @@
+# yaml-language-server: $schema=../tooling/schemas/translations.schema.json
+- key: Added in {expacIcon} ({versionTriple})
+  translations:
+    esMX: Añadido en {expacIcon} ({versionTriple})
+    ptBR: Adicionado em {expacIcon} ({versionTriple})
+    ruRU: Добавлено в {expacIcon} ({versionTriple})
+    zhCN: 添加于 {expacIcon} ({versionTriple})
+- key: Addon Version
+  translations:
+    esMX: Versión del addon
+    ptBR: Versão do Addon
+    ruRU: Версия аддона
+    zhCN: 插件版本
+- key: Apply version corrections
+  translations:
+    esMX: Aplicar correcciones de versión
+    ptBR: Aplicar correção de versão
+    ruRU: Применить исправления версий
+    zhCN: 应用版本修正
+- key: Battle for Azeroth
+  translations:
+    koKR: 격전의 아제로스
+    zhCN: 争霸艾泽拉斯
+    zhTW: 決戰艾澤拉斯
+- key: BfA
+- key: Build number only
+  translations:
+    esMX: Solo número de compilación
+    ptBR: Somente o número da build
+    ruRU: Только номер сборки
+    zhCN: 仅构建号
+- key: Cata
+  translations:
+    ruRU: Катак
+- key: Cataclysm
+  translations:
+    koKR: 대격변
+    ruRU: Катаклизм
+    zhCN: 大地的裂变
+    zhTW: 浩劫與重生
+- key: Classic|canon
+  description: The full name of the Classic expansion. English reuses "Classic" for both the canonical and short names, but a context marker lets other languages tell them apart.
+  translations:
+    enUS: Classic
+    esMX: 'World of Warcraft: Clásico'
+    koKR: 오리지널
+    ptBR: Clássico
+    ruRU: World of Warcraft
+    zhCN: 经典旧世
+    zhTW: 艾澤拉斯
+- key: Classic|short
+  description: The short name of the Classic expansion. See Classic|canon.
+  translations:
+    enUS: Classic
+    esMX: 'World of Warcraft: Clásico'
+    koKR: 오리지널
+    ptBR: Clássico
+    ruRU: World of Warcraft
+    zhCN: 经典旧世
+    zhTW: 艾澤拉斯
+- key: Color of the line of text in the tooltip
+  translations:
+    esMX: Color de la línea de texto en la descripción emergente
+    ptBR: Cor da linha do texto na caixa de dica de HUD
+    ruRU: Цвет строки текста в подсказке
+    zhCN: 鼠标提示信息的文本颜色
+- key: Correct the version for some items whose release version is different than their usable version.
+  translations:
+    esMX: Corrige la versión de algunos objetos cuya versión de lanzamiento es diferente de la versión en la que pueden usarse.
+    ptBR: Corrija a versão de alguns itens cuja versão disponível é diferente da versão usável do item.
+    ruRU: Исправляет версию для некоторых предметов, чья версия появления отличается от версии использования.
+    zhCN: 修正部分物品的版本信息（实装版本与可用版本不一致）。
+- key: Customize the format of the item version information shown in tooltips.
+  translations:
+    esMX: Personaliza el formato de la información de versión de los objetos mostrada en las descripciones emergentes.
+    ptBR: Personalize o formato da versão do item mostrada na caixa de dica de HUD.
+    ruRU: Настройка формата отображения информации о версии предмета в подсказках.
+    zhCN: 自定义鼠标提示信息中物品版本信息的显示格式
+- key: Description
+  translations:
+    esMX: Descripción
+    ptBR: Descrição
+    ruRU: Описание
+    zhCN: 描述
+- key: DF
+- key: Dragonflight
+  translations:
+    koKR: 용군단
+    zhCN: 巨龙时代
+    zhTW: 巨龍崛起
+- key: Enable tooltip integration
+  translations:
+    esMX: Activar integración con las descripciones emergentes
+    ruRU: Включить интеграцию с подсказками
+    zhCN: 启用鼠标提示信息
+- key: Example
+  translations:
+    esMX: Ejemplo
+    ruRU: Пример
+    zhCN: 示例
+- key: Expansion icon
+  translations:
+    esMX: Icono de expansión
+    ruRU: Иконка дополнения
+    zhCN: 资料片图标
+- key: Format Tokens
+  translations:
+    esMX: Tokens de formato
+    ruRU: Маркеры форматирования
+    zhCN: 格式标记
+- key: Full name of the expansion
+  translations:
+    esMX: Nombre completo de la expansión
+    ruRU: Полное название дополнения
+    zhCN: 资料片全称
+- key: Full version
+  translations:
+    esMX: Versión completa
+    ruRU: Полная версия
+    zhCN: 完整版本
+- key: Invalid item ID or link provided
+  translations:
+    esMX: Se proporcionó un ID o enlace de objeto no válido
+    ruRU: Указан неверный ID предмета или ссылка
+    zhCN: 提供的物品ID或链接无效
+- key: ItemVersion does not support profile version %d, so your settings have been reset.
+- key: Key Modifiers Needed to Show Info
+  translations:
+    esMX: Teclas modificadoras necesarias para mostrar la información
+    ruRU: Клавиши-модификаторы для отображения информации
+    zhCN: 显示信息所需的修饰键
+- key: Legion|canon
+  description: The full name of the Legion expansion. See Classic|canon.
+  translations:
+    enUS: Legion
+    koKR: 군단
+    zhCN: 军团再临
+    zhTW: 軍臨天下
+- key: Legion|short
+  description: The short name of the Legion expansion. See Legion|canon.
+  translations:
+    enUS: Legion
+    koKR: 군단
+    zhCN: 军团再临
+    zhTW: 軍臨天下
+- key: Line Color
+  translations:
+    esMX: Color de la línea
+    ruRU: Цвет строки
+    zhCN: 文本颜色
+- key: Lookup item ID or Link and print tooltip line
+  translations:
+    esMX: Buscar un ID o enlace de objeto y mostrar la línea de la descripción emergente
+    ruRU: Найти предмет по ID или ссылке и вывести строку подсказки
+    zhCN: 查询物品ID或链接并输出提示信息行
+- key: Major, minor, and patch version
+  translations:
+    esMX: Versión mayor, menor y de parche
+    ruRU: Основная, дополнительная и патч-версия
+    zhCN: 主版本号、次版本号和补丁版本号
+- key: Midnight
+  translations:
+    koKR: 한밤
+    zhCN: 至暗之夜
+    zhTW: 至暗之夜
+- key: Mists of Pandaria
+  translations:
+    koKR: 판다리아의 안개
+    zhCN: 熊猫人之谜
+    zhTW: 潘達利亞之謎
+- key: MN
+- key: MoP
+- key: Mouseover Preview
+  translations:
+    esMX: Vista previa al pasar el cursor
+    ruRU: Предпросмотр при наведении
+    zhCN: 鼠标提示预览
+- key: Must supply an item ID or link to lookup
+  translations:
+    esMX: Debe proporcionar un ID o enlace de objeto para realizar la búsqueda
+    ruRU: Необходимо указать ID предмета или ссылку для поиска
+    zhCN: 必须提供物品ID或链接以进行查询
+- key: No version information found for item ID %d
+  translations:
+    esMX: No se encontró información de versión para el ID de objeto %d
+    ruRU: Информация о версии для предмета ID %d не найдена
+    zhCN: 未找到物品ID %d 的版本信息
+- key: Open options
+  translations:
+    esMX: Abrir opciones
+    ruRU: Открыть настройки
+    zhCN: 打开选项
+- key: Platform
+  translations:
+    esMX: Plataforma
+    ruRU: Платформа
+    zhCN: 平台
+- key: Profiles
+  translations:
+    esMX: Perfiles
+    ruRU: Профили
+    zhCN: 配置文件
+- key: Provide a template to format the tooltip line
+  translations:
+    esMX: Proporcione una plantilla para dar formato a la línea de la descripción emergente
+    ruRU: Укажите шаблон для форматирования строки подсказки
+    zhCN: 提供模板以格式化鼠标提示信息行
+- key: Shadowlands
+  translations:
+    koKR: 어둠땅
+    ruRU: Тёмные земли
+    zhCN: 暗影国度
+    zhTW: 暗影之境
+- key: Short name of the expansion
+  translations:
+    esMX: Nombre corto de la expansión
+    ruRU: Краткое название дополнения
+    zhCN: 资料片简称
+- key: Show item version info in tooltips when the %s key is held down.
+  translations:
+    esMX: Mostrar la información de versión del objeto en las descripciones emergentes al mantener presionada la tecla %s.
+    ruRU: Показывать информацию о версии предмета в подсказках при зажатой клавише %s.
+    zhCN: 按住 %s 键时，在鼠标提示信息中显示物品版本信息
+- key: Show item version information in tooltips.
+  translations:
+    esMX: Mostrar la información de versión de los objetos en las descripciones emergentes.
+    ruRU: Показывать информацию о версии предмета в подсказках.
+    zhCN: 在鼠标提示信息中显示物品版本信息
+- key: Show this message
+  translations:
+    esMX: Mostrar este mensaje
+    ruRU: Показать это сообщение
+    zhCN: 显示此消息
+- key: Show version info
+  translations:
+    esMX: Mostrar información de versión
+    ruRU: Показать информацию о версии
+    zhCN: 显示版本信息
+- key: SL
+- key: TBC
+- key: The Burning Crusade
+  translations:
+    koKR: 불타는 성전
+    zhCN: 燃烧的远征
+    zhTW: 燃燒的遠征
+- key: The War Within
+  translations:
+    koKR: 내부 전쟁
+    zhCN: 地心之战
+    zhTW: 地心之戰
+- key: Token
+  translations:
+    ruRU: Маркер
+    zhCN: 标记
+- key: Tooltip format
+  translations:
+    esMX: Formato de la descripción emergente
+    ruRU: Формат подсказки
+    zhCN: 鼠标提示信息格式
+- key: 'Usage: /itemversion <command>'
+  translations:
+    esMX: 'Uso: /itemversion <comando>'
+    ruRU: 'Использование: /itemversion <команда>'
+    zhCN: 用法：/itemversion <命令>
+- key: Version Information
+  translations:
+    esMX: Información de versión
+    ruRU: Информация о версии
+    zhCN: 版本信息
+- key: Warlords of Draenor
+  translations:
+    koKR: 드레노어의 전쟁군주
+    zhCN: 德拉诺之王
+    zhTW: 德拉諾之霸
+- key: WoD
+- key: WotLK
+  translations:
+    zhCN: WLK
+- key: WoW Build
+  translations:
+    esMX: Compilación de WoW
+    ruRU: Сборка WoW
+    zhCN: 构建号
+- key: WoW Build Date
+  translations:
+    esMX: Fecha de compilación de WoW
+    ruRU: Дата сборки WoW
+    zhCN: 构建日期
+- key: WoW Version
+  translations:
+    esMX: Versión de WoW
+    ruRU: Версия WoW
+    zhCN: 游戏版本
+- key: Wrath of the Lich King
+  translations:
+    koKR: 리치 왕의 분노
+    zhCN: 巫妖王之怒
+    zhTW: 巫妖王之怒
+- key: WW

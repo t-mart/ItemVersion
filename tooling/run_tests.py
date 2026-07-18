@@ -1,6 +1,7 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
+#   "jsonschema>=4.0",
 #   "luaparser>=3.2.1",
 #   "pytest>=8",
 #   "python-dotenv>=1.0",

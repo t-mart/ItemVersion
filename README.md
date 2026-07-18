@@ -64,34 +64,34 @@ for more information.
 If you know another language, you can help, and you don't need to know how to
 program.
 
-The translations live in
-[`ItemVersion/Locales/`](https://github.com/t-mart/ItemVersion/tree/master/src/ItemVersion/Locales),
-one file per language. Open the one for yours, and you'll see lines like this:
+All the translations live in one file,
+[`src/translations.yml`](https://github.com/t-mart/ItemVersion/blob/master/src/translations.yml).
+Each entry is one string: its English key, an optional description to give you
+context, and a translation for each language. To add yours, add a line under
+`translations`:
 
-```lua
-L["Addon Version"] = "Versão do Addon"
--- L["Apply version corrections"] = ""
+```yaml
+- key: Apply version corrections
+  description: A checkbox label on the options screen.
+  translations:
+    deDE: Versionskorrekturen anwenden
+    ptBR: Aplicar correcao de versao
 ```
 
-The first is translated. The second is commented out, which means nobody has
-translated it yet: the English in the brackets is what a player sees today.
-To translate it, delete the leading `-- ` and type your translation between the
-empty quotes.
+If your language has no line for a string, players who use it see the English
+key instead, so anything you add is pure improvement.
 
 That's the whole job. You can do it in GitHub's web editor, using the pencil
 icon on the file, and "Propose changes" will open a pull request for you.
 
-Three things worth knowing:
+Two things worth knowing:
 
-- **Leave `enUS.lua` alone.** That one is the English source that everything
-  else falls back to.
 - **Keep anything in `%` or `{}` exactly as it is.** `%s`, `%d` and
   `{expacIcon}` get replaced with real values when the addon runs, so
   `"Added in {expacIcon}"` can become `"Added in Legion"`. You can move them
   around to suit your language, but don't rename or drop them.
-- **Don't leave a line half done.** An empty `""` shows the player nothing at
-  all, which is worse than English. If you want to skip one, comment it back
-  out.
+- **Skip a string by leaving it out, not by writing `""`.** An empty string
+  shows the player nothing at all, which is worse than the English fallback.
 
 A missing language is fine too: just ask in an issue and one will be added.
 Translations are living things, so if you spot one that reads badly, please say

@@ -58,8 +58,14 @@ class TestParseConfig:
             config.parse_config(text)
 
     def test_non_mapping_dies(self):
-        with pytest.raises(common.Die, match="mapping"):
+        with pytest.raises(common.Die, match="object"):
             config.parse_config("- just\n- a\n- list\n")
+
+    def test_unknown_key_dies(self):
+        # additionalProperties: false in the schema is what forbids a stray key.
+        text = VALID + "surprise: yes\n"
+        with pytest.raises(common.Die, match="surprise"):
+            config.parse_config(text)
 
 
 class TestDerivedPaths:
@@ -70,6 +76,15 @@ class TestDerivedPaths:
         assert cfg.source_dir == tmp_path / "src" / "ItemVersion"
         assert cfg.libs_dir == tmp_path / "src" / "ItemVersion" / "Libs"
         assert cfg.toc_path == tmp_path / "src" / "ItemVersion" / "ItemVersion.toc"
+        assert cfg.locales_dir == tmp_path / "src" / "ItemVersion" / "Locales"
+
+    def test_translations_live_beside_the_addon_not_inside_it(self, tmp_path, monkeypatch):
+        # Outside src/<name>, so it is never symlinked into WoW nor built into the zip.
+        monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
+        cfg = config.parse_config(VALID)
+
+        assert cfg.translations_path == tmp_path / "src" / "translations.yml"
+        assert cfg.source_dir not in cfg.translations_path.parents
 
     def test_a_rename_moves_the_whole_layout(self, tmp_path, monkeypatch):
         monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")

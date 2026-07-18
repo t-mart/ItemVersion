@@ -1,8 +1,5 @@
--- The English strings, and the source of truth for what keys exist.
---
--- Unlike the translations beside it, this file is written by hand and the
--- locale tool only checks it. The tool will not reformat it, so the comments
--- below survive.
+-- Generated from src/translations.yml by `./dev prepare`. Do not edit by hand;
+-- edit that file instead.
 
 local AddonName = ...
 
@@ -19,8 +16,6 @@ L["BfA"] = true
 L["Build number only"] = true
 L["Cata"] = true
 L["Cataclysm"] = true
--- In English, we use "Classic" for both the canon and short names, but they have different
--- semantic meaning. To allow for other languages to distinguish them, we use a context marker.
 L["Classic|canon"] = "Classic"
 L["Classic|short"] = "Classic"
 L["Color of the line of text in the tooltip"] = true
@@ -38,7 +33,6 @@ L["Full version"] = true
 L["Invalid item ID or link provided"] = true
 L["ItemVersion does not support profile version %d, so your settings have been reset."] = true
 L["Key Modifiers Needed to Show Info"] = true
--- same as "Classic" above
 L["Legion|canon"] = "Legion"
 L["Legion|short"] = "Legion"
 L["Line Color"] = true

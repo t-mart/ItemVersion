@@ -1,9 +1,11 @@
+# yaml-language-server: $schema=tooling/schemas/wowaddon.schema.json
+#
 # Project configuration for the ./dev tooling.
 #
 # name                 the addon folder and the base of the packaged zip name
 # curseforge-project-id the project this uploads to on CurseForge
 # ignore               files under the addon dir to keep out of a build
-# libs                 embedded libraries, fetched by `./dev libs`. Each maps a
+# libs                 embedded libraries, fetched by `./dev prepare`. Each maps a
 #                      folder under ItemVersion/Libs to the SVN url it comes from.
 #                      Ace3 and friends are published over SVN on CurseForge, so
 #                      these stay svn even though the rest of the world is git.

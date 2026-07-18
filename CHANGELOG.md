@@ -11,10 +11,10 @@
   ([#106](https://github.com/t-mart/ItemVersion/issues/106)) and to
   [@HectorZaGa](https://github.com/HectorZaGa) for the Spanish
   ([#116](https://github.com/t-mart/ItemVersion/issues/116)).
-- Translations now live in the addon itself rather than on CurseForge. If you
-  speak a language ItemVersion does not cover yet, everything you need is in
-  `ItemVersion/Locales/`, and GitHub's web editor is enough to send a fix. Lines
-  that are commented out are the ones still needing a translation.
+- Translations now live in the addon's own repository rather than on CurseForge.
+  If you speak a language ItemVersion does not cover yet, every string is in a
+  single file, `src/translations.yml`, and GitHub's web editor is enough to send
+  a fix. A string with no line for your language just falls back to English.
 - The original game is now called "Classic", both in full and abbreviated,
   instead of "World of Warcraft" and "Vanilla". This is what Blizzard internally
   calls it.

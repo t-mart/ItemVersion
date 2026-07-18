@@ -11,6 +11,13 @@ on:
   push:
     branches:
       - master
+  # So the release workflow can gate on these same checks. It passes ref: release
+  # to check the branch being published rather than whatever triggered the run.
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
 
 jobs:
   check:
@@ -19,6 +26,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # Empty on normal triggers, which makes checkout use the triggering
+          # ref; set to release when called from the release workflow.
+          ref: ${{ inputs.ref }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

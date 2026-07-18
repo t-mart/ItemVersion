@@ -85,6 +85,18 @@ recommended way to achieve this is as follows:
    only some flavors instead of all of them. The `install-status` command shows
    what is linked, and `uninstall` removes the links again.
 
+   To test the exact files that get published rather than your working tree, pass
+   a source instead of the default symlink:
+
+   - `./dev install --gh <tag>` copies a published GitHub release (use `latest`
+     for the most recent one).
+   - `./dev install --cf <file-id>` copies a published CurseForge file by id.
+
+   These land as real directories, each carrying a `.dev-install` marker so
+   `install-status` names them, `uninstall` cleans them up, and re-installing
+   replaces them. A foreign directory sitting at the target is left alone unless
+   you pass `--force`, which deletes it first.
+
    On Windows, creating a symlink needs either Developer Mode turned on
    (Settings > System > For developers) or an Administrator terminal.
 

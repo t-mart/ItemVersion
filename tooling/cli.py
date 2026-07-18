@@ -91,6 +91,28 @@ def install_options(parser: argparse.ArgumentParser) -> None:
             f"{', '.join(FLAVOR_DIRS)}, or {ALL_FLAVORS} (the default)."
         ),
     )
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument(
+        "--local",
+        action="store_true",
+        help="symlink the working source, so edits live-reload (the default)",
+    )
+    source.add_argument(
+        "--gh",
+        metavar="TAG",
+        help="download and install a published GitHub release by tag (or 'latest')",
+    )
+    source.add_argument(
+        "--cf",
+        metavar="FILE_ID",
+        type=int,
+        help="download and install a published CurseForge file by id",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="replace a foreign real directory sitting at the target",
+    )
 
 
 COMMANDS = {
@@ -110,7 +132,8 @@ COMMANDS = {
     "clean": Command(cmd_clean, "Remove dist/ and the generated Libs and Locales."),
     "install": Command(
         cmd_install,
-        "Symlink the addon into each WoW flavor's AddOns dir.",
+        "Install the addon into each WoW flavor: symlink the source, or copy a "
+        "published GitHub/CurseForge build.",
         install_options,
     ),
     "uninstall": Command(cmd_uninstall, "Remove our symlinks."),

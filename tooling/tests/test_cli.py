@@ -46,6 +46,18 @@ class TestCli:
         args = cli.build_parser().parse_args(["interfaces", "--dry-run"])
         assert args.dry_run is True
 
+    def test_install_parses_a_gh_tag(self):
+        args = cli.build_parser().parse_args(["install", "--gh", "1.2.3"])
+        assert args.gh == "1.2.3"
+
+    def test_install_parses_a_cf_file_id_as_an_int(self):
+        args = cli.build_parser().parse_args(["install", "--cf", "12345"])
+        assert args.cf == 12345
+
+    def test_install_source_flags_are_mutually_exclusive(self):
+        with pytest.raises(SystemExit):
+            cli.build_parser().parse_args(["install", "--gh", "1.0", "--cf", "5"])
+
     def test_die_becomes_exit_one(self, monkeypatch, capsys):
         monkeypatch.delenv("WOW_ROOT", raising=False)
         monkeypatch.setattr(install, "ENV_FILE", Path("/nonexistent"))

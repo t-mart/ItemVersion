@@ -1,6 +1,8 @@
 # ItemVersion Changelog
 
-> [!NOTE] If a release is not documented here, it was likely an automated item
+> [!NOTE]
+>
+> If a release is not documented here, it was likely an automated item
 > database refresh.
 
 ## 2026.28.1

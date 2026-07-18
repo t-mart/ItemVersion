@@ -166,12 +166,6 @@
     koKR: 군단
     zhCN: 军团再临
     zhTW: 軍臨天下
-- key: Line Color
-  description: Name of the tooltip line color option.
-  translations:
-    esMX: Color de la línea
-    ruRU: Цвет строки
-    zhCN: 文本颜色
 - key: Lookup item ID or Link and print tooltip line
   description: Help text for the 'lookup' slash command.
   translations:
@@ -306,6 +300,12 @@
     esMX: Formato de la descripción emergente
     ruRU: Формат подсказки
     zhCN: 鼠标提示信息格式
+- key: Tooltip text color
+  description: Name of the tooltip line color option.
+  translations:
+    esMX: Color de la línea
+    ruRU: Цвет строки
+    zhCN: 文本颜色
 - key: 'Usage: /itemversion <command>'
   description: Slash-command usage hint. Keep /itemversion literal.
   translations:

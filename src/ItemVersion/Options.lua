@@ -60,7 +60,7 @@ local OPTIONS_TABLE = {
     },
     lineColor = {
       type = "color",
-      name = L["Line Color"],
+      name = L["Tooltip text color"],
       desc = L["Color of the line of text in the tooltip"],
       get = "GetColor",
       set = "SetColor",

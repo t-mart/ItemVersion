@@ -2,9 +2,9 @@
 
   ./dev locales          reconcile translations.yml with the code, then report
   ./dev locales --check   report only, write nothing (for CI)
-  ./dev prepare           generate Locales/*.lua from translations.yml
+  ./dev prepare-src       generate Locales/*.lua from translations.yml
 
-The first two live here. Generation is a step of prepare (packaging.py), which
+The first two live here. Generation is a step of prepare-src (packaging.py), which
 calls generate() below.
 
 Used keys are found by parsing the addon's Lua, not by matching text: a regex over
@@ -50,7 +50,7 @@ TOKEN = re.compile(r"\{(\w+)\}")
 
 # Generated files say so, and point at the source, so nobody edits the output.
 GENERATED_BANNER = (
-    "-- Generated from src/translations.yml by `./dev prepare`. Do not edit by hand;\n"
+    "-- Generated from src/translations.yml by `./dev prepare-src`. Do not edit by hand;\n"
     "-- edit that file instead.\n"
 )
 
@@ -302,7 +302,7 @@ def check_placeholders(message: Message, path: Path) -> list[Problem]:
 def check_toc_locales(config: Config, messages: tuple[Message, ...]) -> list[Problem]:
     """The TOC's generated file list must name exactly the locales in the source.
 
-    They only diverge when a whole language is added or dropped and prepare has not
+    They only diverge when a whole language is added or dropped and prepare-src has not
     run since, which would leave the new locale's file unloaded (or a dead entry).
     """
     try:
@@ -319,7 +319,7 @@ def check_toc_locales(config: Config, messages: tuple[Message, ...]) -> list[Pro
             config.toc_path,
             None,
             f"the TOC loads locales {current}, but translations.yml implies "
-            f"{expected}; run ./dev prepare",
+            f"{expected}; run ./dev prepare-src",
         )
     ]
 

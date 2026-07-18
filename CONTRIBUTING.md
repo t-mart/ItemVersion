@@ -44,7 +44,7 @@ something it needs is missing:
 
 - `check` and `format` want [selene](https://kampfkarren.github.io/selene/) and
   [stylua](https://github.com/JohnnyMorganz/StyLua).
-- `prepare` and `build` want [Subversion](https://subversion.apache.org/), used
+- `prepare-src` and `build` want [Subversion](https://subversion.apache.org/), used
   to fetch the embedded Ace3 libraries from CurseForge.
 - `publish` wants the [GitHub CLI](https://cli.github.com/) to create a release,
   and a `CURSEFORGE_TOKEN` (see `.env.template`) to upload to CurseForge.
@@ -60,7 +60,7 @@ recommended way to achieve this is as follows:
    gitignored, and one command produces them:
 
    ```bash
-   ./dev prepare
+   ./dev prepare-src
    ```
 
 2. Tell the tooling where WoW lives, by copying the template and editing it:
@@ -147,7 +147,7 @@ A key with no `enUS` translation shows its own text to English players, which is
 how AceLocale spells "this string is already English", so you rarely write an
 `enUS` line at all. A language with no translation for a key falls back to that
 English. The locale files under `src/ItemVersion/Locales/` are generated from
-this file by `./dev prepare`; they are gitignored and never edited by hand.
+this file by `./dev prepare-src`; they are gitignored and never edited by hand.
 
 There's nothing else to do. Translations live in this repo, so there is no
 separate system to notify.
@@ -184,7 +184,7 @@ process, and no Lua knowledge is needed.
 
 The `locales` command keeps that file tidy: it sorts entries by key, adds keys
 the code has started using, and drops keys it has stopped using. `check` runs the
-same checks without writing anything, which is what CI does. `prepare` then turns
+same checks without writing anything, which is what CI does. `prepare-src` then turns
 the file into the Lua locale files the game loads.
 
 ## Building a Release
@@ -195,7 +195,7 @@ To create a packaged addon zip in `dist/`:
 ./dev build
 ```
 
-This runs `prepare` (fetching libraries and generating the locale files), copies
+This runs `prepare-src` (fetching libraries and generating the locale files), copies
 `src/ItemVersion/` into `dist/`, stamps the build date into the TOC, and zips it
 up. Files listed under `ignore` in `wowaddon.yml` (such as the development-only
 `Bindings.xml`) are left out. Subversion needs to be installed for the library

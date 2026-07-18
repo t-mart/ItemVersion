@@ -38,7 +38,7 @@ HEADER = f"""\
 #
 # `./dev locales` sorts this file and keeps it in step with the code. Editing it
 # does NOT change the running game on its own: the locale files an `./dev install`
-# symlink serves are generated, so run `./dev prepare` afterwards (or `./dev watch`,
+# symlink serves are generated, so run `./dev prepare-src` afterwards (or `./dev watch`,
 # which regenerates them for you on every save) and then /reload in game.
 """
 

@@ -125,7 +125,7 @@ def wow_root() -> Path:
 
 
 def require_prepared(config: Config) -> None:
-    """The generated bits a symlinked install needs, or a pointer to prepare.
+    """The generated bits a symlinked install needs, or a pointer to prepare-src.
 
     Libs and the locale files are gitignored output, so a fresh checkout has
     neither, and the addon would fail to load without them. A downloaded build
@@ -141,7 +141,7 @@ def require_prepared(config: Config) -> None:
         raise Die(
             f"{config.name} is missing {' and '.join(missing)}, so it would fail to load.\n"
             "Generate them first:\n"
-            "  ./dev prepare"
+            "  ./dev prepare-src"
         )
 
 

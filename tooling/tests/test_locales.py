@@ -279,7 +279,7 @@ class TestCheckTocLocales:
         messages = translations.read_messages(tree.translations_path)
         problems = locales.check_toc_locales(tree, messages)
         assert [p.severity for p in problems] == [locales.ERROR]
-        assert "run ./dev prepare" in problems[0].message
+        assert "run ./dev prepare-src" in problems[0].message
 
 
 class TestGenerate:

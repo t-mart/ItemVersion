@@ -130,7 +130,7 @@ class TestBuild:
 
 class TestPrepare:
     def test_present_libs_are_not_refetched(self, packager, capsys):
-        assert packaging.cmd_prepare() == 0
+        assert packaging.cmd_prepare_src() == 0
 
         assert packager.calls == []
         assert "present" in capsys.readouterr().out
@@ -140,7 +140,7 @@ class TestPrepare:
 
         shutil.rmtree(packager.source / "Libs" / "AceAddon-3.0")
 
-        assert packaging.cmd_prepare() == 0
+        assert packaging.cmd_prepare_src() == 0
         assert any(command[:2] == ["svn", "export"] for command in packager.calls)
 
     def test_a_failed_export_dies(self, packager, monkeypatch):
@@ -150,14 +150,14 @@ class TestPrepare:
         monkeypatch.setattr(packaging, "run", lambda command: 1)
 
         with pytest.raises(common.Die, match="could not export"):
-            packaging.cmd_prepare()
+            packaging.cmd_prepare_src()
 
     def test_generates_locale_files_and_syncs_the_toc(self, packager):
         packager.config.translations_path.write_text(
             "- key: Hello\n  translations:\n    deDE: Hallo\n", encoding="utf-8"
         )
 
-        assert packaging.cmd_prepare() == 0
+        assert packaging.cmd_prepare_src() == 0
 
         locales_dir = packager.source / "Locales"
         assert (locales_dir / "enUS.lua").is_file()
@@ -173,7 +173,7 @@ class TestPrepare:
         stale.parent.mkdir(parents=True, exist_ok=True)
         stale.write_text("-- left over", encoding="utf-8")
 
-        packaging.cmd_prepare()
+        packaging.cmd_prepare_src()
 
         assert not stale.exists()
 

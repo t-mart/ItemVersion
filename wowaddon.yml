@@ -15,7 +15,7 @@
 # ignore
 #   files under the addon dir to keep out of a build
 # libs
-#   embedded libraries, fetched by `./dev prepare`. Each maps a folder under
+#   embedded libraries, fetched by `./dev prepare-src`. Each maps a folder under
 #   ItemVersion/Libs to the SVN url it comes from
 
 name: ItemVersion

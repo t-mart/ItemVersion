@@ -48,7 +48,7 @@ def ensure_libs(config: Config) -> None:
         report(folder, "fetched")
 
 
-def cmd_prepare() -> int:
+def cmd_prepare_src() -> int:
     """Populate the addon's generated bits: the embedded libs and the locale files.
 
     Both are gitignored output that build and install need but do not commit. Libs

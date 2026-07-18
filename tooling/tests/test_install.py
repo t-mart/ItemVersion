@@ -214,7 +214,7 @@ class TestInstall:
 
         shutil.rmtree(install.load_config().libs_dir)
 
-        with pytest.raises(common.Die, match="dev prepare"):
+        with pytest.raises(common.Die, match="dev prepare-src"):
             install.cmd_install()
 
         assert not install.target_for(installed, "_retail_", NAME).exists()

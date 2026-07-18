@@ -22,7 +22,7 @@ from install import (
     cmd_uninstall,
 )
 from interfaces import cmd_interfaces
-from packaging import cmd_build, cmd_clean, cmd_prepare
+from packaging import cmd_build, cmd_clean, cmd_prepare_src
 from publish import RELEASE, RELEASE_TYPES, TARGETS, cmd_publish
 from quality import cmd_check, cmd_format, cmd_locales, cmd_test, cmd_watch
 
@@ -121,8 +121,8 @@ COMMANDS = {
         "Update the TOC's Interface line from Blizzard.",
         interfaces_options,
     ),
-    "prepare": Command(
-        cmd_prepare, "Fetch the embedded libraries and generate the locale files."
+    "prepare-src": Command(
+        cmd_prepare_src, "Fetch the embedded libraries and generate the locale files."
     ),
     "get-item-data": Command(
         cmd_get_item_data,

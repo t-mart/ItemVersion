@@ -22,6 +22,11 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+        with:
+          # Our Python deps live in the dev script's PEP 723 block, not a
+          # pyproject or lockfile, so key the uv cache on it. Without this the
+          # cache never invalidates and setup-uv warns about it.
+          cache-dependency-glob: dev
 
       # Straight from each project's releases, because both ship a prebuilt
       # binary. cargo binstall was building selene from source, which dominated an

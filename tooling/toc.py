@@ -7,6 +7,7 @@ hand.
 
 from __future__ import annotations
 
+import fnmatch
 import re
 
 from common import Die
@@ -14,6 +15,40 @@ from common import Die
 # A file-list entry loading a locale, as `Locales\enUS.lua`. Either slash, since
 # WoW accepts both and a repo might have been written with forward slashes.
 LOCALE_LINE = re.compile(r"^Locales[\\/].+\.lua\s*$")
+
+
+def _references_a_devonly_file(line: str, patterns: tuple[str, ...]) -> bool:
+    """True when a TOC file-list line points at a dev-only path.
+
+    Matches the referenced path against each glob, both as a full relative path and
+    by basename, with slashes normalized. Comment (`##`) and blank lines carry no
+    file reference, so they never match.
+    """
+    reference = line.strip()
+    if not reference or reference.startswith("#"):
+        return False
+
+    normalized = reference.replace("\\", "/")
+    basename = normalized.rsplit("/", 1)[-1]
+    for pattern in patterns:
+        glob = pattern.replace("\\", "/")
+        if fnmatch.fnmatch(normalized, glob) or fnmatch.fnmatch(basename, glob):
+            return True
+    return False
+
+
+def strip_files(text: str, patterns: tuple[str, ...]) -> str:
+    """The TOC with any file-list line referencing a dev-only path removed.
+
+    So a packaged TOC never names a file the build left out. Line endings and every
+    other line are preserved.
+    """
+    if not patterns:
+        return text
+
+    lines = text.splitlines(keepends=True)
+    kept = [line for line in lines if not _references_a_devonly_file(line, patterns)]
+    return "".join(kept)
 
 
 def toc_field(text: str, field: str) -> str | None:

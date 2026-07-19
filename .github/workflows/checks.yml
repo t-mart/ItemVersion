@@ -1,9 +1,11 @@
 name: Checks
 
-# Lint, formatting and locale checks, on pull requests and on master.
+# Lint, formatting, locale checks, and the addon's Lua test suite, on pull
+# requests and on master.
 #
 # This runs `./dev check`, which is the same command you run locally, so
-# a green run here means the same thing as a green run on your machine.
+# a green run here means the same thing as a green run on your machine. It also
+# runs `./dev test-tooling`, the pytest suite for the ./dev tooling itself.
 
 on:
   workflow_dispatch:
@@ -66,5 +68,29 @@ jobs:
           mv selene stylua "$BIN/"
           echo "$BIN" >> "$GITHUB_PATH"
 
+      # WoW ships a customized PUC-Rio Lua 5.1, so the addon's busted suite (run by
+      # ./dev check) targets 5.1, not the system lua. These actions build that Lua,
+      # wire up luarocks against it, and put the busted launcher on PATH.
+      #
+      # Pinned like selene and stylua above: bump when the version you test with
+      # locally moves on.
+      - name: Install Lua 5.1
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+
+      - name: Install luarocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install busted
+        env:
+          BUSTED_VERSION: "2.3.0"
+        run: luarocks install busted "$BUSTED_VERSION"
+
       - name: Check
         run: ./dev check
+
+      # The dev tooling's own pytest suite. Separate from check because it exercises
+      # ./dev itself, not the addon, and needs nothing beyond uv.
+      - name: Tooling tests
+        run: ./dev test-tooling

@@ -1,7 +1,14 @@
 std = "wow-stdlib"
 
 # ItemData.lua is generated and is ~1s of an otherwise ~4ms lint run, so skip it.
-exclude = ["src/ItemVersion/Libs/**", "src/ItemVersion/ItemData.lua"]
+# DevTests.lua is a dev-only in-client suite that pokes a broad client surface
+# (scanning tooltips, timers) the shipped addon never touches, so it is not worth
+# teaching the std about; it never ships anyway.
+exclude = [
+  "src/ItemVersion/Libs/**",
+  "src/ItemVersion/ItemData.lua",
+  "src/ItemVersion/DevTests.lua",
+]
 
 [config]
 unscoped_variables = { ignore_pattern = "ItemVersion" }

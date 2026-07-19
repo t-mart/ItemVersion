@@ -94,3 +94,42 @@ class TestVersionFromToc:
 
     def test_ignores_a_version_further_in(self):
         assert toc.version_from_toc("## X-Foo: ## Version: nope\n") is None
+
+
+class TestStripFiles:
+    TOC = (
+        "## Title: X\n"
+        "## Version: 1.0\n"
+        "\n"
+        "Init.lua\n"
+        "DevTests.lua\n"
+        "Sub\\Dir\\Thing.lua\n"
+    )
+
+    def test_removes_a_matching_file_line(self):
+        out = toc.strip_files(self.TOC, ("DevTests.lua",))
+        assert "DevTests.lua" not in out
+        assert "Init.lua" in out
+
+    def test_leaves_everything_else_including_headers_and_blanks(self):
+        out = toc.strip_files(self.TOC, ("DevTests.lua",))
+        assert out == (
+            "## Title: X\n## Version: 1.0\n\nInit.lua\nSub\\Dir\\Thing.lua\n"
+        )
+
+    def test_matches_by_basename_across_separators(self):
+        # A bare pattern still catches a file nested under a subdir, either slash.
+        out = toc.strip_files(self.TOC, ("Thing.lua",))
+        assert "Thing.lua" not in out
+
+    def test_honors_a_glob(self):
+        out = toc.strip_files("A.lua\nB.lua\nKeep.txt\n", ("*.lua",))
+        assert out == "Keep.txt\n"
+
+    def test_never_touches_comment_or_blank_lines(self):
+        # A pattern that would match a header word must not eat the header.
+        toc_text = "## Title\n\nInit.lua\n"
+        assert toc.strip_files(toc_text, ("*",)) == "## Title\n\n"
+
+    def test_no_patterns_is_a_no_op(self):
+        assert toc.strip_files(self.TOC, ()) == self.TOC

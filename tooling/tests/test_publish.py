@@ -17,7 +17,7 @@ WHEN = datetime(2026, 7, 17, 21, 37, 26, tzinfo=timezone.utc)
 CONFIG = Config(
     name="ItemVersion",
     curseforge_project_id=433258,
-    ignore=(),
+    dev_only=(),
     libs=(("A", "svn://x"),),
     changelog_url="https://example/CHANGELOG.md",
     curseforge_project_slug="itemversion",

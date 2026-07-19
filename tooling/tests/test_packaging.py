@@ -26,7 +26,9 @@ def packager(tmp_path, monkeypatch):
     cfg = Config(
         name="ItemVersion",
         curseforge_project_id=1,
-        ignore=("Bindings.xml",),
+        # Bindings.xml is dev-only and not in the TOC; DevTests.lua is dev-only and
+        # listed in the TOC, so the build must drop the file and strip its line.
+        dev_only=("Bindings.xml", "DevTests.lua"),
         libs=(("AceAddon-3.0", "svn://example/AceAddon-3.0"),),
     )
 
@@ -34,11 +36,12 @@ def packager(tmp_path, monkeypatch):
     (source / "Libs" / "AceAddon-3.0").mkdir(parents=True)
     (source / "Libs" / "AceAddon-3.0" / "AceAddon-3.0.lua").write_text("-- lib", encoding="utf-8")
     (cfg.toc_path).write_text(
-        "## Title: ItemVersion\n## Version: 1.2.3\n\nLocales\\enUS.lua\nInit.lua\n",
+        "## Title: ItemVersion\n## Version: 1.2.3\n\nLocales\\enUS.lua\nInit.lua\nDevTests.lua\n",
         encoding="utf-8",
     )
     (source / "Init.lua").write_text("-- code\n", encoding="utf-8")
     (source / "Bindings.xml").write_text("<Bindings/>\n", encoding="utf-8")
+    (source / "DevTests.lua").write_text("-- dev tests\n", encoding="utf-8")
 
     calls: list[list[str]] = []
 
@@ -86,14 +89,25 @@ class TestBuild:
         assert "ItemVersion/Init.lua" in names
         assert "ItemVersion/Libs/AceAddon-3.0/AceAddon-3.0.lua" in names
 
-    def test_leaves_out_ignored_files(self, packager):
+    def test_leaves_out_dev_only_files(self, packager):
         packaging.cmd_build()
 
         staged = packager.build_root / "ItemVersion"
-        assert not (staged / "Bindings.xml").exists()
-        assert "ItemVersion/Bindings.xml" not in ZipFile(
-            packager.build_root / "ItemVersion-1.2.3.zip"
-        ).namelist()
+        names = ZipFile(packager.build_root / "ItemVersion-1.2.3.zip").namelist()
+
+        for dev_only in ("Bindings.xml", "DevTests.lua"):
+            assert not (staged / dev_only).exists()
+            assert f"ItemVersion/{dev_only}" not in names
+
+    def test_strips_dev_only_lines_from_the_staged_toc(self, packager):
+        packaging.cmd_build()
+
+        toc = (packager.build_root / "ItemVersion" / "ItemVersion.toc").read_text(encoding="utf-8")
+
+        # The dev-only file that was in the TOC is gone, but the shipped ones remain.
+        assert "DevTests.lua" not in toc
+        assert "Init.lua" in toc
+        assert "Locales\\enUS.lua" in toc
 
     def test_stamps_the_build_date_into_the_staged_toc(self, packager):
         packaging.cmd_build()

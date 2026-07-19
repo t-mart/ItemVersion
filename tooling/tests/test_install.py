@@ -22,7 +22,7 @@ NAME = "ItemVersion"
 
 
 def make_config(name: str = NAME) -> Config:
-    return Config(name=name, curseforge_project_id=1, ignore=(), libs=(("AceAddon-3.0", "svn://x"),))
+    return Config(name=name, curseforge_project_id=1, dev_only=(), libs=(("AceAddon-3.0", "svn://x"),))
 
 
 def make_wow_root(tmp_path: Path, flavors: tuple[str, ...] = install.FLAVORS) -> Path:

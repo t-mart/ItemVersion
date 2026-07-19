@@ -137,7 +137,7 @@ class TestCmdInterfaces:
     @pytest.fixture
     def stale(self, tmp_path, monkeypatch):
         monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
-        cfg = Config(name="ItemVersion", curseforge_project_id=1, ignore=(), libs=(("A", "svn://x"),))
+        cfg = Config(name="ItemVersion", curseforge_project_id=1, dev_only=(), libs=(("A", "svn://x"),))
         cfg.toc_path.parent.mkdir(parents=True)
         cfg.toc_path.write_text("## Title: ItemVersion\n## Interface: 1, 2\n", encoding="utf-8")
         monkeypatch.setattr(interfaces, "load_config", lambda: cfg)

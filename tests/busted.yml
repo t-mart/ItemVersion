@@ -1,0 +1,42 @@
+# selene standard library for the busted test suite: plain Lua 5.1 plus the globals
+# busted and luassert inject. Kept separate from the addon's wow-stdlib, since these
+# files run outside WoW.
+base: lua51
+globals:
+  describe:
+    args:
+      - type: string
+      - type: function
+  it:
+    args:
+      - type: string
+      - type: function
+  before_each:
+    args:
+      - type: function
+  after_each:
+    args:
+      - type: function
+  # luassert's assert is callable (the Lua base assert) and also a namespace of
+  # matchers. Each matcher takes (value, [extra...]), so accept a vararg.
+  assert.are.equal:
+    args:
+      - type: "..."
+  assert.are.same:
+    args:
+      - type: "..."
+  assert.is_true:
+    args:
+      - type: "..."
+  assert.is_false:
+    args:
+      - type: "..."
+  assert.is_nil:
+    args:
+      - type: "..."
+  assert.is_not_nil:
+    args:
+      - type: "..."
+  assert.is_function:
+    args:
+      - type: "..."

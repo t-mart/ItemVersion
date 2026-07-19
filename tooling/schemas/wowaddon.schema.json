@@ -27,9 +27,9 @@
       "format": "uri",
       "description": "Optional link to the changelog. Publish uses it as the release notes rather than inlining anything."
     },
-    "ignore": {
+    "dev-only": {
       "type": "array",
-      "description": "Paths, relative to the source dir, to leave out of a build (glob patterns allowed).",
+      "description": "Paths, relative to the source dir, that exist for development and never ship (glob patterns allowed). They are left out of the build, and any TOC line referencing one is stripped from the built TOC.",
       "items": { "type": "string", "minLength": 1 }
     },
     "libs": {

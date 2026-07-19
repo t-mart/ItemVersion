@@ -12,7 +12,7 @@ name: ItemVersion
 curseforge-project-id: 433258
 curseforge-project-slug: itemversion
 changelog-url: https://example/CHANGELOG.md
-ignore:
+dev-only:
   - Bindings.xml
 libs:
   AceAddon-3.0: svn://example/AceAddon-3.0
@@ -28,7 +28,7 @@ class TestParseConfig:
         assert result.curseforge_project_id == 433258
         assert result.curseforge_project_slug == "itemversion"
         assert result.changelog_url == "https://example/CHANGELOG.md"
-        assert result.ignore == ("Bindings.xml",)
+        assert result.dev_only == ("Bindings.xml",)
         assert result.libs == (
             ("AceAddon-3.0", "svn://example/AceAddon-3.0"),
             ("LibStub", "svn://example/LibStub"),
@@ -42,9 +42,9 @@ class TestParseConfig:
             "LibStub",
         ]
 
-    def test_ignore_is_optional(self):
+    def test_dev_only_is_optional(self):
         text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"
-        assert config.parse_config(text).ignore == ()
+        assert config.parse_config(text).dev_only == ()
 
     def test_changelog_url_is_optional(self):
         text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"

@@ -1,0 +1,7 @@
+std = "busted"
+
+# The harness deliberately writes WoW globals (format, LibStub, ...) onto _G to stub
+# them before loading the addon files. That is the point of the harness, not an
+# idiom slip, so allow it here.
+[lints]
+global_usage = "allow"

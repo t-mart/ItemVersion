@@ -1,8 +1,8 @@
 """The project configuration, read from wowaddon.yml at the repo root.
 
 This is the one place that knows the addon's name, where it uploads, which files
-to leave out of a build, and where the embedded libraries come from. The build,
-publish and libs commands all read it from here.
+are development-only and never ship, and where the embedded libraries come from.
+The build, publish and libs commands all read it from here.
 """
 
 from __future__ import annotations
@@ -26,7 +26,10 @@ SRC_ROOT = REPO_ROOT / "src"
 class Config:
     name: str
     curseforge_project_id: int
-    ignore: tuple[str, ...]
+    # Development-only files: never packaged, and any TOC line referencing them is
+    # stripped from the build. Some (Bindings.xml) load in dev via WoW auto-loading;
+    # others are listed in the TOC so a symlinked dev install picks them up.
+    dev_only: tuple[str, ...]
     libs: tuple[tuple[str, str], ...]  # (folder under Libs, svn url), in file order
     changelog_url: str | None = None
     curseforge_project_slug: str | None = None
@@ -64,7 +67,7 @@ def parse_config(text: str) -> Config:
     return Config(
         name=data["name"],
         curseforge_project_id=data["curseforge-project-id"],
-        ignore=tuple(data.get("ignore") or []),
+        dev_only=tuple(data.get("dev-only") or []),
         libs=tuple(data["libs"].items()),
         changelog_url=data.get("changelog-url"),
         curseforge_project_slug=data.get("curseforge-project-slug"),

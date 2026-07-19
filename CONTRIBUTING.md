@@ -44,10 +44,44 @@ something it needs is missing:
 
 - `check` and `format` want [selene](https://kampfkarren.github.io/selene/) and
   [stylua](https://github.com/JohnnyMorganz/StyLua).
+- `test` and `check` want [busted](https://lunarmodules.github.io/busted/) on a
+  Lua 5.1 rock tree, to run the addon's Lua suite (see Running the Tests below).
 - `prepare-src` and `build` want [Subversion](https://subversion.apache.org/), used
   to fetch the embedded Ace3 libraries from CurseForge.
 - `publish` wants the [GitHub CLI](https://cli.github.com/) to create a release,
   and a `CURSEFORGE_TOKEN` (see `.env.template`) to upload to CurseForge.
+
+### Running the Tests
+
+There are two automated suites:
+
+- `./dev test` runs the addon's Lua suite with
+  [busted](https://lunarmodules.github.io/busted/). The specs live in `tests/` and
+  exercise the addon's pure logic (the version lookup, corrections, token
+  formatting, colors) outside the WoW client: a small harness in `tests/helper.lua`
+  stubs the few globals the core touches and loads the addon files the way WoW
+  would. It runs under PUC-Rio Lua 5.1, the version WoW ships, so 5.1-only
+  behavior is what gets tested. Install busted on a Lua 5.1 rock tree first:
+
+  ```bash
+  luarocks --lua-version 5.1 install busted
+  ```
+
+  On Arch, the `lua51-busted` package works too and lands on your `PATH`.
+
+- `./dev test-tooling` runs the Python tests for the `./dev` tooling itself
+  (pytest, via uv). More esoteric; most contributors will not need it.
+
+`./dev check` runs the Lua suite alongside the linters, formatter check, and
+locale check, and `./dev watch` re-runs `check` on every save.
+
+The busted suite cannot reach the parts that only exist inside the client (the
+tooltip hook firing, client globals per flavor). Those are covered by a small
+in-client suite in `src/ItemVersion/DevTests.lua`: install the addon into a flavor
+(see below), then run `/ivtest` in game to print pass/fail for each client check.
+That file is development-only. It is listed under `dev-only` in `wowaddon.yml`, so
+`./dev build` drops it and strips its line from the packaged TOC; it loads only in
+a symlinked dev install, never in a shipped release.
 
 ### Testing Your Changes In-Game
 

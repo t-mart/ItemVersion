@@ -1,0 +1,8 @@
+return {
+  default = {
+    ROOT = { "tests" },
+    pattern = "_spec%.lua$",
+    -- so specs can require("helper")
+    lpath = "./tests/?.lua",
+  },
+}

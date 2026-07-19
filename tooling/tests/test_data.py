@@ -11,7 +11,7 @@ from config import Config
 CONFIG = Config(
     name="ItemVersion",
     curseforge_project_id=433258,
-    ignore=(),
+    dev_only=(),
     libs=(),
 )
 

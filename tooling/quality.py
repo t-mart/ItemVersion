@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 from typing import Iterable
 
@@ -9,12 +10,21 @@ from watchfiles import Change, watch  # type: ignore[ty:unresolved-import]
 
 import locales
 import packaging
-from common import Die, relative, require_tool, run
+from common import REPO_ROOT, Die, capture, relative, require_tool, run
 from config import CONFIG_FILE, load_config
 
-# The tests declare their dependencies inline, so uv runs them without a venv.
-# They are the one thing not imported: pytest belongs to the tests, not to ./dev.
+# The tooling tests declare their dependencies inline, so uv runs them without a
+# venv. They are the one thing not imported: pytest belongs to the tests, not to ./dev.
 TEST_RUNNER = "tooling/run_tests.py"
+
+# The addon's Lua suite runs under busted. WoW ships a customized PUC-Rio Lua 5.1,
+# so we target that rock tree rather than whatever the system lua happens to be.
+BUSTED_LUA_VERSION = "5.1"
+
+# The busted suite sits outside the addon source and is plain Lua 5.1, not WoW, so
+# it lints against its own selene std (tests/busted.yml) via its own config.
+TESTS_DIR = "tests"
+TESTS_SELENE_CONFIG = "tests/selene.toml"
 
 # What watch re-lints on. The addon is Lua plus the TOC and the XML that lists the
 # libraries and widgets.
@@ -31,10 +41,15 @@ def cmd_check() -> int:
     source = relative(load_config().source_dir)
     failed = 0
 
+    # The addon lints against wow-stdlib; the tests against their own Lua 5.1 std.
     if run(["selene", source]) != 0:
         failed = 1
+    if run(["selene", "--config", TESTS_SELENE_CONFIG, TESTS_DIR]) != 0:
+        failed = 1
 
-    if run(["stylua", "--check", source]) == 0:
+    # stylua shares one config across both trees; .styluaignore keeps the generated
+    # files out.
+    if run(["stylua", "--check", source, TESTS_DIR]) == 0:
         print("stylua: no changes needed")
     else:
         print("stylua: formatting needed, run the format command")
@@ -45,6 +60,9 @@ def cmd_check() -> int:
     if locales.main(["--check"]) != 0:
         failed = 1
 
+    if cmd_test() != 0:
+        failed = 1
+
     return failed
 
 
@@ -53,7 +71,39 @@ def cmd_locales() -> int:
     return locales.main([])
 
 
+def _find_busted() -> str:
+    """The busted launcher, whether it is on PATH or only in a Lua 5.1 rock tree.
+
+    A distro package (Arch's lua51-busted) lands on PATH; `luarocks --local install`
+    tucks the launcher into the tree's bin dir instead, so fall back to asking
+    luarocks where that is. Either way the launcher pins itself to Lua 5.1.
+    """
+    on_path = shutil.which("busted")
+    if on_path:
+        return on_path
+
+    if shutil.which("luarocks"):
+        for scope in (["--local"], []):
+            code, out = capture(
+                ["luarocks", "--lua-version", BUSTED_LUA_VERSION, *scope, "config", "deploy_bin_dir"]
+            )
+            candidate = Path(out.strip()) / "busted"
+            if code == 0 and candidate.is_file():
+                return str(candidate)
+
+    raise Die(
+        "busted is not installed. Install it against Lua 5.1:\n"
+        "  luarocks --lua-version 5.1 install busted\n"
+        "or, on Arch, the lua51-busted package."
+    )
+
+
 def cmd_test() -> int:
+    """The addon's Lua suite. Reads .busted for the test dir and require path."""
+    return run([_find_busted()])
+
+
+def cmd_test_tooling() -> int:
     require_tool("uv")
     return run(["uv", "run", TEST_RUNNER])
 
@@ -61,9 +111,9 @@ def cmd_test() -> int:
 def cmd_format() -> int:
     require_tool("stylua")
     source = relative(load_config().source_dir)
-    failed = run(["stylua", source])
+    failed = run(["stylua", source, TESTS_DIR])
     if failed == 0:
-        print(f"formatted {source}")
+        print(f"formatted {source} and {TESTS_DIR}")
     return failed
 
 
@@ -128,7 +178,9 @@ def cmd_watch() -> int:
     translations_path = config.translations_path.resolve()
     config_file = CONFIG_FILE.resolve()
 
-    print(f"watching {relative(config.source_dir)}, translations.yml and wowaddon.yml...")
+    tests_dir = REPO_ROOT / TESTS_DIR
+
+    print(f"watching {relative(config.source_dir)}, {TESTS_DIR}, translations.yml and wowaddon.yml...")
     _regenerate_locales(config)
     cmd_check()
 
@@ -142,6 +194,7 @@ def cmd_watch() -> int:
     # per burst is the point.
     for changes in watch(
         config.source_dir,
+        tests_dir,
         config.translations_path,
         CONFIG_FILE,
         watch_filter=keep,

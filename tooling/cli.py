@@ -24,7 +24,14 @@ from install import (
 from interfaces import cmd_interfaces
 from packaging import cmd_build, cmd_clean, cmd_prepare_src
 from publish import RELEASE, RELEASE_TYPES, TARGETS, cmd_publish
-from quality import cmd_check, cmd_format, cmd_locales, cmd_test, cmd_watch
+from quality import (
+    cmd_check,
+    cmd_format,
+    cmd_locales,
+    cmd_test,
+    cmd_test_tooling,
+    cmd_watch,
+)
 
 
 def cmd_help() -> int:
@@ -146,13 +153,16 @@ COMMANDS = {
         cmd_install_status, "Show what is installed for each flavor."
     ),
     "check": Command(
-        cmd_check, "Lint, check formatting, and check the locale files. Writes nothing."
+        cmd_check,
+        "Lint, check formatting, check the locale files, and run the Lua suite. "
+        "Writes nothing.",
     ),
     "format": Command(cmd_format, "Reformat the addon with stylua."),
     "locales": Command(
         cmd_locales, "Reconcile translations.yml with the code. This one writes."
     ),
-    "test": Command(cmd_test, "Run the tests for the dev tooling."),
+    "test": Command(cmd_test, "Run the addon's Lua test suite (busted)."),
+    "test-tooling": Command(cmd_test_tooling, "Run the tests for the dev tooling (pytest)."),
     "watch": Command(
         cmd_watch, "Re-run check on every save. Reload in game to see changes."
     ),

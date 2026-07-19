@@ -16,7 +16,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import locales
 from common import REPO_ROOT, Die, relative, report, require_tool, run
 from config import Config, load_config
-from toc import require_version
+from toc import require_version, strip_files
 
 BUILD_ROOT = REPO_ROOT / "dist"
 
@@ -113,12 +113,13 @@ def cmd_build() -> int:
         shutil.rmtree(staged)
     staged.parent.mkdir(parents=True, exist_ok=True)
 
-    ignore = shutil.ignore_patterns(*config.ignore) if config.ignore else None
+    ignore = shutil.ignore_patterns(*config.dev_only) if config.dev_only else None
     shutil.copytree(config.source_dir, staged, ignore=ignore)
 
     staged_toc = staged / f"{config.name}.toc"
-    stamped = stamp_build_date(staged_toc.read_text(encoding="utf-8"), datetime.now(timezone.utc))
-    staged_toc.write_text(stamped, encoding="utf-8")
+    toc_text = strip_files(staged_toc.read_text(encoding="utf-8"), config.dev_only)
+    toc_text = stamp_build_date(toc_text, datetime.now(timezone.utc))
+    staged_toc.write_text(toc_text, encoding="utf-8")
 
     archive = BUILD_ROOT / f"{config.name}-{version}.zip"
     _zip_dir(staged, archive, config.name)

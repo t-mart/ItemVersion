@@ -251,7 +251,7 @@ def tree(tmp_path, monkeypatch):
     """A scratch addon: source that uses two keys, a matching translations.yml,
     and a TOC whose locale block already lists what the source implies."""
     monkeypatch.setattr(config, "SRC_ROOT", tmp_path / "src")
-    cfg = Config(name="ItemVersion", curseforge_project_id=1, ignore=(), libs=(("A", "svn://x"),))
+    cfg = Config(name="ItemVersion", curseforge_project_id=1, dev_only=(), libs=(("A", "svn://x"),))
 
     cfg.source_dir.mkdir(parents=True)
     (cfg.source_dir / "Thing.lua").write_text(

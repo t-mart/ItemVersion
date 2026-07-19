@@ -12,6 +12,7 @@ import sys
 from dataclasses import dataclass
 from typing import Callable
 
+from calver import cmd_bump_calver
 from common import Die
 from data import cmd_get_item_data
 from install import (
@@ -53,6 +54,14 @@ def interfaces_options(parser: argparse.ArgumentParser) -> None:
         "--dry-run",
         action="store_true",
         help="say what would be written, but leave the TOC alone",
+    )
+
+
+def bump_calver_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="say what the version would become, but leave the TOC alone",
     )
 
 
@@ -134,6 +143,11 @@ COMMANDS = {
     "get-item-data": Command(
         cmd_get_item_data,
         "Download the latest ItemData.lua from item-version-scrape",
+    ),
+    "bump-calver": Command(
+        cmd_bump_calver,
+        "Bump the calver version configured in the wowaddon.yml",
+        bump_calver_options,
     ),
     "build": Command(cmd_build, "Package the addon zip into dist/."),
     "clean": Command(cmd_clean, "Remove dist/ and the generated Libs and Locales."),

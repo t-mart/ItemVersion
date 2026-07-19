@@ -252,12 +252,14 @@ publish by hand.
 
 ItemVersion adheres to [CalVer](https://calver.org/) for its releases.
 
-This is the format: `year.weeknumber.patch`.
+This is the format: `{YYYY}.{0W}.{N}`: the ISO week-year, the zero-padded ISO
+week, and a 0-based serial. Releases in a new week reset the serial to 0;
+releases within the same week increment it (0, 1, 2, ...).
 
-Data refresh releases will bump the `year.weeknumber` part. Intraweek
-development releases will bump the `patch` part.
-
-See `.bumpversion.toml` for more details.
+`./dev bump-calver` computes the next version from today's date and rewrites the
+`## Version:` line in the TOC, which is the single source of truth. Run it with
+`--dry-run` to preview. The `version:` block in `wowaddon.yml` configures the
+file, pattern and format; the bump does no git of its own.
 
 ## Release Process
 

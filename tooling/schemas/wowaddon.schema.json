@@ -37,6 +37,29 @@
       "description": "Embedded libraries to fetch into the addon's Libs dir, mapping a folder name to an svn url.",
       "minProperties": 1,
       "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "version": {
+      "type": "object",
+      "description": "How ./dev bump-calver reads and writes the version. The version is the single source of truth in this one file.",
+      "additionalProperties": false,
+      "required": ["file", "pattern", "format"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repo-relative path to the file holding the version (the TOC)."
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Regex locating the version, via a `version` named group or its first group."
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Calver template. Tokens: {YYYY} (ISO week-year), {0W} (zero-padded ISO week), {N} (0-based serial)."
+        }
+      }
     }
   }
 }

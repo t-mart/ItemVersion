@@ -23,6 +23,20 @@ SRC_ROOT = REPO_ROOT / "src"
 
 
 @dataclass(frozen=True)
+class VersionConfig:
+    """Where the version lives and the shape bump-calver keeps it in.
+
+    `file` is repo-relative, `pattern` is a regex whose `version` group (or first
+    group) locates the version substring, and `format` is a calver template like
+    `{YYYY}.{0W}.{N}`. See calver.py for the tokens.
+    """
+
+    file: str
+    pattern: str
+    format: str
+
+
+@dataclass(frozen=True)
 class Config:
     name: str
     curseforge_project_id: int
@@ -33,6 +47,7 @@ class Config:
     libs: tuple[tuple[str, str], ...]  # (folder under Libs, svn url), in file order
     changelog_url: str | None = None
     curseforge_project_slug: str | None = None
+    version: VersionConfig | None = None
 
     # The name is the single source of truth for the layout: the source directory
     # is src/<name>, and WoW requires the TOC basename to match the folder name.
@@ -58,12 +73,31 @@ class Config:
     def translations_path(self) -> Path:
         return SRC_ROOT / "translations.yml"
 
+    # bump-calver needs a version block; the rest of the tooling does not, so it
+    # stays optional on the config and this is where a missing one is caught.
+    @property
+    def require_version_config(self) -> VersionConfig:
+        if self.version is None:
+            raise Die("wowaddon.yml has no `version:` block; add file, pattern and format")
+        return self.version
+
 
 def parse_config(text: str) -> Config:
     data = yaml.safe_load(text)
     schema.validate(data, "wowaddon", CONFIG_FILE.name)
 
     # The schema has vouched for the shape, so these accesses are safe.
+    raw_version = data.get("version")
+    version = (
+        VersionConfig(
+            file=raw_version["file"],
+            pattern=raw_version["pattern"],
+            format=raw_version["format"],
+        )
+        if raw_version is not None
+        else None
+    )
+
     return Config(
         name=data["name"],
         curseforge_project_id=data["curseforge-project-id"],
@@ -71,6 +105,7 @@ def parse_config(text: str) -> Config:
         libs=tuple(data["libs"].items()),
         changelog_url=data.get("changelog-url"),
         curseforge_project_slug=data.get("curseforge-project-slug"),
+        version=version,
     )
 
 

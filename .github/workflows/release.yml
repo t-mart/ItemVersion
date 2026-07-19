@@ -61,8 +61,6 @@ jobs:
 
       - name: Install support tooling
         run: |
-          # bump-my-version bumps our versions
-          uv tool install bump-my-version
           # ./dev build fetches the embedded Ace3 libraries over SVN
           sudo apt-get install -y subversion
 
@@ -88,10 +86,20 @@ jobs:
             git add src/ItemVersion/ItemVersion.toc
             git commit -m "Update interface versions"
           fi
-          bump-my-version bump patch
+
+          # bump-calver rewrites the TOC's ## Version line and prints the new
+          # version; we make the commit and tag here, since it does no git itself.
+          new_version=$(./dev bump-calver)
+          git add src/ItemVersion/ItemVersion.toc
+          git commit -m "Release ${new_version}"
+
+          git tag -a "${new_version}" -m "Release ${new_version}"
+
           git push --follow-tags
+
           ./dev build
           ./dev publish --type release --yes
+          
           git checkout master
           git merge release
           git push origin master

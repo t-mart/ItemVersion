@@ -12,6 +12,11 @@
 #   https://www.curseforge.com/wow/addons/<slug>
 # changelog-url
 #   optional link used as the release notes on publish
+# version
+#   how `./dev bump-calver` reads and writes the version, which lives only in the
+#   TOC. `pattern` locates it (via a `version` group or the first group) and
+#   `format` is the calver template: {YYYY} ISO week-year, {0W} zero-padded ISO
+#   week, {N} the 0-based serial that resets each new week
 # dev-only
 #   files under the addon dir that exist for development and never ship. They are
 #   kept out of the build, and any TOC line that references one is stripped from
@@ -28,6 +33,11 @@ curseforge-project-id: 433258
 curseforge-project-slug: itemversion
 
 changelog-url: https://github.com/t-mart/ItemVersion/blob/master/CHANGELOG.md
+
+version:
+  file: src/ItemVersion/ItemVersion.toc
+  pattern: '## Version: (?P<version>\S+)'
+  format: '{YYYY}.{0W}.{N}'
 
 dev-only:
   - Bindings.xml

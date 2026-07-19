@@ -12,6 +12,10 @@ name: ItemVersion
 curseforge-project-id: 433258
 curseforge-project-slug: itemversion
 changelog-url: https://example/CHANGELOG.md
+version:
+  file: src/ItemVersion/ItemVersion.toc
+  pattern: '## Version: (?P<version>\\S+)'
+  format: '{YYYY}.{0W}.{N}'
 dev-only:
   - Bindings.xml
 libs:
@@ -49,6 +53,22 @@ class TestParseConfig:
     def test_changelog_url_is_optional(self):
         text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"
         assert config.parse_config(text).changelog_url is None
+
+    def test_reads_the_version_block(self):
+        version = config.parse_config(VALID).version
+        assert version is not None
+        assert version.file == "src/ItemVersion/ItemVersion.toc"
+        assert version.pattern == r"## Version: (?P<version>\S+)"
+        assert version.format == "{YYYY}.{0W}.{N}"
+
+    def test_version_is_optional(self):
+        text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"
+        assert config.parse_config(text).version is None
+
+    def test_a_version_block_missing_a_key_dies(self):
+        text = VALID.replace("  format: '{YYYY}.{0W}.{N}'\n", "")
+        with pytest.raises(common.Die, match="format"):
+            config.parse_config(text)
 
     def test_project_slug_is_optional(self):
         text = "name: X\ncurseforge-project-id: 1\nlibs:\n  A: svn://x\n"

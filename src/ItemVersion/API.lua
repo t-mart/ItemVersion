@@ -128,6 +128,7 @@ function ItemLookupMixin:Format(formatString)
 end
 
 ---@class ItemVersionLookup
+---@field itemId number
 ---@field expansion {major: number, canonName: string, shortName: string, texture: string}
 ---@field minor number
 ---@field patch number
@@ -145,6 +146,7 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
     expansion = Expansion:GetCorrectedExpansionForItemId(itemId)
     if expansion then
       return setmetatable({
+        itemId = itemId,
         expansion = toLookupExpansion(expansion),
         minor = 0,
         patch = 0,
@@ -166,6 +168,7 @@ function API.GetItemVersion(itemId, applyVersionCorrections)
   end
 
   return setmetatable({
+    itemId = itemId,
     expansion = toLookupExpansion(expansion),
     minor = version.minor,
     patch = version.patch,

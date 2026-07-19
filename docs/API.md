@@ -13,6 +13,7 @@ function(itemId: number, applyVersionCorrections: bool | nil) -> ItemVersionLook
 Where `ItemVersionLookup` is a table with the following fields and methods:
 
 **Fields:**
+- **`itemId`**: The item ID that was looked up
 - **`expansion`**: The expansion table containing:
   - `major`: The major version number (expansion number)
   - `canonName`: The full expansion name (e.g., "Shadowlands")
@@ -53,6 +54,7 @@ Shadowlands. With corrections disabled, it will show its canonical BfA version.
 local version = ItemVersion.API.GetItemVersion(168589, false)
 -- Returns:
 -- {
+--   itemId = 168589,
 --   expansion = {
 --     major = 8,
 --     canonName = "Battle for Azeroth",
@@ -72,6 +74,7 @@ print(format("%d.%d.%d", version.expansion.major, version.minor, version.patch))
 local version = ItemVersion.API.GetItemVersion(168589, true)
 -- Returns:
 -- {
+--   itemId = 168589,
 --   expansion = {
 --     major = 9,
 --     canonName = "Shadowlands",

@@ -55,4 +55,11 @@ Private.Tokens = {
       return tostring(lookup.build)
     end,
   },
+  {
+    string = "{itemId}",
+    description = L["Item ID"],
+    resolve = function(lookup)
+      return tostring(lookup.itemId)
+    end,
+  },
 }

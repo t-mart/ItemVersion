@@ -187,6 +187,13 @@
     ruRU: Указан неверный ID предмета или ссылка
     zhCN: 提供的物品ID或链接无效
 
+- key: Item ID
+  description: What the {itemId} format token does.
+  translations:
+    esMX: ID del objeto
+    ruRU: ID предмета
+    zhCN: 物品ID
+
 - key: ItemVersion does not support profile version %d, so your settings have been reset.
   description: Shown when settings get reset. %d is a number.
 

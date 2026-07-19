@@ -7,6 +7,8 @@ update the item database.
 
 ## Unreleased
 
+- Add an `{itemId}` format token that renders the item's ID.
+  Fixes [#126](https://github.com/t-mart/ItemVersion/issues/126)
 - Fix the documentation and format token help referring to a `{expacLong}` token
   that does not exist. The token for the full expansion name has always been
   `{expacFull}`. A format string using `{expacLong}` rendered it literally

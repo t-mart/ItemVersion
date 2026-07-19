@@ -5,6 +5,7 @@ local Tokens = Private.Tokens
 -- resolves to something recognizable.
 local function makeLookup()
   return {
+    itemId = 49623,
     expansion = {
       major = 3,
       canonName = "Wrath of the Lich King",
@@ -36,6 +37,7 @@ describe("Tokens", function()
     ["{versionFull}"] = "3.2.5.12340",
     ["{versionTriple}"] = "3.2.5",
     ["{buildNumber}"] = "12340",
+    ["{itemId}"] = "49623",
   }
 
   for tokenString, expected in pairs(cases) do

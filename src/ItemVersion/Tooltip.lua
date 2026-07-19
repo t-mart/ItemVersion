@@ -10,6 +10,19 @@ local match = string.match
 
 Private.Tooltip = {}
 
+-- Frames we modify, resolved once in HookTooltip. hookedFrames drives the modifier
+-- refresh; isHookedFrame is the filter the render hook applies, since the mainline
+-- post-call is global and fires for every tooltip in the game.
+local hookedFrames = {}
+local isHookedFrame = {}
+
+-- Dedupe guard. OnTooltipSetItem and the mainline post-call can each fire more than
+-- once for the same tooltip contents before a clear (comparison tooltips and
+-- re-sets are common sources), which would add our line twice. We stamp a frame when
+-- we add the line and clear the stamp on OnTooltipCleared, so the next fill can add
+-- it again.
+local lineAddedTo = {}
+
 -- MODIFIER_STATE_CHANGED reports each physical key, so both sides of a modifier
 -- map to the one profile key that gates it.
 local MODIFIER_PROFILE_KEYS = {
@@ -69,9 +82,12 @@ local function hook(tooltip, data)
     return
   end
 
-  -- GameTooltip is the one attached to the mouse
-  -- ItemRefTooltip is the static one after clicking an item link
-  if tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip then
+  if not isHookedFrame[tooltip] then
+    return
+  end
+
+  -- Already stamped this fill; adding again would duplicate the line.
+  if lineAddedTo[tooltip] then
     return
   end
 
@@ -92,8 +108,15 @@ local function hook(tooltip, data)
 
   local line = Private.Color.WrapTextWithColor(lookup:Format(profile.tooltipFormat), profile.lineColor)
 
+  lineAddedTo[tooltip] = true
   tooltip:AddLine(line)
   tooltip:Show()
+end
+
+---Reset the dedupe guard when a tooltip is wiped, so the next fill can add the line
+---@param tooltip table The tooltip frame
+local function onTooltipCleared(tooltip)
+  lineAddedTo[tooltip] = nil
 end
 
 ---Rebuild a tooltip in place, so the version line can appear or disappear
@@ -141,23 +164,76 @@ local function onModifierStateChanged(key)
     return
   end
 
-  refresh(GameTooltip)
-  refresh(ItemRefTooltip)
+  for _, tooltip in ipairs(hookedFrames) do
+    refresh(tooltip)
+  end
+end
+
+---Call fn once for each frame that exists, tolerating the nil holes that appear
+---because some of these frames do not exist on every flavor. A plain table literal
+---plus ipairs would stop at the first missing frame, so pass them as varargs.
+---@param fn fun(frame: table)
+local function forEachPresentFrame(fn, ...)
+  for i = 1, select("#", ...) do
+    local frame = select(i, ...)
+    if frame then
+      fn(frame)
+    end
+  end
 end
 
 ---Hook into the tooltip system to add item version information
 function Private.Tooltip.HookTooltip()
-  local hasOnTooltipSetItem = GameTooltip:HasScript("OnTooltipSetItem") and ItemRefTooltip:HasScript("OnTooltipSetItem")
-  if hasOnTooltipSetItem then
-    -- old way
-    GameTooltip:HookScript("OnTooltipSetItem", hook)
-    ItemRefTooltip:HookScript("OnTooltipSetItem", hook)
+  -- GameTooltip is the one attached to the mouse; ItemRefTooltip is the static one
+  -- after clicking an item link; the ShoppingTooltip pair renders the currently
+  -- equipped item(s) alongside a hovered one, and the ItemRef variants do the same
+  -- off a chat link.
+  forEachPresentFrame(
+    function(frame)
+      table.insert(hookedFrames, frame)
+      isHookedFrame[frame] = true
+    end,
+    GameTooltip,
+    ItemRefTooltip,
+    ShoppingTooltip1,
+    ShoppingTooltip2,
+    ItemRefShoppingTooltip1,
+    ItemRefShoppingTooltip2
+  )
+
+  if GameTooltip:HasScript("OnTooltipSetItem") then
+    -- old way: a per-frame render script
+    for _, frame in ipairs(hookedFrames) do
+      if frame:HasScript("OnTooltipSetItem") then
+        frame:HookScript("OnTooltipSetItem", hook)
+      end
+    end
   elseif TooltipDataProcessor then
-    -- new way
+    -- new way: one global post-call for every item tooltip. hook filters to the
+    -- frames we care about via isHookedFrame.
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hook)
   else
     error("ItemVersion: Unable to hook into tooltips!")
   end
+
+  -- Reset the dedupe guard whenever a frame's contents are wiped.
+  for _, frame in ipairs(hookedFrames) do
+    if frame:HasScript("OnTooltipCleared") then
+      frame:HookScript("OnTooltipCleared", onTooltipCleared)
+    end
+  end
+
+  -- The compare tooltips are populated through SetCompareItem, which does not
+  -- reliably emit an item render on every flavor, so the hooks above can miss them.
+  -- Hook the method directly so the line still lands; the dedupe guard keeps this
+  -- from doubling up on flavors where the render does fire.
+  forEachPresentFrame(function(frame)
+    if frame.SetCompareItem then
+      hooksecurefunc(frame, "SetCompareItem", function(self)
+        hook(self, nil)
+      end)
+    end
+  end, ShoppingTooltip1, ShoppingTooltip2, ItemRefShoppingTooltip1, ItemRefShoppingTooltip2)
 
   local watcher = CreateFrame("Frame")
   watcher:RegisterEvent("MODIFIER_STATE_CHANGED")

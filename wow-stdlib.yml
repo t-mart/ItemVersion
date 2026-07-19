@@ -85,6 +85,17 @@ globals:
       - type: string # Event name
     return: 
       - type: boolean
+  ShoppingTooltip1:
+    property: read-only
+  ShoppingTooltip2:
+    property: read-only
+  ItemRefShoppingTooltip1:
+    property: read-only
+  ItemRefShoppingTooltip2:
+    property: read-only
+  hooksecurefunc:
+    args:
+      - type: "..." # (table, methodName, hook) or (functionName, hook)
   TooltipDataProcessor:
     property: read-only
   TooltipDataProcessor.AddTooltipPostCall:

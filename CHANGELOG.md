@@ -7,6 +7,11 @@ update the item database.
 
 ## Unreleased
 
+- Show the version line on the item comparison tooltips (the "currently equipped"
+  tooltips shown alongside an item you hover), not just the main tooltip.
+  Fixes [#96](https://github.com/t-mart/ItemVersion/issues/96)
+- Prevent the version line from occasionally appearing twice on a single tooltip.
+  Fixes [#127](https://github.com/t-mart/ItemVersion/issues/127)
 - Add an `{itemId}` format token that renders the item's ID.
   Fixes [#126](https://github.com/t-mart/ItemVersion/issues/126)
 - Fix the documentation and format token help referring to a `{expacLong}` token

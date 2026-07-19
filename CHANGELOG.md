@@ -7,6 +7,8 @@ update the item database.
 
 ## Unreleased
 
+## 2026.28.2
+
 - Show the version line on the item comparison tooltips (the "currently equipped"
   tooltips shown alongside an item you hover), not just the main tooltip.
   Fixes [#96](https://github.com/t-mart/ItemVersion/issues/96)

@@ -57,7 +57,8 @@ jobs:
           gh release download "${{ inputs.data-release-tag }}" \
             --repo t-mart/item-version-scrape \
             --pattern ItemVersionData.lua \
-            --output src/ItemVersion/ItemData.lua
+            --output src/ItemVersion/ItemData.lua \
+            --clobber
 
       - name: Commit & Push
         shell: bash

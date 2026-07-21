@@ -46,6 +46,14 @@ class TestCli:
         args = cli.build_parser().parse_args(["interfaces", "--dry-run"])
         assert args.dry_run is True
 
+    def test_publish_declares_preflight(self):
+        args = cli.build_parser().parse_args(["publish", "--preflight"])
+        assert args.preflight is True
+
+    def test_publish_validation_modes_are_mutually_exclusive(self):
+        with pytest.raises(SystemExit):
+            cli.build_parser().parse_args(["publish", "--dry-run", "--preflight"])
+
     def test_install_parses_a_gh_tag(self):
         args = cli.build_parser().parse_args(["install", "--gh", "1.2.3"])
         assert args.gh == "1.2.3"

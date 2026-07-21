@@ -241,6 +241,23 @@ def upload_curseforge(config: Config, plan: Plan) -> None:
         print(f"  Public URL: {public_file_url(config.curseforge_project_slug, file_id)}")
 
 
+def preflight_curseforge(config: Config, plan: Plan) -> None:
+    token = cf_token()
+    catalog = _get_json(f"{CF_HOST}/api/game/versions", token)
+    resolve_version_ids(catalog, plan.version_names)
+    print("  CurseForge credentials and game versions are ready")
+
+
+def preflight_github() -> None:
+    require_tool("gh")
+    failed, _ = capture(
+        ["gh", "auth", "status", "--active", "--hostname", "github.com"]
+    )
+    if failed:
+        raise Die("GitHub authentication preflight failed")
+    print("  GitHub authentication is ready")
+
+
 def upload_github(plan: Plan) -> None:
     require_tool("gh")
     # gh writes the new release's url to stdout; capture it so we can echo it plainly.
@@ -292,6 +309,7 @@ def cmd_publish(
     type: str = RELEASE,
     to: list[str] | None = None,
     dry_run: bool = False,
+    preflight: bool = False,
     yes: bool = False,
 ) -> int:
     config = load_config()
@@ -313,6 +331,13 @@ def cmd_publish(
     print_plan(plan, targets, config)
 
     if dry_run:
+        return 0
+    if preflight:
+        for target in targets:
+            if target == CURSEFORGE:
+                preflight_curseforge(config, plan)
+            elif target == GITHUB:
+                preflight_github()
         return 0
     if not yes and not _confirm():
         print("aborted, nothing uploaded", file=sys.stderr)

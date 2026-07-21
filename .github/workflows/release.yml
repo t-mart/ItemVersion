@@ -24,15 +24,21 @@ on:
         type: string
         required: true
         default: "release"
+      candidate-ref:
+        type: string
+        required: true
+      candidate-branch:
+        type: string
+        required: true
 
 jobs:
   # Gate the release on the same checks we run on pull requests and master.
   # checks.yml doesn't trigger on the release branch, so we invoke it here as a
-  # reusable workflow against release before anything gets published.
+  # reusable workflow against the exact candidate before anything gets published.
   check:
     uses: ./.github/workflows/checks.yml
     with:
-      ref: release
+      ref: ${{ inputs.candidate-ref }}
 
   release:
     name: Release
@@ -48,7 +54,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
-          ref: release
+          ref: ${{ inputs.candidate-ref }}
           fetch-depth: 0 # ensure git knows about shared history between release and master
 
       - name: Install uv
@@ -68,6 +74,26 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git switch -C release "${{ inputs.candidate-ref }}"
+
+      - name: Refuse an already promoted candidate
+        if: ${{ inputs.release-type == 'release' }}
+        run: |
+          candidate=$(git rev-parse HEAD)
+          tags=$(git tag --points-at "$candidate")
+          if [[ -n "$tags" ]]; then
+            echo "::error::Candidate ${{ inputs.candidate-ref }} is already tagged: ${tags//$'\n'/, }"
+            echo "Refusing to create another version from the same candidate."
+            exit 1
+          fi
+
+          release_tip=$(git rev-parse origin/release)
+          release_tags=$(git tag --points-at "$release_tip")
+          if [[ -n "$release_tags" ]] && git merge-base --is-ancestor "$candidate" "$release_tip"; then
+            echo "::error::Candidate ${{ inputs.candidate-ref }} was already promoted as ${release_tags//$'\n'/, }"
+            echo "A prior run reached the git checkpoint. Reconcile its publishers instead of releasing again."
+            exit 1
+          fi
 
       # ./dev interfaces reads Blizzard's version endpoints itself, validates what
       # comes back, and rewrites the working TOC. It fails loudly on anything
@@ -75,12 +101,9 @@ jobs:
       - name: Update interface versions
         run: ./dev interfaces
 
-      - # Push to CurseForge and make a GH release
-        name: Full release
+      - name: Prepare full release
+        id: full-release
         if: ${{ inputs.release-type == 'release' }}
-        env:
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [[ -n $(git status --porcelain src/ItemVersion/ItemVersion.toc) ]]; then
             git add src/ItemVersion/ItemVersion.toc
@@ -94,35 +117,62 @@ jobs:
           git commit -m "Release ${new_version}"
 
           git tag -a "${new_version}" -m "Release ${new_version}"
+          echo "version=${new_version}" >> "$GITHUB_OUTPUT"
 
-          git push --follow-tags
-
-          ./dev build
-          ./dev publish --type release --yes
-          
-          git checkout master
-          git merge release
-          git push origin master
-
-      - # Just push to CurseForge
-        name: Pre-release
-        if: ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
-        env:
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-        run: |
-          ./dev build
-          ./dev publish --type ${{ inputs.release-type }} --yes
-
-      - # Just build
-        name: Build only
-        if: ${{ inputs.release-type == 'none' }}
+      - name: Build
         run: ./dev build
+
+      - name: Validate publish plan
+        if: ${{ inputs.release-type != 'none' }}
+        run: ./dev publish --type ${{ inputs.release-type }} --dry-run
 
       - name: Upload build
         uses: actions/upload-artifact@v6
         with:
-          name: ItemVersion
+          name: ItemVersion-${{ github.run_id }}-${{ github.run_attempt }}
           include-hidden-files: true
-          path: |
-            dist/
-            !dist/*.zip
+          path: dist/
+
+      - name: Preflight publishing
+        if: ${{ inputs.release-type != 'none' }}
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./dev publish --type ${{ inputs.release-type }} --preflight
+
+      - name: Promote candidate to release
+        if: ${{ inputs.release-type != 'release' }}
+        run: git push origin release:refs/heads/release
+
+      - name: Prepare master reconciliation
+        if: ${{ inputs.release-type == 'release' }}
+        run: |
+          git switch -C master-reconcile origin/master
+          git merge --no-edit release
+          git switch release
+
+      - name: Push release refs atomically
+        if: ${{ inputs.release-type == 'release' }}
+        run: |
+          git push --atomic origin \
+            release:refs/heads/release \
+            master-reconcile:refs/heads/master \
+            "refs/tags/${{ steps.full-release.outputs.version }}:refs/tags/${{ steps.full-release.outputs.version }}"
+
+      - name: Publish full release
+        if: ${{ inputs.release-type == 'release' }}
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./dev publish --type release --yes
+
+      - name: Publish pre-release
+        if: ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: ./dev publish --type ${{ inputs.release-type }} --yes
+
+      - name: Clean up candidate branch
+        if: ${{ success() }}
+        continue-on-error: true
+        run: git push origin --delete "${{ inputs.candidate-branch }}"

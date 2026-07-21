@@ -1,10 +1,10 @@
 name: Refresh Data and Release
 
-# 1. On release branch, download the new ItemData.lua from an item-version-scrape
-#    release, and commit and push it. (This is intentionally not done on master
-#    branch -- master branch has a different lifecycle than the weekly data
-#    refreshes. master branch is where we do development, and we don't want
-#    master's possibly-unfinished work to be auto-released to CurseForge.)
+# 1. From the release branch, download the new ItemData.lua from an
+#    item-version-scrape release and stage the commit on a candidate branch.
+#    The release workflow promotes that candidate only after checks and build.
+#    (This is intentionally not based on master, which has a different lifecycle
+#    and may contain unfinished work that should not be auto-released.)
 # 2. Run release workflow (see release.yml)
 #
 # The scrape itself now happens in item-version-scrape, which produces a GH release
@@ -36,14 +36,23 @@ on:
         type: string
         required: true
 
+concurrency:
+  group: itemversion-release
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   commit:
     name: Commit new item data
+    outputs:
+      candidate-sha: ${{ steps.candidate.outputs.sha }}
+      candidate-branch: ${{ steps.candidate.outputs.branch }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
     env:
       release_ref: release
+      candidate_ref: release-candidates/${{ github.run_id }}
     steps:
       - name: Checkout addon code
         uses: actions/checkout@v6
@@ -54,24 +63,43 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ITEM_VERSION_SCRAPE_PAT }}
         run: |
+          downloaded=$(mktemp src/ItemVersion/.ItemData.lua.XXXXXX)
+          trap 'rm -f "$downloaded"' EXIT
+
           gh release download "${{ inputs.data-release-tag }}" \
             --repo t-mart/item-version-scrape \
             --pattern ItemVersionData.lua \
-            --output src/ItemVersion/ItemData.lua \
+            --output "$downloaded" \
             --clobber
 
-      - name: Commit & Push
+          test -s "$downloaded"
+          mv "$downloaded" src/ItemVersion/ItemData.lua
+          trap - EXIT
+
+      - name: Commit & Stage
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/ItemVersion/ItemData.lua
-          git commit -m "Refresh item data"
-          git push origin "${{ env.release_ref }}"
+          if git diff --cached --quiet; then
+            echo "Item data is already current"
+          else
+            git commit -m "Refresh item data"
+          fi
+          git push origin "HEAD:refs/heads/${{ env.candidate_ref }}"
+
+      - name: Record candidate
+        id: candidate
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=${{ env.candidate_ref }}" >> "$GITHUB_OUTPUT"
 
   release:
     needs: commit
     uses: ./.github/workflows/release.yml
     with:
       release-type: ${{ inputs.release-type || 'release' }}
+      candidate-ref: ${{ needs.commit.outputs.candidate-sha }}
+      candidate-branch: ${{ needs.commit.outputs.candidate-branch }}
     secrets: inherit

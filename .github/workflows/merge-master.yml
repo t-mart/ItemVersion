@@ -1,8 +1,7 @@
 name: Merge Master into Release
 
-# 1. Merge master into release branch
-# 2. Push release branch
-# 3. Run release workflow (see release.yml)
+# 1. Merge master into a candidate based on the release branch
+# 2. Run the release workflow against that exact candidate (see release.yml)
 #
 # This workflow should be dispatched manually when the work on master is
 # in a releaseable state
@@ -21,12 +20,22 @@ on:
         default: "release"
         required: true
 
+concurrency:
+  group: itemversion-release
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   merge:
     name: Merge Master into Release
+    outputs:
+      candidate-sha: ${{ steps.candidate.outputs.sha }}
+      candidate-branch: ${{ steps.candidate.outputs.branch }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    env:
+      candidate_ref: release-candidates/${{ github.run_id }}
     steps:
       - name: Checkout addon code
         uses: actions/checkout@v6
@@ -40,14 +49,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Put master on release and push
+      - name: Merge master and stage candidate
         run: |
           git merge origin/master
-          git push origin release
+          git push origin "HEAD:refs/heads/${{ env.candidate_ref }}"
+
+      - name: Record candidate
+        id: candidate
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=${{ env.candidate_ref }}" >> "$GITHUB_OUTPUT"
 
   release:
     needs: merge
     uses: ./.github/workflows/release.yml
     with:
       release-type: ${{ inputs.release-type }}
+      candidate-ref: ${{ needs.merge.outputs.candidate-sha }}
+      candidate-branch: ${{ needs.merge.outputs.candidate-branch }}
     secrets: inherit

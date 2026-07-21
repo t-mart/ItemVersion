@@ -13,8 +13,8 @@ on:
   push:
     branches:
       - master
-  # So the release workflow can gate on these same checks. It passes ref: release
-  # to check the branch being published rather than whatever triggered the run.
+  # So the release workflow can gate on these same checks. It passes the exact
+  # candidate SHA rather than whatever the release branch points at later.
   workflow_call:
     inputs:
       ref:
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           # Empty on normal triggers, which makes checkout use the triggering
-          # ref; set to release when called from the release workflow.
+          # ref; set to the candidate SHA when called from the release workflow.
           ref: ${{ inputs.ref }}
 
       - name: Install uv

@@ -102,6 +102,33 @@ class TestResolveVersionIds:
             publish.resolve_version_ids({"nope": True}, ("12.0.7",))
 
 
+class TestPreflight:
+    PLAN = publish.build_plan(
+        CONFIG, "2026.28.0", ("120007",), "release", "notes", WHEN
+    )
+
+    def test_curseforge_checks_credentials_and_game_versions(self, monkeypatch):
+        seen = []
+        monkeypatch.setattr(publish, "cf_token", lambda: "token")
+        monkeypatch.setattr(
+            publish,
+            "_get_json",
+            lambda url, token: seen.append((url, token))
+            or [{"id": 1, "name": "12.0.7"}],
+        )
+
+        publish.preflight_curseforge(CONFIG, self.PLAN)
+
+        assert seen == [(f"{publish.CF_HOST}/api/game/versions", "token")]
+
+    def test_github_authentication_failure_dies(self, monkeypatch):
+        monkeypatch.setattr(publish, "require_tool", lambda name: name)
+        monkeypatch.setattr(publish, "capture", lambda command: (1, ""))
+
+        with pytest.raises(common.Die, match="authentication"):
+            publish.preflight_github()
+
+
 class TestMultipart:
     def test_encodes_metadata_and_file(self):
         boundary, body = publish._multipart({"metadata": "{}"}, "a.zip", b"PK\x03\x04")
@@ -145,6 +172,22 @@ class TestPublish:
         assert "Release type: release" in out
         assert "12.0.7" in out and "1.15.8" in out
         assert "https://example/CHANGELOG.md" in out
+
+    def test_preflight_checks_targets_and_uploads_nothing(self, published, monkeypatch):
+        checked = []
+
+        def forbidden(*args):
+            raise AssertionError("preflight must not upload")
+
+        monkeypatch.setattr(
+            publish, "preflight_curseforge", lambda *args: checked.append("cf")
+        )
+        monkeypatch.setattr(publish, "preflight_github", lambda: checked.append("gh"))
+        monkeypatch.setattr(publish, "upload_curseforge", forbidden)
+        monkeypatch.setattr(publish, "upload_github", forbidden)
+
+        assert publish.cmd_publish(preflight=True) == 0
+        assert checked == ["cf", "gh"]
 
     def test_missing_archive_dies(self, published):
         (published.build_root / "ItemVersion-1.2.3.zip").unlink()

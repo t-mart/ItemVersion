@@ -83,10 +83,16 @@ def publish_options(parser: argparse.ArgumentParser) -> None:
             "release goes everywhere, alpha and beta to curseforge only."
         ),
     )
-    parser.add_argument(
+    validation = parser.add_mutually_exclusive_group()
+    validation.add_argument(
         "--dry-run",
         action="store_true",
         help="print the plan and stop, uploading nothing",
+    )
+    validation.add_argument(
+        "--preflight",
+        action="store_true",
+        help="validate remote credentials and metadata, uploading nothing",
     )
     parser.add_argument(
         "--yes",

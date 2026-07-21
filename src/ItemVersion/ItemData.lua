@@ -1,11 +1,10 @@
--- Last updated: 2026-07-18T09:17:24.745328+00:00
+-- Last updated: 2026-07-21T22:20:40.233708+00:00
 --
 -- This is a generated file not meant to be edited by hand.
 -- If you need to make modifications, open an issue to discuss.
 --
--- Item-to-version data, run-length encoded. Item ids sorted ascending are covered by
--- contiguous runs, each sharing a single version. Item ids not covered by any run were
--- absent from the source, so a lookup of one finds nothing (exact semantics).
+-- Item-to-version data, run-length encoded. Item ids are covered by contiguous runs, 
+-- each sharing a single version. 
 --
 -- runStartDeltas[i] : run i's first item id relative to a running cursor. Reconstruct
 --                     absolute starts: pos=0; start=pos+delta; pos=start+length.

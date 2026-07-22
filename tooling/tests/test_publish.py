@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 from types import SimpleNamespace
 
@@ -206,19 +207,87 @@ class TestPublish:
 
     def test_release_uploads_to_both_targets(self, published, monkeypatch):
         uploaded = []
-        monkeypatch.setattr(publish, "upload_curseforge", lambda *a: uploaded.append("cf"))
-        monkeypatch.setattr(publish, "upload_github", lambda *a: uploaded.append("gh"))
+        monkeypatch.setattr(
+            publish, "upload_curseforge", lambda *a: uploaded.append("cf") or {}
+        )
+        monkeypatch.setattr(
+            publish, "upload_github", lambda *a: uploaded.append("gh") or {}
+        )
 
         assert publish.cmd_publish(yes=True) == 0
         assert uploaded == ["cf", "gh"]
 
     def test_alpha_uploads_to_curseforge_only(self, published, monkeypatch):
         uploaded = []
-        monkeypatch.setattr(publish, "upload_curseforge", lambda *a: uploaded.append("cf"))
-        monkeypatch.setattr(publish, "upload_github", lambda *a: uploaded.append("gh"))
+        monkeypatch.setattr(
+            publish, "upload_curseforge", lambda *a: uploaded.append("cf") or {}
+        )
+        monkeypatch.setattr(
+            publish, "upload_github", lambda *a: uploaded.append("gh") or {}
+        )
 
         assert publish.cmd_publish(type="alpha", yes=True) == 0
         assert uploaded == ["cf"]
+
+    def test_result_file_records_each_destination(self, published, monkeypatch, tmp_path):
+        result_file = tmp_path / "publish-result.json"
+        monkeypatch.setattr(
+            publish,
+            "upload_curseforge",
+            lambda *a: {
+                "file_id": 123,
+                "author_url": "https://authors.example/123",
+                "public_url": "https://curseforge.example/123",
+            },
+        )
+        monkeypatch.setattr(
+            publish,
+            "upload_github",
+            lambda *a: {"url": "https://github.example/releases/1.2.3"},
+        )
+
+        assert publish.cmd_publish(yes=True, result_file=result_file) == 0
+
+        result = json.loads(result_file.read_text(encoding="utf-8"))
+        assert result["version"] == "1.2.3"
+        assert result["targets"]["curseforge"] == {
+            "status": "published",
+            "file_id": 123,
+            "author_url": "https://authors.example/123",
+            "public_url": "https://curseforge.example/123",
+        }
+        assert result["targets"]["github"] == {
+            "status": "published",
+            "url": "https://github.example/releases/1.2.3",
+        }
+
+    def test_result_file_preserves_a_partial_publish(
+        self, published, monkeypatch, tmp_path
+    ):
+        result_file = tmp_path / "publish-result.json"
+        monkeypatch.setattr(
+            publish,
+            "upload_curseforge",
+            lambda *a: {"public_url": "https://curseforge.example/123"},
+        )
+
+        def fail_github(*args):
+            raise common.Die("GitHub failed")
+
+        monkeypatch.setattr(publish, "upload_github", fail_github)
+
+        with pytest.raises(common.Die, match="GitHub failed"):
+            publish.cmd_publish(yes=True, result_file=result_file)
+
+        result = json.loads(result_file.read_text(encoding="utf-8"))
+        assert result["targets"]["curseforge"] == {
+            "status": "published",
+            "public_url": "https://curseforge.example/123",
+        }
+        assert result["targets"]["github"] == {
+            "status": "error",
+            "message": "GitHub failed",
+        }
 
 
 class TestCfToken:

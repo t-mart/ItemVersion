@@ -30,6 +30,13 @@ on:
       candidate-branch:
         type: string
         required: true
+    outputs:
+      curseforge-url:
+        description: Published CurseForge file URL, when available
+        value: ${{ jobs.release.outputs.curseforge-url }}
+      github-url:
+        description: Published GitHub release URL, when available
+        value: ${{ jobs.release.outputs.github-url }}
 
 jobs:
   # Gate the release on the same checks we run on pull requests and master.
@@ -46,6 +53,9 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    outputs:
+      curseforge-url: ${{ steps.publication.outputs.curseforge-url }}
+      github-url: ${{ steps.publication.outputs.github-url }}
     steps:
       - name: Release info
         run: |
@@ -164,13 +174,65 @@ jobs:
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./dev publish --type release --yes
+        run: ./dev publish --type release --yes --result-file "$RUNNER_TEMP/publish-result.json"
 
       - name: Publish pre-release
         if: ${{ inputs.release-type == 'alpha' || inputs.release-type == 'beta' }}
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-        run: ./dev publish --type ${{ inputs.release-type }} --yes
+        run: ./dev publish --type ${{ inputs.release-type }} --yes --result-file "$RUNNER_TEMP/publish-result.json"
+
+      - name: Summarize publication
+        id: publication
+        if: ${{ always() && inputs.release-type != 'none' }}
+        continue-on-error: true
+        run: |
+          result="$RUNNER_TEMP/publish-result.json"
+          if [[ ! -s "$result" ]]; then
+            printf '## Publication\n\nNo structured publishing result was produced.\n' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if ! jq -e 'type == "object"' "$result" > /dev/null; then
+            printf '## Publication\n\nThe publishing result could not be read.\n' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          version=$(jq -r '.version // "unknown"' "$result")
+          {
+            echo "## Publication"
+            echo
+            echo "- Version: \`${version}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          curseforge_status=$(jq -r '.targets.curseforge.status // empty' "$result")
+          if [[ -n "$curseforge_status" ]]; then
+            curseforge_url=$(jq -r '.targets.curseforge.public_url // .targets.curseforge.author_url // empty' "$result")
+            author_url=$(jq -r '.targets.curseforge.author_url // empty' "$result")
+            if [[ "$curseforge_status" == "published" && -n "$curseforge_url" ]]; then
+              if [[ -n "$author_url" && "$author_url" != "$curseforge_url" ]]; then
+                echo "- CurseForge: [published file](${curseforge_url}) ([author dashboard](${author_url}))" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "- CurseForge: [published file](${curseforge_url})" >> "$GITHUB_STEP_SUMMARY"
+              fi
+              echo "curseforge-url=${curseforge_url}" >> "$GITHUB_OUTPUT"
+              echo "::notice title=CurseForge release::${curseforge_url}"
+            else
+              echo "- CurseForge: ${curseforge_status}" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          github_status=$(jq -r '.targets.github.status // empty' "$result")
+          if [[ -n "$github_status" ]]; then
+            github_url=$(jq -r '.targets.github.url // empty' "$result")
+            if [[ "$github_status" == "published" && -n "$github_url" ]]; then
+              echo "- GitHub: [release](${github_url})" >> "$GITHUB_STEP_SUMMARY"
+              echo "github-url=${github_url}" >> "$GITHUB_OUTPUT"
+              echo "::notice title=GitHub release::${github_url}"
+            else
+              echo "- GitHub: ${github_status}" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
 
       - name: Clean up candidate branch
         if: ${{ success() }}

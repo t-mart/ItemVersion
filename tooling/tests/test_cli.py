@@ -50,6 +50,12 @@ class TestCli:
         args = cli.build_parser().parse_args(["publish", "--preflight"])
         assert args.preflight is True
 
+    def test_publish_result_file_is_a_path(self):
+        args = cli.build_parser().parse_args(
+            ["publish", "--result-file", "publish-result.json"]
+        )
+        assert args.result_file == Path("publish-result.json")
+
     def test_publish_validation_modes_are_mutually_exclusive(self):
         with pytest.raises(SystemExit):
             cli.build_parser().parse_args(["publish", "--dry-run", "--preflight"])

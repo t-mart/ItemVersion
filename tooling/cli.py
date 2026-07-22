@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
 from calver import cmd_bump_calver
@@ -98,6 +99,11 @@ def publish_options(parser: argparse.ArgumentParser) -> None:
         "--yes",
         action="store_true",
         help="skip the confirmation prompt (for CI)",
+    )
+    parser.add_argument(
+        "--result-file",
+        type=Path,
+        help="write structured publishing progress and destination URLs to this file",
     )
 
 

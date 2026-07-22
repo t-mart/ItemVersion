@@ -10,6 +10,10 @@ Alpha and beta go to CurseForge only, make no git changes, and carry a timestamp
 their label so they sort after the release they were cut from. Nothing uploads until
 you have seen the plan: --dry-run prints it and stops, and without --yes there is a
 confirmation prompt.
+
+For automation, --result-file records each target before and after its upload. A
+failed command therefore leaves a machine-readable account of any target that may
+already have published successfully.
 """
 
 from __future__ import annotations
@@ -188,7 +192,7 @@ def cf_token() -> str:
     return token
 
 
-def upload_curseforge(config: Config, plan: Plan) -> None:
+def upload_curseforge(config: Config, plan: Plan) -> dict[str, object]:
     token = cf_token()
     catalog = _get_json(f"{CF_HOST}/api/game/versions", token)
     version_ids = resolve_version_ids(catalog, plan.version_names)
@@ -234,11 +238,19 @@ def upload_curseforge(config: Config, plan: Plan) -> None:
 
     if file_id is None:
         print("  (no file id in the response; check the project's files page)")
-        return
+        return {}
 
-    print(f"  Author URL: {authors_file_url(config.curseforge_project_id, file_id)}")
+    author_url = authors_file_url(config.curseforge_project_id, file_id)
+    print(f"  Author URL: {author_url}")
+    result: dict[str, object] = {
+        "file_id": file_id,
+        "author_url": author_url,
+    }
     if config.curseforge_project_slug:
-        print(f"  Public URL: {public_file_url(config.curseforge_project_slug, file_id)}")
+        public_url = public_file_url(config.curseforge_project_slug, file_id)
+        print(f"  Public URL: {public_url}")
+        result = {**result, "public_url": public_url}
+    return result
 
 
 def preflight_curseforge(config: Config, plan: Plan) -> None:
@@ -258,7 +270,7 @@ def preflight_github() -> None:
     print("  GitHub authentication is ready")
 
 
-def upload_github(plan: Plan) -> None:
+def upload_github(plan: Plan) -> dict[str, object]:
     require_tool("gh")
     # gh writes the new release's url to stdout; capture it so we can echo it plainly.
     failed, out = capture(
@@ -281,6 +293,39 @@ def upload_github(plan: Plan) -> None:
     url = out.strip()
     if url:
         print(f"  {url}")
+        return {"url": url}
+    return {}
+
+
+def initial_result(plan: Plan, targets: tuple[str, ...]) -> dict[str, object]:
+    return {
+        "version": plan.tag,
+        "release_type": plan.release_type,
+        "display_name": plan.display_name,
+        "archive": relative(plan.archive),
+        "targets": {target: {"status": "pending"} for target in targets},
+    }
+
+
+def with_target_result(
+    result: dict[str, object], target: str, target_result: dict[str, object]
+) -> dict[str, object]:
+    current_targets = result["targets"]
+    if not isinstance(current_targets, dict):
+        raise AssertionError("publish result targets must be an object")
+    return {
+        **result,
+        "targets": {**current_targets, target: target_result},
+    }
+
+
+def write_result(path: Path, result: dict[str, object]) -> None:
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        temporary.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def print_plan(plan: Plan, targets: tuple[str, ...], config: Config) -> None:
@@ -311,6 +356,7 @@ def cmd_publish(
     dry_run: bool = False,
     preflight: bool = False,
     yes: bool = False,
+    result_file: Path | None = None,
 ) -> int:
     config = load_config()
     targets = tuple(to) if to else default_targets(type)
@@ -330,6 +376,9 @@ def cmd_publish(
 
     print_plan(plan, targets, config)
 
+    if result_file is not None and (dry_run or preflight):
+        raise Die("--result-file is only available when publishing")
+
     if dry_run:
         return 0
     if preflight:
@@ -343,10 +392,38 @@ def cmd_publish(
         print("aborted, nothing uploaded", file=sys.stderr)
         return 1
 
+    result = initial_result(plan, targets)
+    if result_file is not None:
+        write_result(result_file, result)
+
     for target in targets:
-        if target == CURSEFORGE:
-            upload_curseforge(config, plan)
-        elif target == GITHUB:
-            upload_github(plan)
+        result = with_target_result(result, target, {"status": "publishing"})
+        if result_file is not None:
+            write_result(result_file, result)
+
+        try:
+            if target == CURSEFORGE:
+                details = upload_curseforge(config, plan)
+            elif target == GITHUB:
+                details = upload_github(plan)
+            else:
+                raise AssertionError(f"unknown publish target: {target}")
+        except Exception as error:
+            result = with_target_result(
+                result,
+                target,
+                {"status": "error", "message": str(error)},
+            )
+            if result_file is not None:
+                write_result(result_file, result)
+            raise
+
+        result = with_target_result(
+            result,
+            target,
+            {"status": "published", **details},
+        )
+        if result_file is not None:
+            write_result(result_file, result)
 
     return 0

@@ -113,6 +113,22 @@ class TestReleaseOrdering:
         assert "master-reconcile:refs/heads/master" in command
         assert "refs/tags/" in command
 
+    def test_publish_results_are_rendered_in_the_run_summary(self):
+        workflow = load_workflow("release.yml")
+        full = named_step(workflow, "release", "Publish full release")["run"]
+        prerelease = named_step(workflow, "release", "Publish pre-release")["run"]
+        summary = named_step(workflow, "release", "Summarize publication")
+
+        assert '--result-file "$RUNNER_TEMP/publish-result.json"' in full
+        assert '--result-file "$RUNNER_TEMP/publish-result.json"' in prerelease
+        assert "always()" in summary["if"]
+        assert "GITHUB_STEP_SUMMARY" in summary["run"]
+        assert "GITHUB_OUTPUT" in summary["run"]
+        assert workflow["jobs"]["release"]["outputs"] == {
+            "curseforge-url": "${{ steps.publication.outputs.curseforge-url }}",
+            "github-url": "${{ steps.publication.outputs.github-url }}",
+        }
+
 
 class TestRefreshRetry:
     def test_download_is_staged_and_an_unchanged_file_is_a_success(self):

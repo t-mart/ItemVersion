@@ -24,7 +24,7 @@ on:
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -68,24 +68,11 @@ jobs:
           mv selene stylua "$BIN/"
           echo "$BIN" >> "$GITHUB_PATH"
 
-      # WoW ships a customized PUC-Rio Lua 5.1, so the addon's busted suite (run by
-      # ./dev check) targets 5.1, not the system lua. These actions build that Lua,
-      # wire up luarocks against it, and put the busted launcher on PATH.
-      #
-      # Pinned like selene and stylua above: bump when the version you test with
-      # locally moves on.
-      - name: Install Lua 5.1
-        uses: leafo/gh-actions-lua@v13
-        with:
-          luaVersion: "5.1"
-
-      - name: Install luarocks
-        uses: leafo/gh-actions-luarocks@v6
-
-      - name: Install busted
-        env:
-          BUSTED_VERSION: "2.3.0"
-        run: luarocks install busted "$BUSTED_VERSION"
+      # WoW ships a customized PUC-Rio Lua 5.1, so the addon's suite targets 5.1.
+      # Noble provides binary packages for both Lua and Busted; using them avoids
+      # compiling Lua, LuaRocks, and Busted's native dependencies on every runner.
+      - name: Install Lua test runner
+        run: sudo apt-get install -y lua5.1 lua-busted
 
       - name: Check
         run: ./dev check

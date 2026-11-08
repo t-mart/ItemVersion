@@ -185,9 +185,10 @@ class TestCurrentInterfaces:
             "wow_classic": "50504",
             "wow_anniversary": "20506",
             "wow_classic_era": "11508",
+            "wow_classic_beta": "16001",
         }[product])
 
-        assert interfaces.current_interfaces() == "120007, 50504, 20506, 11508"
+        assert interfaces.current_interfaces() == "120007, 50504, 20506, 11508, 16001"
 
     def test_covers_the_products_the_toc_lists(self):
         # The TOC and WOW_PRODUCTS have to stay the same length, or the Interface

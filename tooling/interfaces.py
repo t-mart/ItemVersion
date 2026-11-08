@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 import urllib.request
-from typing import Iterable
+from collections.abc import Iterable
 
 from common import Die, relative
 from config import load_config
@@ -15,7 +15,7 @@ from toc import set_toc_field, toc_field
 VERSIONS_URL = "http://us.patch.battle.net:1119/{product}/versions"
 
 # The products the addon supports, in the order the TOC lists their interfaces.
-WOW_PRODUCTS = ("wow", "wow_classic", "wow_anniversary", "wow_classic_era")
+WOW_PRODUCTS = ("wow", "wow_classic", "wow_anniversary", "wow_classic_era", "wow_classic_beta")
 
 REGION = "us"
 

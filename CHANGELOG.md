@@ -7,6 +7,10 @@ update the item database.
 
 ## Unreleased
 
+## 2026.45.0
+
+- Add Forever support
+
 ## 2026.28.2
 
 - Show the version line on the item comparison tooltips (the "currently equipped"

@@ -41,6 +41,7 @@ FLAVOR_DIRS = {
     "classic-era": "_classic_era_",
     "classic": "_classic_",
     "anniversary": "_anniversary_",
+    "forever": "_forever_",
 }
 
 # Directory names, in a stable order, for the commands that touch every flavor.

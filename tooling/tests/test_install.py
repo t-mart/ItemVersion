@@ -235,6 +235,18 @@ class TestInstall:
         assert not install.target_for(installed, "_classic_era_", NAME).exists()
         assert not install.target_for(installed, "_anniversary_", NAME).exists()
 
+    def test_forever_installs_only_into_forever(self, installed):
+        import cli
+
+        assert cli.main(["install", "--flavor", "forever"]) == 0
+
+        target = install.target_for(installed, "_forever_", NAME)
+        assert target.is_symlink()
+        assert target.resolve() == install.load_config().source_dir.resolve()
+        for flavor in install.FLAVORS:
+            if flavor != "_forever_":
+                assert not install.target_for(installed, flavor, NAME).exists()
+
 
 class TestSelectedFlavors:
     def test_no_selection_means_every_flavor(self):
